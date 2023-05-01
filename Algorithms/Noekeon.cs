@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Algorithms;
 
 
-
+/*Algoritma tamamlanmıştır.*/
 /*
 
 Substitution (Yerine Koyma):
