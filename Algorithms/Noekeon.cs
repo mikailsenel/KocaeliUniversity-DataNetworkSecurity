@@ -46,7 +46,10 @@ public class Noekeon: EncryptionAlgorithm
         uint c = BitConverter.ToUInt32(outputData, 8);
         uint d = BitConverter.ToUInt32(outputData, 12);
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
         Permutation(ref a, ref b, ref c, ref d);
         outputData = BitConverter.GetBytes(a).Concat(BitConverter.GetBytes(b)).Concat(BitConverter.GetBytes(c)).Concat(BitConverter.GetBytes(d)).ToArray();
         AddStep("Permutasyon sonrasi data..", BitConverter.ToString(outputData));
@@ -98,6 +101,7 @@ public class Noekeon: EncryptionAlgorithm
             output[i] = sbox[input[i]];
         }
         return output;
+<<<<<<< HEAD
     }
     public void Permutation(ref uint a, ref uint b, ref uint c, ref uint d)
     {
@@ -134,6 +138,44 @@ public class Noekeon: EncryptionAlgorithm
 
     public void XOR(ref uint a, ref uint b, ref uint c, ref uint d, uint[] key) //xor fonksiyonu
     {
+=======
+    }
+    public void Permutation(ref uint a, ref uint b, ref uint c, ref uint d)
+    {
+        const uint delta = 0x9E3779B9; // Altin oran
+        uint tmp;
+        for (int i = 0; i < 4; i++)
+        {
+            // Theta Adimi
+            a += c; c ^= b; c = (c << 16) | (c >> 16);
+            b += d; d ^= a; d = (d << 12) | (d >> 20);
+            a += b; b ^= c; b = (b << 8) | (b >> 24);
+            c += d; d ^= a; d = (d << 7) | (d >> 25);
+
+            // Pi adimi
+            tmp = a; a = b; b = c; c = d; d = tmp;
+
+            // Gamma adimi
+            a = (a << 1) | (a >> 31);
+            b = (b << 2) | (b >> 30);
+            c = (c << 3) | (c >> 29);
+            d = (d << 5) | (d >> 27);
+
+            // Theta adimi
+            a += c; c ^= b; c = (c << 16) | (c >> (32 - 16));
+            b += d; d ^= a; d = (d << 12) | (d >> 20);
+            a += b; b ^= c; b = (b << 8) | (b >> 24);
+            c += d; d ^= a; d = (d << 7) | (d >> 25);
+
+            // Key zamanlama
+            a ^= delta;
+        }
+
+    }
+
+    public void XOR(ref uint a, ref uint b, ref uint c, ref uint d, uint[] key) //xor fonksiyonu
+    {
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
         a ^= key[0];
         b ^= key[1];
         c ^= key[2];
@@ -149,6 +191,7 @@ public class Noekeon: EncryptionAlgorithm
     }
 
 }
+<<<<<<< HEAD
 <<<<<<< HEAD
     
    public  void XOR(ref uint a, ref uint b, ref uint c, ref uint d, uint[] key) //xor fonksiyonu
@@ -174,3 +217,5 @@ public class Noekeon: EncryptionAlgorithm
 
 =======
 >>>>>>> 538c252effd4caed75e69343b417da63bf31744c
+=======
+>>>>>>> 538c252 (Call of algorithms over dashboard.)

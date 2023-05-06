@@ -5,13 +5,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 <<<<<<< HEAD
+<<<<<<< HEAD
 using System.Text;
 =======
+=======
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
 using Algorithms.Common.DataTransferObjects;
 using System;
 using System.Reflection.Metadata;
 using Algorithms.Common.Abstract;
+<<<<<<< HEAD
 >>>>>>> 538c252effd4caed75e69343b417da63bf31744c
+=======
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
 /*Algoritma tamamlanmıştır.*/
 namespace Algorithms;
 
@@ -21,6 +27,7 @@ public class Mysterion : EncryptionAlgorithm
     private static uint[]? _key;
     private static uint[]? _state;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
         public void Initial(string input)
         {
@@ -82,6 +89,23 @@ public static string GetBinaryString(byte[] data)
         AddStep( "Encrypted", BitConverter.ToString(encrypted));
         Console.WriteLine("Encrypted: " + BitConverter.ToString(encrypted));
     }
+=======
+    public Mysterion(string text) : base(text)
+    {
+    }
+
+    protected override void Initial(string input)
+    {
+        byte[] data = System.Text.Encoding.UTF8.GetBytes(input);
+        AddStep( "Şifrelenecek girdi texti", BitConverter.ToString(data));
+        Console.WriteLine("Şifrelenecek girdi texti :" + BitConverter.ToString(data));
+        byte[] key = new byte[] { 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0 };
+
+        byte[] encrypted = Encrypt(data, key);
+        AddStep( "Encrypted", BitConverter.ToString(encrypted));
+        Console.WriteLine("Encrypted: " + BitConverter.ToString(encrypted));
+    }
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
 
     public byte[] Encrypt(byte[] data, byte[] key)
     {
@@ -101,7 +125,10 @@ public static string GetBinaryString(byte[] data)
     }
 
     private void Initialize(byte[] key)
+<<<<<<< HEAD
 >>>>>>> 538c252effd4caed75e69343b417da63bf31744c
+=======
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
     {
         _key = new uint[8];
         _state = new uint[8];
@@ -150,10 +177,14 @@ public static string GetBinaryString(byte[] data)
             }
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
         
 =======
         AddStep($"Get Blok içeriği {blockIndex}", $" {BitConverter.ToString(BitConverter.GetBytes(block[0]))}-{BitConverter.ToString(BitConverter.GetBytes(block[1]))}");
 >>>>>>> 538c252effd4caed75e69343b417da63bf31744c
+=======
+        AddStep($"Get Blok içeriği {blockIndex}", $" {BitConverter.ToString(BitConverter.GetBytes(block[0]))}-{BitConverter.ToString(BitConverter.GetBytes(block[1]))}");
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
         Console.WriteLine($"Get Blok içeriği {blockIndex}: {BitConverter.ToString(BitConverter.GetBytes(block[0]))}-{BitConverter.ToString(BitConverter.GetBytes(block[1]))}");
         
         return block;
@@ -189,6 +220,7 @@ public static string GetBinaryString(byte[] data)
         _state[7] = _state[7];
         _state[7] = t;
     }
+<<<<<<< HEAD
 <<<<<<< HEAD
     uint t = _state[0];
     _state[0] = _state[1];
@@ -236,6 +268,8 @@ private static void DecryptBlock(uint[] block)
 
 =======
 >>>>>>> 538c252effd4caed75e69343b417da63bf31744c
+=======
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
 }
 
 

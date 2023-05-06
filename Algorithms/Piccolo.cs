@@ -12,6 +12,7 @@ namespace Algorithms
     public class Piccolo : EncryptionAlgorithm
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
    public void Initial(string input)
 {
     byte[] key = new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
@@ -48,6 +49,9 @@ namespace Algorithms
 =======
         public Piccolo(string text) : base(text)
 >>>>>>> 538c252effd4caed75e69343b417da63bf31744c
+=======
+        public Piccolo(string text) : base(text)
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
         {
 
         }
@@ -68,14 +72,20 @@ namespace Algorithms
             Console.WriteLine("S-box Çıktısı: " + BitConverter.ToString(sBoxOutput).Replace("-", ""));
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     Console.WriteLine("Şifrelenmiş Metin: " + BitConverter.ToString(state).Replace("-", ""));
     Console.WriteLine("Şifrelenmiş Metin Çıktısı binary gösterimi: " + GetBinaryString(state));
 =======
+=======
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
             // P-box'ı düz metne uygula
             byte[] pBoxOutput = ApplyPBox(plaintext);
             AddStep("P-box Çktısı: " , BitConverter.ToString(pBoxOutput).Replace("-", ""));
             Console.WriteLine("P-box Çktısı: " + BitConverter.ToString(pBoxOutput).Replace("-", ""));
+<<<<<<< HEAD
 >>>>>>> 538c252effd4caed75e69343b417da63bf31744c
+=======
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
 
             // Round key üret
             byte[][] roundKeys = GenerateRoundKeys(key);
@@ -130,6 +140,7 @@ namespace Algorithms
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     Console.WriteLine("Şifrelenmiş key'in çıktısı: " + BitConverter.ToString(state));
   
     return state;
@@ -155,6 +166,10 @@ namespace Algorithms
         // Piccolo şifreleme fonksiyonu
         public  byte[] Encrypt(byte[] key, byte[] plaintext)
 >>>>>>> 538c252effd4caed75e69343b417da63bf31744c
+=======
+        // Piccolo şifreleme fonksiyonu
+        public  byte[] Encrypt(byte[] key, byte[] plaintext)
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
         {
             if (key == null || key.Length != 8)
                 throw new ArgumentException("Geçersiz key boyutu:  8 byte olmalı");
@@ -247,6 +262,7 @@ namespace Algorithms
             int shift = bits % 8;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         return output;
     }
 
@@ -262,6 +278,8 @@ namespace Algorithms
 }
 }
 =======
+=======
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
             for (int i = 0; i < input.Length - bytes; i++)
             {
                 int newIndex = (i + input.Length - bytes) % input.Length;
@@ -274,7 +292,10 @@ namespace Algorithms
 
             return output;
         }
+<<<<<<< HEAD
 >>>>>>> 538c252effd4caed75e69343b417da63bf31744c
+=======
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
 
     }
 

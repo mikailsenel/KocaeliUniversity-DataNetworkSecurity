@@ -12,6 +12,7 @@ public class Present : EncryptionAlgorithm
     {
 
 <<<<<<< HEAD
+<<<<<<< HEAD
        public void Initial(string input)
         {
 =======
@@ -51,6 +52,23 @@ private readonly byte[] SBox = {
         0x3, 0xE, 0xF, 0x8, 0x4, 0x7, 0x1, 0x2
     };
 =======
+=======
+    }
+
+    protected override void Initial(string input)
+    {
+        // Anahtar 32 byte
+        byte[] key = new byte[32] { 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0 };
+
+        // Şifrelenecek Data
+        byte[] plaintext = System.Text.Encoding.ASCII.GetBytes(input);
+        AddStep("Girilen Metin: " , BitConverter.ToString(plaintext));
+        Console.WriteLine("Girilen Metin: " + BitConverter.ToString(plaintext));
+        byte[] ciphertext = Encrypt(plaintext, key);
+
+        // Print the results
+
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
         AddStep("Şifrelenmiş Metin: " , BitConverter.ToString(ciphertext));
         Console.WriteLine("Şifrelenmiş Metin: " + BitConverter.ToString(ciphertext));
 
@@ -59,7 +77,10 @@ private readonly byte[] SBox = {
     0xC, 0x5, 0x6, 0xB, 0x9, 0x0, 0xA, 0xD,
     0x3, 0xE, 0xF, 0x8, 0x4, 0x7, 0x1, 0x2
 };
+<<<<<<< HEAD
 >>>>>>> 538c252effd4caed75e69343b417da63bf31744c
+=======
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
     private readonly byte[] PBox = {
     0, 16, 32, 48, 1, 17, 33, 49,
     2, 18, 34, 50, 3, 19, 35, 51,
@@ -145,6 +166,7 @@ private readonly byte[] SBox = {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     Console.WriteLine("Substitution sonucu: " + Substitution(result[result.Length - 8]));
     ulong value = Substitution(result[result.Length - 8]);
 string binaryString = Convert.ToString((long)value, 2);
@@ -165,6 +187,10 @@ private ulong Substitution(ulong block)
 
     private ulong Substitution(ulong block)
 >>>>>>> 538c252effd4caed75e69343b417da63bf31744c
+=======
+
+    private ulong Substitution(ulong block)
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
     {
         ulong result = 0;
         for (int i = 0; i < 64; i += 4)
@@ -173,6 +199,7 @@ private ulong Substitution(ulong block)
             nibble = SBox[nibble];
             result |= (ulong)nibble << i;
         }
+<<<<<<< HEAD
 
         return result;
     }
@@ -267,10 +294,28 @@ private ulong PermutationInverse(ulong block)
     {
         ulong bit = (block >> PBox[i]) & 1;
         result |= bit << i;
+=======
+
+        return result;
     }
-    return result;
+
+    private ulong Permutation(ulong block)
+    {
+        ulong result = 0;
+        for (int i = 0; i < 64; i++)
+        {
+            ulong bit = (block >> i) & 1;
+            result |= bit << PBox[i];
+        }
+        return result;
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
+    }
+
+
+
 }
 
+<<<<<<< HEAD
     }
 
     }
@@ -281,3 +326,8 @@ private ulong PermutationInverse(ulong block)
 
 
 >>>>>>> 538c252effd4caed75e69343b417da63bf31744c
+=======
+
+
+
+>>>>>>> 538c252 (Call of algorithms over dashboard.)
