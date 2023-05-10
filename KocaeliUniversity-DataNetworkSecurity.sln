@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33502.453
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication", "ConsoleApplication\ConsoleApplication.csproj", "{0B17A1E2-9C8A-459E-B9FD-E1B33E110871}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApplication", "ConsoleApplication\ConsoleApplication.csproj", "{0B17A1E2-9C8A-459E-B9FD-E1B33E110871}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algorithms", "Algorithms\Algorithms.csproj", "{BDC57B6D-3D45-43FE-903B-54C01B085459}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algorithms", "Algorithms\Algorithms.csproj", "{BDC57B6D-3D45-43FE-903B-54C01B085459}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dashboard", "Dashboard\Dashboard.csproj", "{1F5AF440-AA8C-4512-9593-2638E29E2A97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{BDC57B6D-3D45-43FE-903B-54C01B085459}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDC57B6D-3D45-43FE-903B-54C01B085459}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDC57B6D-3D45-43FE-903B-54C01B085459}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F5AF440-AA8C-4512-9593-2638E29E2A97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F5AF440-AA8C-4512-9593-2638E29E2A97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F5AF440-AA8C-4512-9593-2638E29E2A97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F5AF440-AA8C-4512-9593-2638E29E2A97}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
