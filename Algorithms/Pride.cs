@@ -18,7 +18,6 @@ public class Pride : EncryptionAlgorithm
     }
 
 <<<<<<< HEAD
-<<<<<<< HEAD
     // Düz metni ve anahtarı ekrana yazdırın
     Console.WriteLine("Düz metin: " + plaintext);
     byte[] plaintextBytes = Encoding.ASCII.GetBytes(plaintext);
@@ -89,47 +88,6 @@ public class Pride : EncryptionAlgorithm
         // Düz metnin byte dizisine dönüştürülmesi
         byte[] plaintextBytes = Encoding.UTF8.GetBytes(plaintext);
 
-=======
-    protected override void Initial(string plaintext)
-    {
-        // Düz metin ve anahtarı belirleyin
-        //string plaintext = "This is a secret message";
-        string key = "mysecretkey";
-
-        // Düz metni ve anahtarı ekrana yazdırın
-        AddStep("Düz metin: ", plaintext);
-        Console.WriteLine("Düz metin: " + plaintext);
-        AddStep("Anahtar: ", key);
-        Console.WriteLine("Anahtar: " + key);
-
-        // PrideCipher algoritmasını kullanarak düz metni şifreleyin
-        string ciphertext = Encrypt(plaintext, key);
-
-        // Şifreli metni ekrana yazdırın
-        AddStep("Şifreli metin: ", ciphertext);
-        Console.WriteLine("Şifreli metin: " + ciphertext);
-
-        // Şifreli metni aynı anahtar kullanarak çözün
-        string decryptedText = Decrypt(ciphertext, key);
-
-        // Çözülmüş düz metni ekrana yazdırın
-        AddStep("Çözülmüş metin: ", decryptedText);
-        Console.WriteLine("Çözülmüş metin: " + decryptedText);
-
-    }
-
-    public string Encrypt(string plaintext, string key)
-    {
-        // Anahtarın byte dizisine dönüştürülmesi
-        byte[] keyBytes = Encoding.UTF8.GetBytes(key);
-
-        // Keystream'in oluşturulması
-        byte[] keystream = GenerateKeystream(keyBytes, plaintext.Length);
-
-        // Düz metnin byte dizisine dönüştürülmesi
-        byte[] plaintextBytes = Encoding.UTF8.GetBytes(plaintext);
-
->>>>>>> 538c252 (Call of algorithms over dashboard.)
         // Düz metnin keystream ile XOR işlemine tabi tutulması
         byte[] ciphertextBytes = new byte[plaintextBytes.Length];
         for (int i = 0; i < plaintextBytes.Length; i++)
@@ -137,7 +95,6 @@ public class Pride : EncryptionAlgorithm
             ciphertextBytes[i] = (byte)(plaintextBytes[i] ^ keystream[i]);
         }
 
-<<<<<<< HEAD
 <<<<<<< HEAD
     // Şifreli metnin Base64 formatında string'e dönüştürülmesi
     return Convert.ToBase64String(ciphertextBytes);
@@ -173,10 +130,6 @@ public static string Decrypt(string ciphertext, string key)
         // Şifreli metnin Base64 formatında string'e dönüştürülmesi
         return Convert.ToBase64String(ciphertextBytes);
 >>>>>>> 538c252effd4caed75e69343b417da63bf31744c
-=======
-        // Şifreli metnin Base64 formatında string'e dönüştürülmesi
-        return Convert.ToBase64String(ciphertextBytes);
->>>>>>> 538c252 (Call of algorithms over dashboard.)
     }
 
     public string Decrypt(string ciphertext, string key)
