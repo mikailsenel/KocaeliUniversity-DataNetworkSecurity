@@ -31,6 +31,7 @@ public class Mysterion : EncryptionAlgorithm
         byte[] encrypted = Encrypt(data, key);
         AddStep( "Encrypted", BitConverter.ToString(encrypted));
         Console.WriteLine("Encrypted: " + BitConverter.ToString(encrypted));
+
     }
 
     public byte[] Encrypt(byte[] data, byte[] key)
