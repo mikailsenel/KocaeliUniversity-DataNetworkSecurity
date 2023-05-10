@@ -49,6 +49,7 @@ public class Noekeon: EncryptionAlgorithm
         uint c = BitConverter.ToUInt32(outputData, 8);
         uint d = BitConverter.ToUInt32(outputData, 12);
 
+
         Permutation(ref a, ref b, ref c, ref d);
         outputData = BitConverter.GetBytes(a).Concat(BitConverter.GetBytes(b)).Concat(BitConverter.GetBytes(c)).Concat(BitConverter.GetBytes(d)).ToArray();
         AddStep("Permutasyon sonrasi data..", BitConverter.ToString(outputData));
