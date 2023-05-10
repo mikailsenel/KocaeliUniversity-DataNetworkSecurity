@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
-
+using System.Text;
 namespace Algorithms;
-
 
 /*Algoritma tamamlanmıştır.*/
 /*
@@ -18,7 +16,6 @@ Permütasyon işlevi, sabit bir permütasyon kuralları kümesine dayalı olarak
 Anahtar Ekleme:
 XOR ve Toplama işlevleri, temel toplama adımını uygular. Giriş sözcükleri ile orijinal anahtardan türetilen bir anahtar arasında (sırasıyla) bir XOR işlemi ve bir toplama işlemi gerçekleştirirler.
 
-
 */
 
     public class Noekeon
@@ -30,12 +27,14 @@ XOR ve Toplama işlevleri, temel toplama adımını uygular. Giriş sözcükleri
 // Ornek input data
     byte[] inputData = new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, }; //16 bit input data giriş yapılıyor
     Console.WriteLine("Girdi Metin datasi..: " + BitConverter.ToString(inputData));
+    Console.WriteLine("Girdi Metin verisi Binary: " + GetBinaryString(inputData));
     // Ornek key
     uint[] key = new uint[] { 0x01234567, 0x89ABCDEF, 0xFEDCBA98, 0x76543210 }; //128 bit data
 
     // Yerine Koyma Islemi
     byte[] outputData = Substitution(inputData);
     Console.WriteLine("Yerine koyma islemi sonrasi data..: " + BitConverter.ToString(outputData));
+    Console.WriteLine("Yerine Koyma işlemi sonrası binary gösterimi: " + GetBinaryString(outputData));
     // Permutasyon işlemi
     uint a = BitConverter.ToUInt32(outputData, 0);
     uint b = BitConverter.ToUInt32(outputData, 4);
@@ -45,6 +44,7 @@ XOR ve Toplama işlevleri, temel toplama adımını uygular. Giriş sözcükleri
     Permutation(ref a, ref b, ref c, ref d);
     outputData = BitConverter.GetBytes(a).Concat(BitConverter.GetBytes(b)).Concat(BitConverter.GetBytes(c)).Concat(BitConverter.GetBytes(d)).ToArray();
     Console.WriteLine("Permutasyon sonrasi data..: " + BitConverter.ToString(outputData));
+    Console.WriteLine("Permutasyon sonrası data Binary Gösterimi: " + GetBinaryString(outputData));
     //  XOR ve Toplama Islemi
     a = BitConverter.ToUInt32(outputData, 0);
     b = BitConverter.ToUInt32(outputData, 4);
@@ -54,15 +54,32 @@ XOR ve Toplama işlevleri, temel toplama adımını uygular. Giriş sözcükleri
     XOR(ref a, ref b, ref c, ref d, key);
     byte[] xordata = BitConverter.GetBytes(a).Concat(BitConverter.GetBytes(b)).Concat(BitConverter.GetBytes(c)).Concat(BitConverter.GetBytes(d)).ToArray();
     Console.WriteLine("Xor sonrasi data..: " + BitConverter.ToString(xordata));
+    Console.WriteLine("XOR sonrası data Binary Gösterimi: " + GetBinaryString(xordata));
     
     Addition(ref a, ref b, ref c, ref d, key);
 byte[] addition = BitConverter.GetBytes(a).Concat(BitConverter.GetBytes(b)).Concat(BitConverter.GetBytes(c)).Concat(BitConverter.GetBytes(d)).ToArray();
     Console.WriteLine("Toplama sonrasi data..: " + BitConverter.ToString(addition));
+    Console.WriteLine("Toplama sonrasi data binary gösterimi: " + GetBinaryString(addition));
     // Cıktı sonucu
     
     Console.WriteLine(" Sifrelenmiş data..: " + BitConverter.ToString(outputData));
+    Console.WriteLine("Sifrelenmiş data binary gösterimi: " + GetBinaryString(outputData));
+     
+            
+            
+            
 
     }
+    public static string GetBinaryString(byte[] data)
+{
+    StringBuilder binaryString = new StringBuilder();
+    foreach (byte b in data)
+    {
+        string binary = Convert.ToString(b, 2).PadLeft(8, '0');
+        binaryString.Append(binary);
+    }
+    return binaryString.ToString();
+}
     
     public  byte[] Substitution(byte[] input)
 {
@@ -139,5 +156,9 @@ public  void Permutation(ref uint a, ref uint b, ref uint c, ref uint d)
     c += key[1];
     d += key[2];
 }
+
+
     
     }
+
+

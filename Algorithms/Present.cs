@@ -1,13 +1,12 @@
 using System;
 using System.Security.Cryptography;
-
+using System.Text;
 /*Algoritma tamamlanmıştır*/
 
 namespace Algorithms
 {
     public class Present 
     {
-
 
        public void Initial(string input)
         {
@@ -21,11 +20,15 @@ namespace Algorithms
             // Şifrelenecek Data
             byte[] plaintext = System.Text.Encoding.ASCII.GetBytes("Merhaba Dunya");
             Console.WriteLine("Girilen Metin: " + BitConverter.ToString(plaintext));
+             Console.WriteLine("Girilen Metin Binary Gösterimi: " + GetBinaryString(plaintext));
             byte[] ciphertext = present.Encrypt(plaintext, key);
-
+            byte[] decryptedData = present.Decrypt(ciphertext, key);
             // Print the results
             
             Console.WriteLine("Şifrelenmiş Metin: " + BitConverter.ToString(ciphertext));
+             Console.WriteLine("Şifrelenmiş Metin Binary Gösterimi: " + GetBinaryString(ciphertext));
+            Console.WriteLine("Decrypted Metin: " + BitConverter.ToString(decryptedData));
+            Console.WriteLine("Decrypted Metin Binary Gösterimi: " + GetBinaryString(ciphertext));
           
         }
 private readonly byte[] SBox = {
@@ -109,11 +112,16 @@ public byte[] Encrypt(byte[] data, byte[] key)
     }
 
     Console.WriteLine("Substitution sonucu: " + Substitution(result[result.Length - 8]));
-    Console.WriteLine("Permutation sonucu: " + Permutation(result[result.Length - 8]));
+    ulong value = Substitution(result[result.Length - 8]);
+string binaryString = Convert.ToString((long)value, 2);
+Console.WriteLine("Substitution sonucu Binary Gösterimi : " + binaryString);
+Console.WriteLine("Permutation sonucu:" + Permutation(result[result.Length - 8]));
+    ulong value1 = Permutation(result[result.Length - 8]);
+   string binaryString1 = Convert.ToString((long)value, 2);
+    Console.WriteLine("Permutation sonucu Binary Gösterimi: " + binaryString1);
 
     return result;
 }
-
 
 private ulong Substitution(ulong block)
 {
@@ -138,11 +146,88 @@ private ulong Substitution(ulong block)
     }
     return result;
 }
+  public static string GetBinaryString(byte[] data)
+{
+    StringBuilder binaryString = new StringBuilder();
+    foreach (byte b in data)
+    {
+        string binary = Convert.ToString(b, 2).PadLeft(8, '0');
+        binaryString.Append(binary);
+    }
+    return binaryString.ToString();
+}
 
+public byte[] Decrypt(byte[] data, byte[] key)
+{
+    uint[] roundKeys = GenerateRoundKeys(key);
+    int length = data.Length;
 
-
+    byte[] result = new byte[length];
+    for (int i = 0; i < length; i += 8)
+    {
+        ulong block = BitConverter.ToUInt64(data, i);
+        block = block ^ roundKeys[31];
+        for (int j = 30; j >= 0; j--)
+        {
+            block = PermutationInverse(block);
+            block = SubstitutionInverse(block);
+            block = block ^ roundKeys[j];
+        }
+        block = PermutationInverse(block);
+        Array.Copy(BitConverter.GetBytes(block), 0, result, i, 8);
     }
 
+    int padding = result[length - 1];
+    if (padding > 0 && padding < 9)
+    {
+        bool validPadding = true;
+        for (int i = length - padding; i < length; i++)
+        {
+            if (result[i] != padding)
+            {
+                validPadding = false;
+                break;
+            }
+        }
+
+        if (validPadding)
+        {
+            byte[] unpaddedResult = new byte[length - padding];
+            Array.Copy(result, unpaddedResult, length - padding);
+            result = unpaddedResult;
+        }
+    }
+
+    return result;
+}
+
+private ulong SubstitutionInverse(ulong block)
+{
+    ulong result = 0;
+    for (int i = 0; i < 64; i += 4)
+    {
+        byte nibble = (byte)((block >> i) & 0xF);
+       nibble = (byte)Array.IndexOf(SBox, nibble);
+        result |= (ulong)nibble << i;
+    }
+
+    return result;
+}
+
+private ulong PermutationInverse(ulong block)
+{
+    ulong result = 0;
+    for (int i = 0; i < 64; i++)
+    {
+        ulong bit = (block >> PBox[i]) & 1;
+        result |= bit << i;
+    }
+    return result;
+}
+
+    }
 
     }
     
+
+ 

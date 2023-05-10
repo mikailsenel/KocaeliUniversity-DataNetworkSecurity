@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-/*Algoritma tamamlanmıştır.*/
+using System.Text;
+
+/*Algoritma tamamlanmıştır. Algoritmanın Deşifreleme Adımı Yoktur*/
 namespace Algorithms
 {
     public class Piccolo
@@ -12,6 +14,7 @@ namespace Algorithms
     byte[] key = new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
     byte[] plaintext = new byte[] { 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
     Console.WriteLine("Şifrelenecek Metin: " + BitConverter.ToString(plaintext).Replace("-", ""));
+    Console.WriteLine("Şifrelenecek Metin binary gösterimi: " + GetBinaryString(plaintext));
     // Düz metnin her baytına S-box uygula
     byte[] sBoxOutput = new byte[8];
     for (int i = 0; i < 8; i++)
@@ -19,10 +22,13 @@ namespace Algorithms
         sBoxOutput[i] = sBox[plaintext[i] % 16];
     }
     Console.WriteLine("S-box Çıktısı: " + BitConverter.ToString(sBoxOutput).Replace("-", ""));
+    Console.WriteLine("S-box Çıktısı binary gösterimi: " + GetBinaryString(sBoxOutput));
+    
 
     // P-box'ı düz metne uygula
     byte[] pBoxOutput = ApplyPBox(plaintext);
     Console.WriteLine("P-box Çktısı: " + BitConverter.ToString(pBoxOutput).Replace("-", ""));
+    Console.WriteLine("P-box Çıktısı binary gösterimi: " + GetBinaryString(pBoxOutput));
 
     // Round key üret
     byte[][] roundKeys = GenerateRoundKeys(key);
@@ -45,6 +51,7 @@ namespace Algorithms
     }
 
     Console.WriteLine("Şifrelenmiş Metin: " + BitConverter.ToString(state).Replace("-", ""));
+    Console.WriteLine("Şifrelenmiş Metin Çıktısı binary gösterimi: " + GetBinaryString(state));
 
 }// Substitution kutusu (S-box)  Piccolo şifreleme algoritması için
 private static readonly byte[] sBox = {
@@ -106,6 +113,7 @@ private static byte[] ApplyPBox(byte[] state)
     }
 
     Console.WriteLine("Şifrelenmiş key'in çıktısı: " + BitConverter.ToString(state));
+  
     return state;
 }
 
@@ -180,6 +188,17 @@ private static byte[] Xor(byte[] a, byte[] b)
 
         return output;
     }
+
+        public static string GetBinaryString(byte[] data)
+{
+    StringBuilder binaryString = new StringBuilder();
+    foreach (byte b in data)
+    {
+        string binary = Convert.ToString(b, 2).PadLeft(8, '0');
+        binaryString.Append(binary);
+    }
+    return binaryString.ToString();
+}
 }
 
     }

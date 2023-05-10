@@ -21,22 +21,33 @@ public void Initial(string input)
 
     // Düz metni ve anahtarı ekrana yazdırın
     Console.WriteLine("Düz metin: " + plaintext);
+    byte[] plaintextBytes = Encoding.ASCII.GetBytes(plaintext);
+    string binaryString = GetBinaryString(plaintextBytes);
+    Console.WriteLine("Düz metin Binary Gösterimi: " + binaryString);
+      
     Console.WriteLine("Anahtar: " + key);
-
+    byte[] keyBytes = Encoding.ASCII.GetBytes(key);
+    string binaryString1 = GetBinaryString(keyBytes);
+    Console.WriteLine("Düz metin Binary Gösterimi: " + binaryString1);
     // PrideCipher algoritmasını kullanarak düz metni şifreleyin
     string ciphertext = Pride.Encrypt(plaintext, key);
 
     // Şifreli metni ekrana yazdırın
     Console.WriteLine("Şifreli metin: " + ciphertext);
+    byte[] ciphertextBytes = Encoding.ASCII.GetBytes(ciphertext);
+    string binaryString2 = GetBinaryString(ciphertextBytes);
+    Console.WriteLine("Şifreli metin Binary Gösterimi: " + binaryString2);
 
     // Şifreli metni aynı anahtar kullanarak çözün
     string decryptedText = Pride.Decrypt(ciphertext, key);
 
     // Çözülmüş düz metni ekrana yazdırın
     Console.WriteLine("Çözülmüş metin: " + decryptedText);
+    byte[] decryptedTextBytes = Encoding.ASCII.GetBytes(decryptedText);
+    string binaryString3 = GetBinaryString(decryptedTextBytes);
+    Console.WriteLine("Çözülmüş metin Binary Gösterimi: " + binaryString3);
 
-    // Konsolu kapatmak için kullanıcı girişini bekleyin
-    Console.ReadLine();
+    
 }
 
 
@@ -63,6 +74,16 @@ public static string Encrypt(string plaintext, string key)
 
     // Şifreli metnin Base64 formatında string'e dönüştürülmesi
     return Convert.ToBase64String(ciphertextBytes);
+}
+public static string GetBinaryString(byte[] data)
+{
+    StringBuilder binaryString = new StringBuilder();
+    foreach (byte b in data)
+    {
+        string binary = Convert.ToString(b, 2).PadLeft(8, '0');
+        binaryString.Append(binary);
+    }
+    return binaryString.ToString();
 }
 
 public static string Decrypt(string ciphertext, string key)
