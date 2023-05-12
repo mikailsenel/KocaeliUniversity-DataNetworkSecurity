@@ -4,50 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Text;
-
-/*Algoritma tamamlanmıştır. Algoritmanın Deşifreleme Adımı Yoktur*/
+/*Algoritma tamamlanmıştır.*/
 namespace Algorithms
 {
     public class Piccolo : EncryptionAlgorithm
     {
-<<<<<<< HEAD
-   public void Initial(string input)
-{
-    byte[] key = new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
-    byte[] plaintext = new byte[] { 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
-    Console.WriteLine("Şifrelenecek Metin: " + BitConverter.ToString(plaintext).Replace("-", ""));
-    Console.WriteLine("Şifrelenecek Metin binary gösterimi: " + GetBinaryString(plaintext));
-    // Düz metnin her baytına S-box uygula
-    byte[] sBoxOutput = new byte[8];
-    for (int i = 0; i < 8; i++)
-    {
-        sBoxOutput[i] = sBox[plaintext[i] % 16];
-    }
-    Console.WriteLine("S-box Çıktısı: " + BitConverter.ToString(sBoxOutput).Replace("-", ""));
-    Console.WriteLine("S-box Çıktısı binary gösterimi: " + GetBinaryString(sBoxOutput));
-    
-
-    // P-box'ı düz metne uygula
-    byte[] pBoxOutput = ApplyPBox(plaintext);
-    Console.WriteLine("P-box Çktısı: " + BitConverter.ToString(pBoxOutput).Replace("-", ""));
-    Console.WriteLine("P-box Çıktısı binary gösterimi: " + GetBinaryString(pBoxOutput));
-
-    // Round key üret
-    byte[][] roundKeys = GenerateRoundKeys(key);
-
-    // 31 tur şifreleme gerçekleştir
-    byte[] state = (byte[])pBoxOutput.Clone();
-    for (int i = 0; i < 31; i++)
-    {
-        // Round key'i durum dönüşümü için XOR'la
-        state = Xor(state, roundKeys[i]);
-
-        // Durumun her baytına S-box uygula
-        for (int j = 0; j < 8; j++)
-=======
         public Piccolo(string text) : base(text)
->>>>>>> 538c252effd4caed75e69343b417da63bf31744c
         {
 
         }
@@ -67,15 +29,10 @@ namespace Algorithms
             AddStep("S-box Çıktısı: " , BitConverter.ToString(sBoxOutput).Replace("-", ""));
             Console.WriteLine("S-box Çıktısı: " + BitConverter.ToString(sBoxOutput).Replace("-", ""));
 
-<<<<<<< HEAD
-    Console.WriteLine("Şifrelenmiş Metin: " + BitConverter.ToString(state).Replace("-", ""));
-    Console.WriteLine("Şifrelenmiş Metin Çıktısı binary gösterimi: " + GetBinaryString(state));
-=======
             // P-box'ı düz metne uygula
             byte[] pBoxOutput = ApplyPBox(plaintext);
             AddStep("P-box Çktısı: " , BitConverter.ToString(pBoxOutput).Replace("-", ""));
             Console.WriteLine("P-box Çktısı: " + BitConverter.ToString(pBoxOutput).Replace("-", ""));
->>>>>>> 538c252effd4caed75e69343b417da63bf31744c
 
             // Round key üret
             byte[][] roundKeys = GenerateRoundKeys(key);
@@ -129,32 +86,8 @@ namespace Algorithms
 
 
 
-<<<<<<< HEAD
-    Console.WriteLine("Şifrelenmiş key'in çıktısı: " + BitConverter.ToString(state));
-  
-    return state;
-}
-
-    //  Round keys üretimi  Piccolo şifreleme algoritması için
-    private static byte[][] GenerateRoundKeys(byte[] key)
-{
-    byte[][] roundKeys = new byte[31][];
-
-    //  round key'in key ile başlatılması
-    roundKeys[0] = key;
-
-    //  31 adet round keys üretilmesi
-    for (int i = 1; i < 31; i++)
-    {
-        //  61 bit sola kaydır
-        byte[] rotatedKey = RotateLeft(key, 61);
-
-        //  S-box uygulaması her bir  key'den byte  üretimi
-        for (int j = 0; j < 8; j++)
-=======
         // Piccolo şifreleme fonksiyonu
         public  byte[] Encrypt(byte[] key, byte[] plaintext)
->>>>>>> 538c252effd4caed75e69343b417da63bf31744c
         {
             if (key == null || key.Length != 8)
                 throw new ArgumentException("Geçersiz key boyutu:  8 byte olmalı");
@@ -246,22 +179,6 @@ namespace Algorithms
             int bytes = bits / 8;
             int shift = bits % 8;
 
-<<<<<<< HEAD
-        return output;
-    }
-
-        public static string GetBinaryString(byte[] data)
-{
-    StringBuilder binaryString = new StringBuilder();
-    foreach (byte b in data)
-    {
-        string binary = Convert.ToString(b, 2).PadLeft(8, '0');
-        binaryString.Append(binary);
-    }
-    return binaryString.ToString();
-}
-}
-=======
             for (int i = 0; i < input.Length - bytes; i++)
             {
                 int newIndex = (i + input.Length - bytes) % input.Length;
@@ -274,7 +191,6 @@ namespace Algorithms
 
             return output;
         }
->>>>>>> 538c252effd4caed75e69343b417da63bf31744c
 
     }
 

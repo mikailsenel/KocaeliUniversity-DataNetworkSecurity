@@ -4,8 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Text;
+
+
 namespace Algorithms;
+
 
 /*Algoritma tamamlanmıştır.*/
 /*
@@ -17,6 +19,7 @@ Permütasyon işlevi, sabit bir permütasyon kuralları kümesine dayalı olarak
 
 Anahtar Ekleme:
 XOR ve Toplama işlevleri, temel toplama adımını uygular. Giriş sözcükleri ile orijinal anahtardan türetilen bir anahtar arasında (sırasıyla) bir XOR işlemi ve bir toplama işlemi gerçekleştirirler.
+
 
 */
 
@@ -45,7 +48,6 @@ public class Noekeon: EncryptionAlgorithm
         uint b = BitConverter.ToUInt32(outputData, 4);
         uint c = BitConverter.ToUInt32(outputData, 8);
         uint d = BitConverter.ToUInt32(outputData, 12);
-
 
         Permutation(ref a, ref b, ref c, ref d);
         outputData = BitConverter.GetBytes(a).Concat(BitConverter.GetBytes(b)).Concat(BitConverter.GetBytes(c)).Concat(BitConverter.GetBytes(d)).ToArray();
@@ -149,28 +151,3 @@ public class Noekeon: EncryptionAlgorithm
     }
 
 }
-<<<<<<< HEAD
-    
-   public  void XOR(ref uint a, ref uint b, ref uint c, ref uint d, uint[] key) //xor fonksiyonu
-{
-    a ^= key[0];
-    b ^= key[1];
-    c ^= key[2];
-    d ^= key[3];
-}
-   public  void Addition(ref uint a, ref uint b, ref uint c, ref uint d, uint[] key) //toplama fonksiyonu
-{
-    const uint constant = 0x08070605;
-    a += constant;
-    b += key[0];
-    c += key[1];
-    d += key[2];
-}
-
-
-    
-    }
-
-
-=======
->>>>>>> 538c252effd4caed75e69343b417da63bf31744c
