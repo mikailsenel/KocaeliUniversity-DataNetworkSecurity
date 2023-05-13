@@ -31,20 +31,20 @@ public  string GetBinaryString(byte[] data)
 
 
     Console.WriteLine("Şifrelenecek Metin: " + BitConverter.ToString(plaintext).Replace("-", ""));
-    AddStep("Şifrelenecek Metin: " + BitConverter.ToString(plaintext).Replace("-", ""));
+    AddStep("Şifrelenecek Metin: " , BitConverter.ToString(plaintext).Replace("-", ""));
     Console.WriteLine("Şifrelenecek Metin binary gösterimi: " + GetBinaryString(plaintext));
-    AddStep("Şifrelenecek Metin binary gösterimi: " + GetBinaryString(plaintext));
+    AddStep("Şifrelenecek Metin binary gösterimi: " , GetBinaryString(plaintext));
     byte[] ciphertext = Encrypt(key, plaintext);
-    AddStep("Şifrelenmiş Metin: " + BitConverter.ToString(ciphertext).Replace("-", ""));
+    AddStep("Şifrelenmiş Metin: " , BitConverter.ToString(ciphertext).Replace("-", ""));
     Console.WriteLine("Şifrelenmiş Metin: " + BitConverter.ToString(ciphertext).Replace("-", ""));
-    AddStep("Şifrelenmiş Metin binary gösterimi: " + GetBinaryString(ciphertext));
+    AddStep("Şifrelenmiş Metin binary gösterimi: " , GetBinaryString(ciphertext));
     Console.WriteLine("Şifrelenmiş Metin binary gösterimi: " + GetBinaryString(ciphertext));
 
     byte[] decryptedText =Decrypt(key, ciphertext);
     Console.WriteLine("Çözülmüş Metin: " + BitConverter.ToString(decryptedText).Replace("-", ""));
-    AddStep("Çözülmüş Metin: " + BitConverter.ToString(decryptedText).Replace("-", ""));
+    AddStep("Çözülmüş Metin: " , BitConverter.ToString(decryptedText).Replace("-", ""));
     Console.WriteLine("Çözülmüş Metin binary gösterimi: " + GetBinaryString(decryptedText));
-     AddStep("Çözülmüş Metin binary gösterimi: " + GetBinaryString(decryptedText));
+     AddStep("Çözülmüş Metin binary gösterimi: " , GetBinaryString(decryptedText));
             }
 
           

@@ -16,29 +16,29 @@ public class Pride : EncryptionAlgorithm
     {
 
     }
-
+string plaintext = "This is a secret message";
     protected override void Initial(string plaintext)
     {
         // Düz metin ve anahtarı belirleyin
-        string plaintext = "This is a secret message";
+        
         string key = "mysecretkey";
 
         // Düz metni ve anahtarı ekrana yazdırın
         
         Console.WriteLine("Düz metin: " + plaintext);
-        AddStep("Düz metin: " + plaintext);
+        AddStep("Düz metin: " , plaintext);
         byte[] plaintextBytes = Encoding.ASCII.GetBytes(plaintext);
         string binaryString = GetBinaryString(plaintextBytes);
         
         Console.WriteLine("Düz metin Binary Gösterimi: " + binaryString);
-        AddStep("Düz metin Binary Gösterimi: " + binaryString);
+        AddStep("Düz metin Binary Gösterimi: " , binaryString);
        
         Console.WriteLine("Anahtar: " + key);
-         AddStep("Anahtar: " + key);
+         AddStep("Anahtar: " , key);
     byte[] keyBytes = Encoding.ASCII.GetBytes(key);
     string binaryString1 = GetBinaryString(keyBytes);
     Console.WriteLine("Düz metin Binary Gösterimi: " + binaryString1);
-AddStep("Düz metin Binary Gösterimi: " + binaryString1);
+AddStep("Düz metin Binary Gösterimi: " , binaryString1);
         // PrideCipher algoritmasını kullanarak düz metni şifreleyin
         string ciphertext = Encrypt(plaintext, key);
 
@@ -46,21 +46,21 @@ AddStep("Düz metin Binary Gösterimi: " + binaryString1);
         // Şifreli metni ekrana yazdırın
         
         Console.WriteLine("Şifreli metin: " + ciphertext);
-        AddStep("Şifreli metin: " + ciphertext);
+        AddStep("Şifreli metin: " , ciphertext);
         byte[] ciphertextBytes = Encoding.ASCII.GetBytes(ciphertext);
     string binaryString2 = GetBinaryString(ciphertextBytes);
     Console.WriteLine("Şifreli metin Binary Gösterimi: " + binaryString2);
-AddStep("Şifreli metin Binary Gösterimi: " + binaryString2);
+AddStep("Şifreli metin Binary Gösterimi: " , binaryString2);
         // Şifreli metni aynı anahtar kullanarak çözün
         string decryptedText = Decrypt(ciphertext, key);
 
     // Çözülmüş düz metni ekrana yazdırın
     Console.WriteLine("Çözülmüş metin: " + decryptedText);
-    AddStep("Çözülmüş metin: " + decryptedText);
+    AddStep("Çözülmüş metin: " , decryptedText);
     byte[] decryptedTextBytes = Encoding.ASCII.GetBytes(decryptedText);
     string binaryString3 = GetBinaryString(decryptedTextBytes);
     Console.WriteLine("Çözülmüş metin Binary Gösterimi: " + binaryString3);
-AddStep("Çözülmüş metin Binary Gösterimi: " + binaryString3);
+AddStep("Çözülmüş metin Binary Gösterimi: " , binaryString3);
     }
 
     public  string Encrypt(string plaintext, string key)

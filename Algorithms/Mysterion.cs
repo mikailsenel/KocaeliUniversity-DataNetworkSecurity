@@ -39,21 +39,21 @@ public class Mysterion : EncryptionAlgorithm
         AddStep( "Şifrelenecek girdi texti", BitConverter.ToString(data));
         Console.WriteLine("Şifrelenecek girdi texti :" + BitConverter.ToString(data));
 
-        AddStep( "Şifrelenecek girdi texti binary gösterimi: " + GetBinaryString(data));
+        AddStep( "Şifrelenecek girdi texti binary gösterimi: " , GetBinaryString(data));
         Console.WriteLine("Şifrelenecek girdi texti binary gösterimi: " + GetBinaryString(data));
         
         byte[] key = new byte[] { 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0 };
 
         byte[] encrypted = Encrypt(data, key);
-        AddStep( "Şifrelenmiş data: " + BitConverter.ToString(encrypted));
+        AddStep( "Şifrelenmiş data: " ,BitConverter.ToString(encrypted));
         Console.WriteLine("Şifrelenmiş data: " + BitConverter.ToString(encrypted));
-         AddStep("Şifrelenmiş data binary gösterimi: " + GetBinaryString(encrypted));
+         AddStep("Şifrelenmiş data binary gösterimi: " , GetBinaryString(encrypted));
          Console.WriteLine("Şifrelenmiş data binary gösterimi: " + GetBinaryString(encrypted));
 
          byte[] decrypted = Decrypt(encrypted, key);
-         AddStep("Şifresi çözülmüş data: " + BitConverter.ToString(decrypted));
+         AddStep("Şifresi çözülmüş data: " , BitConverter.ToString(decrypted));
         Console.WriteLine("Şifresi çözülmüş data: " + BitConverter.ToString(decrypted));
-        AddStep("Şifresi çözülmüş data binary gösterimi: " + GetBinaryString(decrypted));
+        AddStep("Şifresi çözülmüş data binary gösterimi: " , GetBinaryString(decrypted));
         Console.WriteLine("Şifresi çözülmüş data binary gösterimi: " + GetBinaryString(decrypted));
 
         
@@ -170,7 +170,7 @@ private  void DecryptBlock(uint[] block)
         block[0] -= ((block[1] << 4) + _key[0]) ^ (block[1] + sum) ^ ((block[1] >> 5) + _key[1]);
         sum -= 0x9E3779B9;
     }
-   AddStep($"Çözülen Blok: {BitConverter.ToString(BitConverter.GetBytes(block[0]))}-{BitConverter.ToString(BitConverter.GetBytes(block[1]))}");
+   AddStep($"Şifreleme Bloğu",$"Çözülen Blok: {BitConverter.ToString(BitConverter.GetBytes(block[0]))}-{BitConverter.ToString(BitConverter.GetBytes(block[1]))}");
     Console.WriteLine($"Çözülen Blok: {BitConverter.ToString(BitConverter.GetBytes(block[0]))}-{BitConverter.ToString(BitConverter.GetBytes(block[1]))}");
 }
 

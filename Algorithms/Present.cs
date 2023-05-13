@@ -23,19 +23,19 @@ public class Present : EncryptionAlgorithm
 
             byte[] plaintext = Encoding.ASCII.GetBytes("Merhaba Dunya");
             Console.WriteLine("Girilen Metin: " + BitConverter.ToString(plaintext));
-            AddStep("Girilen Metin: " + BitConverter.ToString(plaintext));
+            AddStep("Girilen Metin: " , BitConverter.ToString(plaintext));
             Console.WriteLine("Girilen Metin Binary Gösterimi: " + GetBinaryString(plaintext));
-            AddStep("Girilen Metin Binary Gösterimi: " + GetBinaryString(plaintext));
+            AddStep("Girilen Metin Binary Gösterimi: " , GetBinaryString(plaintext));
             byte[] ciphertext = Encrypt(plaintext, key);
             Console.WriteLine("Şifrelenmiş Metin: " + BitConverter.ToString(ciphertext));
-            AddStep("Şifrelenmiş Metin: " + BitConverter.ToString(ciphertext));
+            AddStep("Şifrelenmiş Metin: " , BitConverter.ToString(ciphertext));
             Console.WriteLine("Şifrelenmiş Metin Binary Gösterimi: " + GetBinaryString(ciphertext));
-        AddStep("Şifrelenmiş Metin Binary Gösterimi: " + GetBinaryString(ciphertext));
+        AddStep("Şifrelenmiş Metin Binary Gösterimi: " , GetBinaryString(ciphertext));
             byte[] decryptedData = Decrypt(ciphertext, key);
             Console.WriteLine("Decrypted Metin: " + BitConverter.ToString(decryptedData));
-            AddStep("Decrypted Metin: " + BitConverter.ToString(decryptedData));
+            AddStep("Decrypted Metin: " , BitConverter.ToString(decryptedData));
             Console.WriteLine("Decrypted Metin Binary Gösterimi: " + GetBinaryString(decryptedData));
-       AddStep("Decrypted Metin Binary Gösterimi: " + GetBinaryString(decryptedData));
+       AddStep("Decrypted Metin Binary Gösterimi: " , GetBinaryString(decryptedData));
 
     }
    private  readonly byte[] SBox = {
