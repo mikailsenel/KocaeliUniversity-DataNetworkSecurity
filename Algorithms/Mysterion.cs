@@ -126,6 +126,10 @@ public class Mysterion : EncryptionAlgorithm
         }
         AddStep($"Get Blok içeriği {blockIndex}", $" {BitConverter.ToString(BitConverter.GetBytes(block[0]))}-{BitConverter.ToString(BitConverter.GetBytes(block[1]))}");
         Console.WriteLine($"Get Blok içeriği {blockIndex}: {BitConverter.ToString(BitConverter.GetBytes(block[0]))}-{BitConverter.ToString(BitConverter.GetBytes(block[1]))}");
+        string binary0 = GetBinaryString(BitConverter.GetBytes(block[0]));
+        string binary1 = GetBinaryString(BitConverter.GetBytes(block[1]));
+        Console.WriteLine($"Get Blok içeriği: {binary0}-{binary1}");
+        AddStep($"Get Blok içeriği binary :{binary0}-{binary1}", $" {binary0}-{binary1}");
         return block;
     }
 
@@ -141,6 +145,10 @@ public class Mysterion : EncryptionAlgorithm
         }
         AddStep($"Şifreleme Bloğu", $"Şifreleme Bloğu: {BitConverter.ToString(BitConverter.GetBytes(block[0]))}-{BitConverter.ToString(BitConverter.GetBytes(block[1]))}");
         Console.WriteLine($"Şifreleme Bloğu: {BitConverter.ToString(BitConverter.GetBytes(block[0]))}-{BitConverter.ToString(BitConverter.GetBytes(block[1]))}");
+        string binary0 = GetBinaryString(BitConverter.GetBytes(block[0]));
+        string binary1 = GetBinaryString(BitConverter.GetBytes(block[1]));
+        Console.WriteLine($"Şifreleme Bloğu içeriği: {binary0}-{binary1}");
+        AddStep($"Şifreleme Bloğu içeriği binary :{binary0}-{binary1}", $" {binary0}-{binary1}");
     }
 
     public  byte[] Decrypt(byte[] encrypted, byte[] key)
@@ -172,11 +180,16 @@ private  void DecryptBlock(uint[] block)
     }
    AddStep($"Şifreleme Bloğu",$"Çözülen Blok: {BitConverter.ToString(BitConverter.GetBytes(block[0]))}-{BitConverter.ToString(BitConverter.GetBytes(block[1]))}");
     Console.WriteLine($"Çözülen Blok: {BitConverter.ToString(BitConverter.GetBytes(block[0]))}-{BitConverter.ToString(BitConverter.GetBytes(block[1]))}");
-}
+        string binary0 = GetBinaryString(BitConverter.GetBytes(block[0]));
+        string binary1 = GetBinaryString(BitConverter.GetBytes(block[1]));
+        Console.WriteLine($"Şifreleme Bloğu çözülen içerik binary: {binary0}-{binary1}");
+        AddStep($"Şifreleme Bloğu çözülen içerik binary :{binary0}-{binary1}", $" {binary0}-{binary1}");
+    }
+    
 
 
 
-     private   void Mix()
+    private   void Mix()
     {
         if (_state == null)
         {

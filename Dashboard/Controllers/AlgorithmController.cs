@@ -36,5 +36,12 @@ public class AlgorithmController : Controller
     {
         return Ok(new Pride(text).GetSteps());
     }
-    
+    [HttpGet("/present/{text}", Name = nameof(GetPresent))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    public async Task<IActionResult> GetPresent([FromRoute] string text)
+    {
+        return Ok(new Pride(text).GetSteps());
+    }
+
+
 }
