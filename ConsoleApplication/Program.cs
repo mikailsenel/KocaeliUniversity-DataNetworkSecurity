@@ -13,13 +13,17 @@ A4.Initial("p2");*/
 /*Pride A5=new Pride();
 A5.Initial("p3");*/
 
-byte[] data = new byte[]{0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0};
+// byte[] data = new byte[]{0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0};
 
-RC512 rc5 = new RC512("asdfasdfasdfasdf");
+// RC512 rc5 = new RC512("asdfasdfasdfasdf");
 
-byte[] encryptedData = rc5.Encrypt(data);
-byte[] decryptedData = rc5.Decrypt(encryptedData);
+// byte[] encryptedData = rc5.Encrypt(data);
+// byte[] decryptedData = rc5.Decrypt(encryptedData);
 
-Console.WriteLine("Data:           " + BitConverter.ToString(data));
-Console.WriteLine("Encrypted Data: " + BitConverter.ToString(encryptedData));
-Console.WriteLine("Decrypted Data: " + BitConverter.ToString(decryptedData));
+// Console.WriteLine("Data:           " + BitConverter.ToString(data));
+// Console.WriteLine("Encrypted Data: " + BitConverter.ToString(encryptedData));
+// Console.WriteLine("Decrypted Data: " + BitConverter.ToString(decryptedData));
+
+
+Rectangle rectangle = new Rectangle("");
+rectangle.test();
