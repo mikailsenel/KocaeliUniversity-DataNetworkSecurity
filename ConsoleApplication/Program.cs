@@ -10,5 +10,5 @@ A3.Initial("p1");*/
 
 /*Mysterion A4=new Mysterion();
 A4.Initial("p2");*/
-Pride A5=new Pride();
-A5.Initial("p3");
+/*Pride A5=new Pride();
+A5.Initial("p3");*/

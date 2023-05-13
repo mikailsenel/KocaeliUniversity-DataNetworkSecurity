@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Algorithms;
 
 
-/*Algoritma tamamlanmıştır.*/
+/*Algoritma tamamlanmıştır. Sağlıklı çalışmaktadır*/
 /*
 
 Substitution (Yerine Koyma):
@@ -28,31 +28,49 @@ public class Noekeon: EncryptionAlgorithm
     public Noekeon(string text) : base(text)
     {
     }
+public  string GetByteArrayAsBinaryString(byte[] byteArray)
+    {
+        string binaryString = "";
 
+        foreach (byte b in byteArray)
+        {
+            string byteBits = Convert.ToString(b, 2).PadLeft(8, '0');
+            binaryString += byteBits;
+        }
+
+        return binaryString;
+    }
     protected override void Initial(string input)
     {
         // Ornek input data
-        //byte[] inputData = new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, }; //16 bit input data giriş yapılıyor
-        byte[] inputData = System.Text.Encoding.UTF8.GetBytes(input);
-        AddStep( "Girdi Metin datasi..", BitConverter.ToString(inputData));
+        byte[] inputData = new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, }; //16 bit input data giriş yapılıyor
+       
+       AddStep("Girdi Metin datasi..: " + BitConverter.ToString(inputData));
         Console.WriteLine("Girdi Metin datasi..: " + BitConverter.ToString(inputData));
+        AddStep("Girdi Binary datası Binary: " + GetByteArrayAsBinaryString(inputData));
+         Console.WriteLine("Girdi Binary datası Binary: " + GetByteArrayAsBinaryString(inputData));
         // Ornek key
         uint[] key = new uint[] { 0x01234567, 0x89ABCDEF, 0xFEDCBA98, 0x76543210 }; //128 bit data
 
         // Yerine Koyma Islemi
         byte[] outputData = Substitution(inputData);
-        AddStep("Yerine koyma islemi sonrasi data..", BitConverter.ToString(outputData));
+         AddStep("Yerine koyma islemi sonrasi data..: " + BitConverter.ToString(outputData));
         Console.WriteLine("Yerine koyma islemi sonrasi data..: " + BitConverter.ToString(outputData));
+          AddStep("Yerine koyma islemi sonrasi data Binary: " + GetByteArrayAsBinaryString(outputData));
+         Console.WriteLine("Yerine koyma islemi sonrasi data Binary: " + GetByteArrayAsBinaryString(outputData));
         // Permutasyon işlemi
         uint a = BitConverter.ToUInt32(outputData, 0);
         uint b = BitConverter.ToUInt32(outputData, 4);
         uint c = BitConverter.ToUInt32(outputData, 8);
         uint d = BitConverter.ToUInt32(outputData, 12);
 
+
         Permutation(ref a, ref b, ref c, ref d);
         outputData = BitConverter.GetBytes(a).Concat(BitConverter.GetBytes(b)).Concat(BitConverter.GetBytes(c)).Concat(BitConverter.GetBytes(d)).ToArray();
-        AddStep("Permutasyon sonrasi data..", BitConverter.ToString(outputData));
-        Console.WriteLine("Permutasyon sonrasi data..: " + BitConverter.ToString(outputData));
+       AddStep("Permutasyon sonrasi data : " + BitConverter.ToString(outputData));
+        Console.WriteLine("Permutasyon sonrasi data : " + BitConverter.ToString(outputData));
+        AddStep("Permutasyon sonrasi data Binary: " + GetByteArrayAsBinaryString(outputData));
+        Console.WriteLine("Permutasyon sonrasi data Binary: " + GetByteArrayAsBinaryString(outputData));
         //  XOR ve Toplama Islemi
         a = BitConverter.ToUInt32(outputData, 0);
         b = BitConverter.ToUInt32(outputData, 4);
@@ -61,17 +79,24 @@ public class Noekeon: EncryptionAlgorithm
 
         XOR(ref a, ref b, ref c, ref d, key);
         byte[] xordata = BitConverter.GetBytes(a).Concat(BitConverter.GetBytes(b)).Concat(BitConverter.GetBytes(c)).Concat(BitConverter.GetBytes(d)).ToArray();
-        AddStep( "Xor sonrasi data..", BitConverter.ToString(xordata));
-        Console.WriteLine("Xor sonrasi data..: " + BitConverter.ToString(xordata));
+       
+       AddStep("Xor sonrasi data: " + BitConverter.ToString(xordata));
+        Console.WriteLine("Xor sonrasi data: " + BitConverter.ToString(xordata));
+          AddStep("Xor sonrasi data Binary: " + GetByteArrayAsBinaryString(xordata));
+        Console.WriteLine("Xor sonrasi data Binary: " + GetByteArrayAsBinaryString(xordata));
 
         Addition(ref a, ref b, ref c, ref d, key);
         byte[] addition = BitConverter.GetBytes(a).Concat(BitConverter.GetBytes(b)).Concat(BitConverter.GetBytes(c)).Concat(BitConverter.GetBytes(d)).ToArray();
-        AddStep( "Toplama sonrasi data..", BitConverter.ToString(addition));
-        Console.WriteLine("Toplama sonrasi data..: " + BitConverter.ToString(addition));
+        AddStep("Toplama sonrasi data: " + BitConverter.ToString(addition));
+        Console.WriteLine("Toplama sonrasi data: " + BitConverter.ToString(addition));
+        AddStep("Toplama sonrasi data Binary: " + GetByteArrayAsBinaryString(addition));
+        Console.WriteLine("Toplama sonrasi data Binary: " + GetByteArrayAsBinaryString(addition));
         // Cıktı sonucu
 
-        AddStep( " Sifrelenmiş data..", BitConverter.ToString(outputData));
+        AddStep(" Sifrelenmiş data..: " + BitConverter.ToString(outputData));
         Console.WriteLine(" Sifrelenmiş data..: " + BitConverter.ToString(outputData));
+         AddStep("Sifrelenmiş data Binary: " + GetByteArrayAsBinaryString(outputData));
+        Console.WriteLine("Sifrelenmiş data Binary: " + GetByteArrayAsBinaryString(outputData));
     }
 
     public byte[] Substitution(byte[] input)

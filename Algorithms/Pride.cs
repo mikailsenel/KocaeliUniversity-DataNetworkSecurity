@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Text;
 using Algorithms.Common.Abstract;
-/*Algoritma tamamlanmıştır*/
+/*Algoritma tamamlanmıştır.Algoritma Sağlıklı çalışmaktadır.*/
 
 
 namespace Algorithms;
@@ -20,32 +20,50 @@ public class Pride : EncryptionAlgorithm
     protected override void Initial(string plaintext)
     {
         // Düz metin ve anahtarı belirleyin
-        //string plaintext = "This is a secret message";
+        string plaintext = "This is a secret message";
         string key = "mysecretkey";
 
         // Düz metni ve anahtarı ekrana yazdırın
-        AddStep("Düz metin: ", plaintext);
+        
         Console.WriteLine("Düz metin: " + plaintext);
-        AddStep("Anahtar: ", key);
+        AddStep("Düz metin: " + plaintext);
+        byte[] plaintextBytes = Encoding.ASCII.GetBytes(plaintext);
+        string binaryString = GetBinaryString(plaintextBytes);
+        
+        Console.WriteLine("Düz metin Binary Gösterimi: " + binaryString);
+        AddStep("Düz metin Binary Gösterimi: " + binaryString);
+       
         Console.WriteLine("Anahtar: " + key);
-
+         AddStep("Anahtar: " + key);
+    byte[] keyBytes = Encoding.ASCII.GetBytes(key);
+    string binaryString1 = GetBinaryString(keyBytes);
+    Console.WriteLine("Düz metin Binary Gösterimi: " + binaryString1);
+AddStep("Düz metin Binary Gösterimi: " + binaryString1);
         // PrideCipher algoritmasını kullanarak düz metni şifreleyin
         string ciphertext = Encrypt(plaintext, key);
 
-        // Şifreli metni ekrana yazdırın
-        AddStep("Şifreli metin: ", ciphertext);
-        Console.WriteLine("Şifreli metin: " + ciphertext);
 
+        // Şifreli metni ekrana yazdırın
+        
+        Console.WriteLine("Şifreli metin: " + ciphertext);
+        AddStep("Şifreli metin: " + ciphertext);
+        byte[] ciphertextBytes = Encoding.ASCII.GetBytes(ciphertext);
+    string binaryString2 = GetBinaryString(ciphertextBytes);
+    Console.WriteLine("Şifreli metin Binary Gösterimi: " + binaryString2);
+AddStep("Şifreli metin Binary Gösterimi: " + binaryString2);
         // Şifreli metni aynı anahtar kullanarak çözün
         string decryptedText = Decrypt(ciphertext, key);
 
-        // Çözülmüş düz metni ekrana yazdırın
-        AddStep("Çözülmüş metin: ", decryptedText);
-        Console.WriteLine("Çözülmüş metin: " + decryptedText);
-
+    // Çözülmüş düz metni ekrana yazdırın
+    Console.WriteLine("Çözülmüş metin: " + decryptedText);
+    AddStep("Çözülmüş metin: " + decryptedText);
+    byte[] decryptedTextBytes = Encoding.ASCII.GetBytes(decryptedText);
+    string binaryString3 = GetBinaryString(decryptedTextBytes);
+    Console.WriteLine("Çözülmüş metin Binary Gösterimi: " + binaryString3);
+AddStep("Çözülmüş metin Binary Gösterimi: " + binaryString3);
     }
 
-    public string Encrypt(string plaintext, string key)
+    public  string Encrypt(string plaintext, string key)
     {
         // Anahtarın byte dizisine dönüştürülmesi
         byte[] keyBytes = Encoding.UTF8.GetBytes(key);
@@ -63,33 +81,46 @@ public class Pride : EncryptionAlgorithm
             ciphertextBytes[i] = (byte)(plaintextBytes[i] ^ keystream[i]);
         }
 
-        // Şifreli metnin Base64 formatında string'e dönüştürülmesi
-        return Convert.ToBase64String(ciphertextBytes);
-    }
 
-    public string Decrypt(string ciphertext, string key)
+    // Şifreli metnin Base64 formatında string'e dönüştürülmesi
+    return Convert.ToBase64String(ciphertextBytes);
+}
+public  string GetBinaryString(byte[] data)
+{
+    StringBuilder binaryString = new StringBuilder();
+    foreach (byte b in data)
     {
-        // Anahtarın byte dizisine dönüştürülmesi
-        byte[] keyBytes = Encoding.UTF8.GetBytes(key);
+        string binary = Convert.ToString(b, 2).PadLeft(8, '0');
+        binaryString.Append(binary);
+    }
+    return binaryString.ToString();
+}
 
-        // Keystream'in oluşturulması
-        byte[] keystream = GenerateKeystream(keyBytes, ciphertext.Length);
+public  string Decrypt(string ciphertext, string key)
+{
+    // Anahtarın byte dizisine dönüştürülmesi
+    byte[] keyBytes = Encoding.UTF8.GetBytes(key);
 
-        // Şifreli metnin Base64 formatından byte dizisine dönüştürülmesi
-        byte[] ciphertextBytes = Convert.FromBase64String(ciphertext);
+    // Keystream'in oluşturulması
+    byte[] keystream = GenerateKeystream(keyBytes, ciphertext.Length);
 
-        // Şifreli metnin keystream ile XOR işlemine tabi tutulması
-        byte[] plaintextBytes = new byte[ciphertextBytes.Length];
-        for (int i = 0; i < ciphertextBytes.Length; i++)
-        {
-            plaintextBytes[i] = (byte)(ciphertextBytes[i] ^ keystream[i]);
-        }
+    // Şifreli metnin Base64 formatından byte dizisine dönüştürülmesi
+    byte[] ciphertextBytes = Convert.FromBase64String(ciphertext);
 
-        // Çözülmüş düz metnin string'e dönüştürülmesi
-        return Encoding.UTF8.GetString(plaintextBytes);
+    // Şifreli metnin keystream ile XOR işlemine tabi tutulması
+    byte[] plaintextBytes = new byte[ciphertextBytes.Length];
+
+    for (int i = 0; i < ciphertextBytes.Length; i++)
+    {
+        plaintextBytes[i] = (byte)(ciphertextBytes[i] ^ keystream[i]);
     }
 
-    private byte[] GenerateKeystream(byte[] key, int length)
+    // Şifre çözülmüş metnin UTF8 formatında string'e dönüştürülmesi
+    return Encoding.UTF8.GetString(plaintextBytes);
+}
+    
+
+    private  byte[] GenerateKeystream(byte[] key, int length)
     {
         // Keystream'in boyutunu belirleme
         byte[] keystream = new byte[length];
