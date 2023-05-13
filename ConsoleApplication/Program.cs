@@ -25,5 +25,8 @@ A5.Initial("p3");*/
 // Console.WriteLine("Decrypted Data: " + BitConverter.ToString(decryptedData));
 
 
-Rectangle rectangle = new Rectangle("");
-rectangle.test();
+// Rectangle rectangle = new Rectangle("");
+// rectangle.test();
+
+Prince prince = new Prince("");
+// prince.test();
