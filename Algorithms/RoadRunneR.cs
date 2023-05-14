@@ -20,11 +20,11 @@ public class RoadRunneR : EncryptionAlgorithm
             0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF
         };
 
-        string message = "Hello World Hello World Hello World Hello World!";
+        string message = "Hello World Hello World Hello World Hello World!   !";
 
-        string enc = RoadRunneR.EncryptString(message, expectedKey);
-        AddStep( "Şifrelenecek girdi:", enc);
-        Console.WriteLine(enc);
+        byte[] enc = RoadRunneR.EncryptString(message, expectedKey);
+        AddStep( "Şifrelenecek girdi:", BitConverter.ToString(enc));
+        Console.WriteLine(BitConverter.ToString(enc));
 
         string dec = RoadRunneR.DecryptString(enc, expectedKey);
         AddStep( "Şifrelenecek girdi:", dec);
@@ -159,7 +159,7 @@ public class RoadRunneR : EncryptionAlgorithm
         return true;
     }
 
-    public static string EncryptString(string plaintext, byte[] key)
+    public static byte[] EncryptString(string plaintext, byte[] key)
     {
         byte[] plaintextBytes = Encoding.UTF8.GetBytes(plaintext);
         byte[] block = new byte[BLOCK_SIZE];
@@ -184,12 +184,14 @@ public class RoadRunneR : EncryptionAlgorithm
         }
         roundKeys.Free();
 
-        return Convert.ToBase64String(plaintextBytes);
+        // return Convert.ToBase64String(plaintextBytes);
+        return plaintextBytes;
     }
 
-    public static string DecryptString(string ciphertext, byte[] key)
+    public static string DecryptString(byte[] ciphertext, byte[] key)
     {
-        byte[] ciphertextBytes = Convert.FromBase64String(ciphertext);
+        // byte[] ciphertextBytes = Convert.FromBase64String(ciphertext);
+        byte[] ciphertextBytes = ciphertext;
         byte[] block = new byte[BLOCK_SIZE];
 
         int numBlocks = ciphertextBytes.Length / BLOCK_SIZE;
