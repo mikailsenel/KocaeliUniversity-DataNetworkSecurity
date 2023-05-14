@@ -28,5 +28,7 @@ A5.Initial("p3");*/
 // Rectangle rectangle = new Rectangle("");
 // rectangle.test();
 
-Prince prince = new Prince("");
+// Prince prince = new Prince("");
 // prince.test();
+
+RoadRunneR rr = new RoadRunneR("");
