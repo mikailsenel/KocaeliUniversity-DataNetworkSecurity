@@ -42,6 +42,34 @@ public class AlgorithmController : Controller
     {
         return Ok(new Pride(text).GetSteps());
     }
+    [HttpGet("/skinny/{text}", Name = nameof(GetSkinny))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    public async Task<IActionResult> GetSkinny([FromRoute] string text)
+    {
+        return Ok(new Skinny(text).GetSteps());
+    }
+
+    [HttpGet("/sea/{text}", Name = nameof(GetSea))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    public async Task<IActionResult> GetSea([FromRoute] string text)
+    {
+        return Ok(new Sea(text).GetSteps());
+    }
+
+
+    [HttpGet("/simon/{text}", Name = nameof(GetSimon))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    public async Task<IActionResult> GetSimon([FromRoute] string text)
+    {
+        return Ok(new Simon(text).GetSteps());
+    }
+
+    [HttpGet("/simeck/{text}", Name = nameof(GetSimeck))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    public async Task<IActionResult> GetSimeck([FromRoute] string text)
+    {
+        return Ok(new Simeck(text).GetSteps());
+    }
 
 
 }
