@@ -56,7 +56,7 @@ namespace Algorithms
 
         const int BLOCK_SIZE = 128; // blok boyutu (bit)
 
-        protected override void Initial(string text)
+        protected override void Initial(string text, string key)
         {
 
             byte[] bufferPlain = Encoding.ASCII.GetBytes(text);

@@ -53,7 +53,7 @@ namespace Algorithms
         {
         }
 
-        protected override void Initial(string text)
+        protected override void Initial(string text, string inputKey)
         {
             // test verileri
             byte[] plaintext = System.Text.Encoding.UTF8.GetBytes(text);

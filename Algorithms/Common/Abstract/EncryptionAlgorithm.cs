@@ -17,13 +17,19 @@ public abstract class EncryptionAlgorithm
     public EncryptionAlgorithm(string text)
     {
         _steps = new List<StepDto>();
-        Initial(text);
+        Initial(text,null);
+    }
+
+    public EncryptionAlgorithm(string text,string key)
+    {
+        _steps = new List<StepDto>();
+        Initial(text, key);
     }
 
     /// <summary>
     /// 
     /// </summary>
-    protected abstract void Initial(string text);
+    protected abstract void Initial(string text,string key);
 
     /// <summary>
     /// 

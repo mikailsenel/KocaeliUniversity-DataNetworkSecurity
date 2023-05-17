@@ -50,7 +50,7 @@ public class Mysterion : EncryptionAlgorithm
     return binaryString.ToString();
 }
     
-    protected  override void Initial(string input)
+    protected  override void Initial(string input,string inputKey)
 
     {
         const int MaxInputLength = 16; // 16 byte = 128 bit

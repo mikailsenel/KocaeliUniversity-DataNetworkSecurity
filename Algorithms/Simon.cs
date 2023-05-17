@@ -30,7 +30,7 @@ namespace Algorithms
 
         }
 
-        protected override void Initial(string text)
+        protected override void Initial(string text, string key)
         {
             // Kullanılacak bloğun veya sözcüğün boyutunu ve anahtarın boyutunu parametrelere göre alan sınıfın yapıcısı,
             // Şifreleyicinin mevcut durumu yalnızca 128 bit bloklarla şifrelemeye izin verir

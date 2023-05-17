@@ -12,7 +12,7 @@ public class Rectangle: EncryptionAlgorithm
     private ushort[] mainKey;
     private ushort rc;
 
-    protected override void Initial(string input)
+    protected override void Initial(string input,string inputKey)
     {
         ushort[] key = new ushort[] { 0xffff, 0xffff, 0xffff, 0xffff, 0xaaaa };
         ushort[] plainText = new ushort[] { 0xabca, 0x4611, 0xffff, 0x1234};
@@ -44,9 +44,6 @@ public class Rectangle: EncryptionAlgorithm
         AddStep( "Şifrelenecek girdi:", UshortArrToString(this.cipherText));
     }
 
-    public void test() {
-        this.Initial("");
-    }
 
     public string UshortArrToString(ushort[] text) {
         string texttmp = "";

@@ -18,7 +18,7 @@ public class Pride : EncryptionAlgorithm
 
     }
 string plaintext = "This is a secret message";
-    protected override void Initial(string plaintext)
+    protected override void Initial(string plaintext, string inputKey)
     {
         // Düz metin ve anahtarı belirleyin
         

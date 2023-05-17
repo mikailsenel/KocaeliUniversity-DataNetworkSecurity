@@ -12,7 +12,7 @@ public class Robin : EncryptionAlgorithm
 
     }
 
-    protected override void Initial(string input)
+    protected override void Initial(string input,string inputKey)
     {
         byte[] PLAIN = {
             0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10,

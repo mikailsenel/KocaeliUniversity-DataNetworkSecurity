@@ -21,7 +21,7 @@ namespace Algorithms
         }
 
 
-        protected override void Initial(string input)
+        protected override void Initial(string input,string inputKey)
         {
             byte[] plaintext = System.Text.Encoding.UTF8.GetBytes(input);
 
