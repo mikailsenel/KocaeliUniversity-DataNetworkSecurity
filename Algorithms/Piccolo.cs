@@ -19,7 +19,7 @@ namespace Algorithms
         {
             if (key.Length != KeySize / 8)
             {
-                throw new ArgumentException($"Key size must be {KeySize} bits.");
+                throw new ArgumentException($"Key  {KeySize} olmalı bit.");
             }
 
             subkeys = GenerateSubkeys(key);
@@ -171,26 +171,26 @@ namespace Algorithms
             const int MaxInputLength = 16; // 16 byte = 128 bit
             byte[] key = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
-            string plaintext = "Hello, Piccolo Cipher!";
+            //string plaintext = "Hello, Piccolo Cipher!";
 
+            byte[] data = System.Text.Encoding.UTF8.GetBytes(input);
+            int requiredLength = (BlockSize / 8) * (int)Math.Ceiling((double)input.Length / (BlockSize / 8));
+           input = input.PadRight(requiredLength, '\0');
 
-            int requiredLength = (BlockSize / 8) * (int)Math.Ceiling((double)plaintext.Length / (BlockSize / 8));
-            plaintext = plaintext.PadRight(requiredLength, '\0');
-
-            /*byte[] data = System.Text.Encoding.UTF8.GetBytes(plaintext);
+           
             // 128 bit üzerinde veri girişi kontrolü
             if (data.Length > MaxInputLength)
             {
                 Console.WriteLine("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.");
                 AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", BitConverter.ToString(data));
                 return;
-            }*/
+            }
             SetKey(key);
-            byte[] ciphertext = Encrypt(plaintext);
+            byte[] ciphertext = Encrypt(input);
             string decryptedText = DecryptToString(ciphertext);
 
-            Console.WriteLine("Plaintext:  " + plaintext);
-            AddStep("Plaintext:  " , plaintext);
+            Console.WriteLine("Plaintext:  " + input);
+            AddStep("Plaintext:  " , input);
             Console.WriteLine("Ciphertext: " + BitConverter.ToString(ciphertext).Replace("-", " "));
             AddStep("Ciphertext: " , BitConverter.ToString(ciphertext).Replace("-", " "));
             Console.WriteLine("Decrypted:  " + decryptedText);
