@@ -125,7 +125,7 @@ public class Noekeon : EncryptionAlgorithm
     {
         if (key.Length != 16)
         {
-            throw new ArgumentException("Key uzunlugu 16 karakter olmalı.");
+            throw new ArgumentException("Key uzunlugu 16 karakter olmali.");
         }
 
         roundKeys = GenerateRoundKeys(key);
@@ -162,9 +162,6 @@ public class Noekeon : EncryptionAlgorithm
         string encodedOutput = Convert.ToBase64String(trimmedOutputBytes);
         return encodedOutput;
     }
-
-
-
 
 
     private void EncryptBlock(uint[] block)
