@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 //Decyrption metodu yanlış çalışıyor
 namespace Algorithms
 {
@@ -26,11 +27,18 @@ public  string GetBinaryString(byte[] data)
 }
         protected override void Initial(string input)
         {
+            const int MaxInputLength = 16; // 16 byte = 128 bit
             byte[] key = new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
-    byte[] plaintext = new byte[] { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17 };
+        byte[] plaintext = new byte[] { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17 };
+            // 128 bit üzerinde veri girişi kontrolü
+            if (plaintext.Length > MaxInputLength)
+            {
+                Console.WriteLine("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.");
+                AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", BitConverter.ToString(plaintext));
+                return;
+            }
 
-
-    Console.WriteLine("Şifrelenecek Metin: " + BitConverter.ToString(plaintext).Replace("-", ""));
+            Console.WriteLine("Şifrelenecek Metin: " + BitConverter.ToString(plaintext).Replace("-", ""));
     AddStep("Şifrelenecek Metin: " , BitConverter.ToString(plaintext).Replace("-", ""));
     Console.WriteLine("Şifrelenecek Metin binary gösterimi: " + GetBinaryString(plaintext));
     AddStep("Şifrelenecek Metin binary gösterimi: " , GetBinaryString(plaintext));

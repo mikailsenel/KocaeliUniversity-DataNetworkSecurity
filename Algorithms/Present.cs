@@ -2,6 +2,7 @@ using Algorithms.Common.Abstract;
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 /*Algoritma sağıklı çalışmaktadır.Algoritma tamamlanmıştır.*/
 
 namespace Algorithms;
@@ -15,14 +16,22 @@ public class Present : EncryptionAlgorithm
 
     protected override void Initial(string input)
     {
+         const int MaxInputLength = 16; // 16 byte = 128 bit
        // Anahtar 16 byte
             byte[] key = new byte[16] {
                 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0,
                 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0
             };
-
-            byte[] plaintext = Encoding.ASCII.GetBytes("Merhaba Dunya");
-            Console.WriteLine("Girilen Metin: " + BitConverter.ToString(plaintext));
+       
+        byte[] plaintext = Encoding.ASCII.GetBytes("Merhaba Dunya");
+        // 128 bit üzerinde veri girişi kontrolü
+        if (plaintext.Length > MaxInputLength)
+        {
+            Console.WriteLine("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.");
+            AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", BitConverter.ToString(plaintext));
+            return;
+        }
+        Console.WriteLine("Girilen Metin: " + BitConverter.ToString(plaintext));
             AddStep("Girilen Metin: " , BitConverter.ToString(plaintext));
             Console.WriteLine("Girilen Metin Binary Gösterimi: " + GetBinaryString(plaintext));
             AddStep("Girilen Metin Binary Gösterimi: " , GetBinaryString(plaintext));

@@ -20,7 +20,8 @@ public class Mysterion : EncryptionAlgorithm
 
     public Mysterion(string text) : base(text)
     {
-    }
+       
+}
 
     public string GetBinaryString(byte[] data)
 {
@@ -32,10 +33,19 @@ public class Mysterion : EncryptionAlgorithm
     }
     return binaryString.ToString();
 }
-
+    
     protected  override void Initial(string input)
+
     {
+        const int MaxInputLength = 16; // 16 byte = 128 bit
         byte[] data = System.Text.Encoding.UTF8.GetBytes(input);
+        // 128 bit üzerinde veri girişi kontrolü
+        if (data.Length > MaxInputLength)
+        {
+            Console.WriteLine("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.");
+            AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", BitConverter.ToString(data));
+            return;
+        }
         AddStep( "Şifrelenecek girdi texti", BitConverter.ToString(data));
         Console.WriteLine("Şifrelenecek girdi texti :" + BitConverter.ToString(data));
 

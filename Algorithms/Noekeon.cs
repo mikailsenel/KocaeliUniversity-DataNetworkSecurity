@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace Algorithms;
@@ -42,10 +43,17 @@ public  string GetByteArrayAsBinaryString(byte[] byteArray)
     }
     protected override void Initial(string input)
     {
+        const int MaxInputLength = 16; // 16 byte = 128 bit
         // Ornek input data
         byte[] inputData = new byte[] { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF, }; //16 bit input data giriş yapılıyor
-       
-       AddStep("Girdi Metin datasi..: " , BitConverter.ToString(inputData));
+        // 128 bit üzerinde veri girişi kontrolü
+        if (inputData.Length > MaxInputLength)
+        {
+            Console.WriteLine("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.");
+            AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", BitConverter.ToString(inputData));
+            return;
+        }
+        AddStep("Girdi Metin datasi..: " , BitConverter.ToString(inputData));
         Console.WriteLine("Girdi Metin datasi..: " + BitConverter.ToString(inputData));
         AddStep("Girdi Binary datası Binary: " ,GetByteArrayAsBinaryString(inputData));
          Console.WriteLine("Girdi Binary datası Binary: " + GetByteArrayAsBinaryString(inputData));

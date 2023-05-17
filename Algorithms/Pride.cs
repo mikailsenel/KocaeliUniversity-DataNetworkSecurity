@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Text;
 using Algorithms.Common.Abstract;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 /*Algoritma tamamlanmıştır.Algoritma Sağlıklı çalışmaktadır.*/
 
 
@@ -22,9 +23,16 @@ string plaintext = "This is a secret message";
         // Düz metin ve anahtarı belirleyin
         
         string key = "mysecretkey";
+        const int MaxInputLength = 16; // 16 byte = 128 bit
 
+        // 128 bit üzerinde veri girişi kontrolü
+        if (plaintext.Length > MaxInputLength)
+        {
+            Console.WriteLine("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.");
+            AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", plaintext);
+            return;
+        }
         // Düz metni ve anahtarı ekrana yazdırın
-        
         Console.WriteLine("Girilen metin: " + plaintext);
         AddStep("Girilen metin: " , plaintext);
         byte[] plaintextBytes = Encoding.ASCII.GetBytes(plaintext);
