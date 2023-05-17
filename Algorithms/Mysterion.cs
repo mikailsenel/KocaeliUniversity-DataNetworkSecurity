@@ -22,7 +22,23 @@ public class Mysterion : EncryptionAlgorithm
     {
        
 }
+    public string GetStringFromBinary(string binaryString)
+{
+    if (binaryString.Length % 8 != 0)
+    {
+        throw new ArgumentException("Binary string length must be a multiple of 8.");
+    }
 
+    StringBuilder stringBuilder = new StringBuilder();
+    for (int i = 0; i < binaryString.Length; i += 8)
+    {
+        string binaryByte = binaryString.Substring(i, 8);
+        byte value = Convert.ToByte(binaryByte, 2);
+        stringBuilder.Append((char)value);
+    }
+
+    return stringBuilder.ToString();
+}
     public string GetBinaryString(byte[] data)
 {
     StringBuilder binaryString = new StringBuilder();

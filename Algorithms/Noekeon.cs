@@ -3,6 +3,7 @@ using Algorithms.Common.DataTransferObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -42,72 +43,86 @@ public class Noekeon : EncryptionAlgorithm
              AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", BitConverter.ToString(inputData));
              return;
          }
-         AddStep("Girdi Metin datasi..: " , BitConverter.ToString(inputData));
-         Console.WriteLine("Girdi Metin datasi..: " + BitConverter.ToString(inputData));
-         AddStep("Girdi Binary datası Binary: " ,GetByteArrayAsBinaryString(inputData));
-          Console.WriteLine("Girdi Binary datası Binary: " + GetByteArrayAsBinaryString(inputData));
-         // Ornek key
-         uint[] key = new uint[] { 0x01234567, 0x89ABCDEF, 0xFEDCBA98, 0x76543210 }; //128 bit data
+         */
+        const int MaxInputLength = 16; // 16 byte = 128 bit
 
-         // Yerine Koyma Islemi
-         byte[] outputData = Substitution(inputData);
-          AddStep("Yerine koyma islemi sonrasi data..: " , BitConverter.ToString(outputData));
-         Console.WriteLine("Yerine koyma islemi sonrasi data..: " + BitConverter.ToString(outputData));
-           AddStep("Yerine koyma islemi sonrasi data Binary: " , GetByteArrayAsBinaryString(outputData));
-          Console.WriteLine("Yerine koyma islemi sonrasi data Binary: " + GetByteArrayAsBinaryString(outputData));
-         // Permutasyon işlemi
-         uint a = BitConverter.ToUInt32(outputData, 0);
-         uint b = BitConverter.ToUInt32(outputData, 4);
-         uint c = BitConverter.ToUInt32(outputData, 8);
-         uint d = BitConverter.ToUInt32(outputData, 12);
-
-
-         Permutation(ref a, ref b, ref c, ref d);
-         outputData = BitConverter.GetBytes(a).Concat(BitConverter.GetBytes(b)).Concat(BitConverter.GetBytes(c)).Concat(BitConverter.GetBytes(d)).ToArray();
-        AddStep("Permutasyon sonrasi data : " , BitConverter.ToString(outputData));
-         Console.WriteLine("Permutasyon sonrasi data : " + BitConverter.ToString(outputData));
-         AddStep("Permutasyon sonrasi data Binary: " , GetByteArrayAsBinaryString(outputData));
-         Console.WriteLine("Permutasyon sonrasi data Binary: " + GetByteArrayAsBinaryString(outputData));
-         //  XOR ve Toplama Islemi
-         a = BitConverter.ToUInt32(outputData, 0);
-         b = BitConverter.ToUInt32(outputData, 4);
-         c = BitConverter.ToUInt32(outputData, 8);
-         d = BitConverter.ToUInt32(outputData, 12);
-
-         XOR(ref a, ref b, ref c, ref d, key);
-         byte[] xordata = BitConverter.GetBytes(a).Concat(BitConverter.GetBytes(b)).Concat(BitConverter.GetBytes(c)).Concat(BitConverter.GetBytes(d)).ToArray();
-
-        AddStep("Xor sonrasi data: " , BitConverter.ToString(xordata));
-         Console.WriteLine("Xor sonrasi data: " + BitConverter.ToString(xordata));
-           AddStep("Xor sonrasi data Binary: " , GetByteArrayAsBinaryString(xordata));
-         Console.WriteLine("Xor sonrasi data Binary: " + GetByteArrayAsBinaryString(xordata));
-
-         Addition(ref a, ref b, ref c, ref d, key);
-         byte[] addition = BitConverter.GetBytes(a).Concat(BitConverter.GetBytes(b)).Concat(BitConverter.GetBytes(c)).Concat(BitConverter.GetBytes(d)).ToArray();
-         AddStep("Toplama sonrasi data: " , BitConverter.ToString(addition));
-         Console.WriteLine("Toplama sonrasi data: " + BitConverter.ToString(addition));
-         AddStep("Toplama sonrasi data Binary: " , GetByteArrayAsBinaryString(addition));
-         Console.WriteLine("Toplama sonrasi data Binary: " + GetByteArrayAsBinaryString(addition));
-         // Cıktı sonucu
-
-         AddStep(" Sifrelenmiş data..: " , BitConverter.ToString(outputData));
-         Console.WriteLine(" Sifrelenmiş data..: " + BitConverter.ToString(outputData));
-          AddStep("Sifrelenmiş data Binary: " , GetByteArrayAsBinaryString(outputData));
-         Console.WriteLine("Sifrelenmiş data Binary: " + GetByteArrayAsBinaryString(outputData));*/
-
+        if (input.Length > MaxInputLength)
+        {
+            Console.WriteLine("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.");
+            AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", input);
+            return;
+        }
         string inputText = input;
         string key = "mysecretkey12345";
 
-        Noekeon noekeon = new Noekeon(inputText);
-        string encryptedText = noekeon.Encrypt(inputText, key);
+
+        byte[] binaryDatakey = GetBinaryDataFromString(key);
+        string binaryStringkey = GetBinaryString(binaryDatakey);
+        AddStep("Girilen Key..: ", key);
+        AddStep("Girilen Key Binary..: ", binaryStringkey);
+
+        string encryptedText = Encrypt(inputText, key);
+        byte[] binaryData = GetBinaryDataFromString(inputText);
+        string binaryString = GetBinaryString(binaryData);
 
         Console.WriteLine("Girdi Metin datasi..: " + inputText);
         AddStep("Girdi Metin datasi..: ", inputText);
-        Console.WriteLine("Şifrelenmiş Text: " + encryptedText);
-        AddStep("Girdi Metin datasi..: ", encryptedText);
+        AddStep("Girdi Metin datasi Binary data..: ", binaryString); 
 
+        Console.WriteLine("Şifrelenmiş Text: " + encryptedText);
+        AddStep("Şifrelenmiş Text..: ", encryptedText);
+
+        byte[] binaryDataenc = GetBinaryDataFromStringenc(encryptedText);
+         string binaryStringenc = GetBinaryString(binaryDataenc);
+
+        AddStep("Şifrelenmiş Text Binary data..: ", binaryStringenc); 
 
     }
+    public string GetBinaryString(byte[] binaryData)
+    {
+        StringBuilder binaryString = new StringBuilder();
+
+        foreach (byte b in binaryData)
+        {
+            string binary = Convert.ToString(b, 2).PadLeft(8, '0');
+            binaryString.Append(binary);
+        }
+
+        return binaryString.ToString();
+    }
+
+    public byte[] GetBinaryDataFromString(string input)
+    {
+        int length = input.Length;
+        byte[] binaryData = new byte[length];
+
+        for (int i = 0; i < length; i++)
+        {
+            binaryData[i] = Convert.ToByte(input[i]);
+        }
+
+        return binaryData;
+    }
+    public byte[] GetBinaryDataFromStringenc(string input)
+    {
+        int length = input.Length;
+        byte[] binaryData = new byte[length * 8];
+
+        for (int i = 0; i < length; i++)
+        {
+            char c = input[i];
+            string binary = Convert.ToString(c, 2).PadLeft(8, '0');
+
+            for (int j = 0; j < 8; j++)
+            {
+                binaryData[i * 8 + j] = (byte)char.GetNumericValue(binary[j]);
+            }
+        }
+
+        return binaryData;
+    }
+
+
 
     private const uint Delta = 0x9e3779b9;
     private const int Rounds = 16;
