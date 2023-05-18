@@ -25,17 +25,31 @@ namespace Algorithms
             subkeys = GenerateSubkeys(key);
         }
 
-        /*public  string GetBinaryString(byte[] data)
+        public string GetBinaryString(byte[] binaryData)
         {
             StringBuilder binaryString = new StringBuilder();
-            foreach (byte b in data)
+
+            foreach (byte b in binaryData)
             {
                 string binary = Convert.ToString(b, 2).PadLeft(8, '0');
                 binaryString.Append(binary);
             }
-            return binaryString.ToString();
-        }*/
 
+            return binaryString.ToString();
+        }
+
+        public byte[] GetBinaryDataFromString(string input)
+        {
+            int length = input.Length;
+            byte[] binaryData = new byte[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                binaryData[i] = Convert.ToByte(input[i]);
+            }
+
+            return binaryData;
+        }
         private const int BlockSize = 128;
         private const int KeySize = 128;
         private const int Rounds = 32;
@@ -65,19 +79,31 @@ namespace Algorithms
         return (value >> count) | (value << (64 - count));
     }
 
-    public byte[] Encrypt(string plaintext)
-    {
-        byte[] plaintextBytes = Encoding.UTF8.GetBytes(plaintext);
-        return Encrypt(plaintextBytes);
-    }
+        public byte[] Encrypt(string plaintext)
+        {
+            byte[] plaintextBytes = Encoding.UTF8.GetBytes(plaintext);
 
-    public string DecryptToString(byte[] ciphertext)
-    {
-        byte[] decryptedBytes = Decrypt(ciphertext);
-        return Encoding.UTF8.GetString(decryptedBytes);
-    }
+            int requiredLength = (BlockSize / 8) * (int)Math.Ceiling((double)plaintextBytes.Length / (BlockSize / 8));
+            byte[] paddedPlaintext = new byte[requiredLength];
+            Array.Copy(plaintextBytes, paddedPlaintext, plaintextBytes.Length);
 
-    private byte[] Encrypt(byte[] plaintext)
+            return Encrypt(paddedPlaintext);
+        }
+
+
+        public string DecryptToString(byte[] ciphertext)
+        {
+            byte[] decryptedBytes = Decrypt(ciphertext);
+
+            // Boşluk karakterlerini çıkar
+            int nullIndex = Array.IndexOf(decryptedBytes, (byte)0);
+            if (nullIndex != -1)
+                decryptedBytes = decryptedBytes.Take(nullIndex).ToArray();
+
+            return Encoding.UTF8.GetString(decryptedBytes);
+        }
+
+        private byte[] Encrypt(byte[] plaintext)
     {
         if (plaintext.Length % (BlockSize / 8) != 0)
         {
@@ -107,8 +133,8 @@ namespace Algorithms
 
         return ciphertext;
     }
-
-    private byte[] Decrypt(byte[] ciphertext)
+      
+        private byte[] Decrypt(byte[] ciphertext)
     {
         if (ciphertext.Length % (BlockSize / 8) != 0)
         {
@@ -140,44 +166,17 @@ namespace Algorithms
     }
         protected override void Initial(string input, string inputKey)
         {
-            /*const int MaxInputLength = 16; // 16 byte = 128 bit
-            byte[] key = new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
-        byte[] plaintext = new byte[] { 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17 };
-            // 128 bit üzerinde veri girişi kontrolü
-            if (plaintext.Length > MaxInputLength)
-            {
-                Console.WriteLine("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.");
-                AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", BitConverter.ToString(plaintext));
-                return;
-            }
-
-            Console.WriteLine("Şifrelenecek Metin: " + BitConverter.ToString(plaintext).Replace("-", ""));
-    AddStep("Şifrelenecek Metin: " , BitConverter.ToString(plaintext).Replace("-", ""));
-    Console.WriteLine("Şifrelenecek Metin binary gösterimi: " + GetBinaryString(plaintext));
-    AddStep("Şifrelenecek Metin binary gösterimi: " , GetBinaryString(plaintext));
-    byte[] ciphertext = Encrypt(key, plaintext);
-    AddStep("Şifrelenmiş Metin: " , BitConverter.ToString(ciphertext).Replace("-", ""));
-    Console.WriteLine("Şifrelenmiş Metin: " + BitConverter.ToString(ciphertext).Replace("-", ""));
-    AddStep("Şifrelenmiş Metin binary gösterimi: " , GetBinaryString(ciphertext));
-    Console.WriteLine("Şifrelenmiş Metin binary gösterimi: " + GetBinaryString(ciphertext));
-
-    byte[] decryptedText =Decrypt(key, ciphertext);
-    Console.WriteLine("Çözülmüş Metin: " + BitConverter.ToString(decryptedText).Replace("-", ""));
-    AddStep("Çözülmüş Metin: " , BitConverter.ToString(decryptedText).Replace("-", ""));
-    Console.WriteLine("Çözülmüş Metin binary gösterimi: " + GetBinaryString(decryptedText));
-     AddStep("Çözülmüş Metin binary gösterimi: " , GetBinaryString(decryptedText));*/
-
-
             const int MaxInputLength = 16; // 16 byte = 128 bit
             byte[] key = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
-            //string plaintext = "Hello, Piccolo Cipher!";
+            // Giriş metnini UTF-8 olarak byte dizisine dönüştür
+            byte[] data = Encoding.UTF8.GetBytes(input);
 
-            byte[] data = System.Text.Encoding.UTF8.GetBytes(input);
-            int requiredLength = (BlockSize / 8) * (int)Math.Ceiling((double)input.Length / (BlockSize / 8));
-           input = input.PadRight(requiredLength, '\0');
+            // Giriş metnini gereken uzunluğa tamamla
+            int requiredLength = (BlockSize / 8) * (int)Math.Ceiling((double)data.Length / (BlockSize / 8));
+            byte[] paddedData = new byte[requiredLength];
+            Array.Copy(data, paddedData, data.Length);
 
-           
             // 128 bit üzerinde veri girişi kontrolü
             if (data.Length > MaxInputLength)
             {
@@ -185,20 +184,43 @@ namespace Algorithms
                 AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", BitConverter.ToString(data));
                 return;
             }
+
             SetKey(key);
-            byte[] ciphertext = Encrypt(input);
+            string binaryStringkey = GetBinaryString(key);
+            AddStep("Girilen Key..:", BitConverter.ToString(key));
+            AddStep("Girilen Key Binary..:", binaryStringkey);
+            byte[] ciphertext = Encrypt(paddedData);
             string decryptedText = DecryptToString(ciphertext);
 
-            Console.WriteLine("Plaintext:  " + input);
-            AddStep("Plaintext:  " , input);
-            Console.WriteLine("Ciphertext: " + BitConverter.ToString(ciphertext).Replace("-", " "));
-            AddStep("Ciphertext: " , BitConverter.ToString(ciphertext).Replace("-", " "));
-            Console.WriteLine("Decrypted:  " + decryptedText);
-            AddStep("Decrypted:  " , decryptedText);
+            Console.WriteLine("Girilen Metin..:  " + input);
+            AddStep("Girilen Metin..:", input);
+            AddStep("Girilen Metin Binary", ConvertToBinary(input));
 
+            Console.WriteLine("Şifreli Metin..: " + BitConverter.ToString(ciphertext).Replace("-", " "));
+            AddStep("Şifreli Metin..: ", BitConverter.ToString(ciphertext).Replace("-", " "));
+
+            string binarydec = GetBinaryString(ciphertext);
+            AddStep("Şifreli Metin Binary..:", binarydec);
+
+            Console.WriteLine("Deşifrelenmiş Metin..:  " + decryptedText.TrimEnd('\0'));
+            AddStep("Deşifrelenmiş Metin..:  ", decryptedText.TrimEnd('\0'));
+
+            AddStep("Deşifrelenmiş Metin Binary...:", ConvertToBinary(decryptedText.TrimEnd('\0')));
         }
 
-          
+        static string ConvertToBinary(string data)
+        {
+            byte[] binaryData = Encoding.Default.GetBytes(data);
+            StringBuilder binaryStringBuilder = new StringBuilder();
+
+            foreach (byte b in binaryData)
+            {
+                binaryStringBuilder.Append(Convert.ToString(b, 2).PadLeft(8, '0'));
+            }
+
+            return binaryStringBuilder.ToString();
+        }
+
 
     }
 }

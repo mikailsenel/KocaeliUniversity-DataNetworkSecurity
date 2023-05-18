@@ -44,6 +44,8 @@ public class Noekeon : EncryptionAlgorithm
             return;
         }
         string inputText = input;
+
+        
         string key = "mysecretkey12345";
 
 
