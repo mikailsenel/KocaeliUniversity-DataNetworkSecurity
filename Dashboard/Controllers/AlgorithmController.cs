@@ -42,12 +42,6 @@ public class AlgorithmController : Controller
     {
         return Ok(new Pride(text).GetSteps());
     }
-    [HttpGet("/skinny/{text}", Name = nameof(GetSkinny))]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    public async Task<IActionResult> GetSkinny([FromRoute] string text)
-    {
-        return Ok(new Skinny(text).GetSteps());
-    }
 
     [HttpGet("/sea/{text}", Name = nameof(GetSea))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
@@ -56,6 +50,12 @@ public class AlgorithmController : Controller
         return Ok(new Sea(text).GetSteps());
     }
 
+    [HttpGet("/simeck/{text}", Name = nameof(GetSimeck))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    public async Task<IActionResult> GetSimeck([FromRoute] string text)
+    {
+        return Ok(new Simeck(text).GetSteps());
+    }
 
     [HttpGet("/simon/{text}", Name = nameof(GetSimon))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
@@ -64,12 +64,23 @@ public class AlgorithmController : Controller
         return Ok(new Simon(text).GetSteps());
     }
 
-    [HttpGet("/simeck/{text}", Name = nameof(GetSimeck))]
+    [HttpGet("/skinny/{text}", Name = nameof(GetSkinny))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    public async Task<IActionResult> GetSimeck([FromRoute] string text)
+    public async Task<IActionResult> GetSkinny([FromRoute] string text)
     {
-        return Ok(new Simeck(text).GetSteps());
+        return Ok(new Skinny(text).GetSteps());
     }
+
+    [HttpGet("/sparx/{text}", Name = nameof(GetSparx))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    public async Task<IActionResult> GetSparx([FromRoute] string text)
+    {
+        return Ok(new Sparx(text).GetSteps());
+    }
+
+
+
+
 
 
 }

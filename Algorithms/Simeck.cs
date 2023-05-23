@@ -11,10 +11,118 @@ namespace Algorithms
 {
     public class Simeck : EncryptionAlgorithm
     {
+        const int BLOCK_SIZE = 128; // blok boyutu (bit)
+        private const int WORDSIZE = 16; //byte
+        const int NUM_ROUNDS = 44;
+
         public Simeck(string text) : base(text)
         {
+
         }
-        
+
+        protected override void Initial(string text, string _key)
+        {
+
+            byte[] plainText;
+
+            if (text.Equals("-"))
+                plainText = new byte[WORDSIZE] { 0x75, 0x6E, 0x64, 0x20, 0x6C, 0x69, 0x6B, 0x65, 0x75, 0x6E, 0x64, 0x20, 0x6C, 0x69, 0x6B, 0x65 };
+            else
+                plainText = Encoding.ASCII.GetBytes(text);
+
+            byte[] key = new byte[] { 0x00, 0x01, 0x02, 0x03, 0x08, 0x09, 0x0A, 0x0B, 0x10, 0x11, 0x12, 0x13, 0x18, 0x19, 0x1A, 0x1B };
+
+            byte[] chiperText = new byte[plainText.Length % WORDSIZE == 0 ? plainText.Length : plainText.Length + (WORDSIZE - (plainText.Length % WORDSIZE))];
+
+            plainText.CopyTo(chiperText, 0);
+
+
+            for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
+            {
+                byte[] tmp = new byte[WORDSIZE];
+
+                Array.Copy(chiperText, i * WORDSIZE, tmp, 0, WORDSIZE);
+
+                tmp = Encrypt(i + 1, tmp, key);
+
+                Array.Copy(tmp, 0, chiperText, i * WORDSIZE, WORDSIZE);
+            }
+
+            AddStep("Düz metin      : " + BitConverter.ToString(plainText), toBinaryString(plainText));
+
+            AddStep("Anahtar        : " + BitConverter.ToString(key), toBinaryString(key));
+
+            AddStep("Şifreli metin  : " + BitConverter.ToString(chiperText), toBinaryString(chiperText));
+
+
+        }
+
+        private static string print_chipers(byte[] state, byte[] keyCells)
+        {
+            return "S = " + BitConverter.ToString(state.Cast<byte>().ToArray()) + (keyCells == null ? "" : " - TK = " + BitConverter.ToString(keyCells.Cast<byte>().ToArray()));
+        }
+
+
+        public static void clearlast0(ref Byte[] chiperText)
+        {
+            if (chiperText.Length == 0)
+                return;
+
+            int clearcount = 0;
+
+            for (int i = (chiperText.Length - 1); i >= (chiperText.Length - WORDSIZE); i--)
+            {
+                if (chiperText[i] == 0x00)
+                    clearcount++;
+                else
+                    break;
+            }
+
+            if (clearcount > 0)
+                Array.Resize<Byte>(ref chiperText, chiperText.Length - clearcount);
+        }
+
+
+
+
+
+        // Encrypt a 64-bit plaintext with a 128-bit key
+        public byte[] Encrypt(int partno, byte[] bplaintext, byte[] masterKey)
+        {
+
+            uint[] ciphertext = byteToUints(bplaintext, 0);
+            uint[] keys = byteToUints(masterKey, 0);
+
+            uint temp;
+
+            uint constant = 0xFFFFFFFC;
+            ulong sequence = 0x938BCA3083F;
+
+            AddStep("Encryption Part (" + partno.ToString("D2") + ") - Başlangıç  " + print_chipers(bplaintext, null), toBinaryString(bplaintext));
+
+            for (int i = 0; i < NUM_ROUNDS; i++)
+            {
+                ROUND64(keys[0], ref ciphertext[1], ref ciphertext[0]);
+                ROUND64(keys[0], ref ciphertext[3], ref ciphertext[2]);
+                constant &= 0xFFFFFFFC;
+                constant |= (uint)(sequence & 1);
+                sequence >>= 1;
+                ROUND64(constant, ref keys[1], ref keys[0]);
+                // rotate the LFSR of keys
+                temp = keys[1];
+                keys[1] = keys[2];
+                keys[2] = keys[3];
+                keys[3] = temp;
+
+
+                AddStep("Encryption Part (" + partno.ToString("D2") + ") Round : (" + i.ToString("D2") + ") " + print_chipers(uinttoByte(ciphertext), null), toBinaryString(uinttoByte(ciphertext)));
+
+            }
+
+            return uinttoByte(ciphertext);
+
+        }
+
         public byte[] GetBigEndianBytes(UInt32 val, bool isLittleEndian)
         {
             UInt32 bigEndian = val;
@@ -28,7 +136,7 @@ namespace Algorithms
 
         private byte[] uinttoByte(uint[] deger)
         {
-            byte[] tmpreturn=new byte[deger.Length * sizeof(uint)];
+            byte[] tmpreturn = new byte[deger.Length * sizeof(uint)];
 
             for (int i = 0; i < deger.Length; i++)
             {
@@ -42,6 +150,10 @@ namespace Algorithms
             return tmpreturn;
         }
 
+        public string toBinaryString(byte[,] data)
+        {
+            return toBinaryString(data.Cast<byte>().ToArray());
+        }
 
         public string toBinaryString(byte[] data)
         {
@@ -49,48 +161,12 @@ namespace Algorithms
             foreach (byte r in data)
             {
                 string binary = Convert.ToString(r, 2).PadLeft(8, '0');
-                binaryString.Append(binary+" ");
+                binaryString.Append(binary + " ");
             }
             return binaryString.ToString();
         }
 
-        const int BLOCK_SIZE = 128; // blok boyutu (bit)
 
-        protected override void Initial(string text, string key)
-        {
-
-            byte[] bufferPlain = Encoding.ASCII.GetBytes(text);
-            
-            //uint[] text64 = { 0x20646e75, 0x656b696c, 0x20646e75, 0x656b696c };
-            uint[] text64 = byteToUints(Encoding.ASCII.GetBytes(text), 0);
-
-
-            // girdilerin uzunluklarını kontrol et
-            if (bufferPlain.Length != BLOCK_SIZE / 8)
-                throw new ArgumentException("Text boyutu " + BLOCK_SIZE + " bit uzunluğunda olmalı");
-
-            
-            uint[] key128 =
-                {
-                    0x03020100,
-                    0x0b0a0908,
-                    0x13121110,
-                    0x1b1a1918
-                };
-
-            
-            AddStep("Düz metin: ", BitConverter.ToString(uinttoByte(text64)));                         
-            AddStep("Düz metin: ", toBinaryString(uinttoByte(text64)));
-            
-            AddStep("Anahtar: ", BitConverter.ToString(uinttoByte(key128)));
-            AddStep("Anahtar: ", toBinaryString(uinttoByte(key128)));
-
-            Encrypt(key128, text64, text64);
-            
-            // Şifreli metni ekrana yazdırın
-            AddStep("Şifreli metin: ", BitConverter.ToString(uinttoByte(text64)));
-            AddStep("Şifreli metin: ", toBinaryString(uinttoByte(text64)));
-        }
 
         // Bir bayt dizisini bir ulong dizisine dönüştüren işlev
         public uint[] byteToUints(byte[] bytes, int minBytes)
@@ -104,9 +180,9 @@ namespace Algorithms
 
             Console.WriteLine();
 
-            
+
             uint[] c = new uint[b.Length / 4];
-                        
+
             for (int i = 0; i < c.Length; i++)
                 c[i] = BitConverter.ToUInt32(b, i * 4);
 
@@ -128,51 +204,8 @@ namespace Algorithms
         }
 
 
-        // Encrypt a 64-bit plaintext with a 128-bit key
-        public void Encrypt(uint[] masterKey, uint[] plaintext, uint[] ciphertext)
-        {
-            const int NUM_ROUNDS = 44;
 
-            uint[] keys = new uint[4]
-            {
-                masterKey[0],
-                masterKey[1],
-                masterKey[2],
-                masterKey[3]
-            };
-            ciphertext[0] = plaintext[0];
-            ciphertext[1] = plaintext[1];
-
-            ciphertext[2] = plaintext[2];
-            ciphertext[3] = plaintext[3];
-
-            uint temp;
-
-            uint constant = 0xFFFFFFFC;
-            ulong sequence = 0x938BCA3083F;
-
-            for (int i = 0; i < NUM_ROUNDS; i++)
-            {
-                ROUND64(keys[0], ref ciphertext[1], ref ciphertext[0]);
-                ROUND64(keys[0], ref ciphertext[3], ref ciphertext[2]);
-                constant &= 0xFFFFFFFC;
-                constant |= (uint)(sequence & 1);
-                sequence >>= 1;
-                ROUND64(constant, ref keys[1], ref keys[0]);                
-                // rotate the LFSR of keys
-                temp = keys[1];
-                keys[1] = keys[2];
-                keys[2] = keys[3];
-                keys[3] = temp;
-
-                
-                AddStep("Encryption Round : (" + i.ToString() + ") ", toBinaryString(uinttoByte(ciphertext)));
-                
-            }
-
-            
-
-        }
 
     }
+
 }

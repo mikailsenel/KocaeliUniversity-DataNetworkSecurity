@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,102 +12,418 @@ namespace Algorithms
     public class Skinny : EncryptionAlgorithm
     {
         // SKINNY algoritmasının parametreleri
-        const int BLOCK_SIZE = 128; // blok boyutu (bit)
-        const int KEY_SIZE = 128; // anahtar boyutu (bit)
-        const int TWEAK_SIZE = 128; // tweak boyutu (bit)
-        const int ROUND_COUNT = 16; // yuvarlama sayısı
 
+        private const int BLOCKSIZE = 128;
+        private const int KEYSIZE = 128;
+        private const int ROUND = 40;
+        private const int WORDSIZE = 16;
 
-        // SKINNY algoritmasının sabit matrisleri
-        static byte[,] M0 = new byte[8, 8] {
-            {11, 15, 4,20, 31, 41, 121, 11},
-            {25, 15,16, 49, 51, 74, 111,21},
-            {61, 42, 215, 4, 0, 42, 10, 111},
-            {1, 69, 95, 64, 10, 100, 56, 47},
-            {87, 88, 98, 90, 44, 42, 2 ,19},
-            {1 ,32 ,65 ,19 ,72 ,11 ,88 ,72},
-            {95 ,34 ,104 ,62 ,241 ,151 ,162 ,0},
-            {92 ,215 ,156 ,114 ,184 ,75 ,94 ,91}
+        // 8-bit Sbox
+        private static readonly byte[] sbox_8 = {
+            0x65, 0x4c, 0x6a, 0x42, 0x4b, 0x63, 0x43, 0x6b, 0x55, 0x75, 0x5a, 0x7a, 0x53, 0x73, 0x5b, 0x7b,
+            0x35, 0x8c, 0x3a, 0x81, 0x89, 0x33, 0x80, 0x3b, 0x95, 0x25, 0x98, 0x2a, 0x90, 0x23, 0x99, 0x2b,
+            0xe5, 0xcc, 0xe8, 0xc1, 0xc9, 0xe0, 0xc0, 0xe9, 0xd5, 0xf5, 0xd8, 0xf8, 0xd0, 0xf0, 0xd9, 0xf9,
+            0xa5, 0x1c, 0xa8, 0x12, 0x1b, 0xa0, 0x13, 0xa9, 0x05, 0xb5, 0x0a, 0xb8, 0x03, 0xb0, 0x0b, 0xb9,
+            0x32, 0x88, 0x3c, 0x85, 0x8d, 0x34, 0x84, 0x3d, 0x91, 0x22, 0x9c, 0x2c, 0x94, 0x24, 0x9d, 0x2d,
+            0x62, 0x4a, 0x6c, 0x45, 0x4d, 0x64, 0x44, 0x6d, 0x52, 0x72, 0x5c, 0x7c, 0x54, 0x74, 0x5d, 0x7d,
+            0xa1, 0x1a, 0xac, 0x15, 0x1d, 0xa4, 0x14, 0xad, 0x02, 0xb1, 0x0c, 0xbc, 0x04, 0xb4, 0x0d, 0xbd,
+            0xe1, 0xc8, 0xec, 0xc5, 0xcd, 0xe4, 0xc4, 0xed, 0xd1, 0xf1, 0xdc, 0xfc, 0xd4, 0xf4, 0xdd, 0xfd,
+            0x36, 0x8e, 0x38, 0x82, 0x8b, 0x30, 0x83, 0x39, 0x96, 0x26, 0x9a, 0x28, 0x93, 0x20, 0x9b, 0x29,
+            0x66, 0x4e, 0x68, 0x41, 0x49, 0x60, 0x40, 0x69, 0x56, 0x76, 0x58, 0x78, 0x50, 0x70, 0x59, 0x79,
+            0xa6, 0x1e, 0xaa, 0x11, 0x19, 0xa3, 0x10, 0xab, 0x06, 0xb6, 0x08, 0xba, 0x00, 0xb3, 0x09, 0xbb,
+            0xe6, 0xce, 0xea, 0xc2, 0xcb, 0xe3, 0xc3, 0xeb, 0xd6, 0xf6, 0xda, 0xfa, 0xd3, 0xf3, 0xdb, 0xfb,
+            0x31, 0x8a, 0x3e, 0x86, 0x8f, 0x37, 0x87, 0x3f, 0x92, 0x21, 0x9e, 0x2e, 0x97, 0x27, 0x9f, 0x2f,
+            0x61, 0x48, 0x6e, 0x46, 0x4f, 0x67, 0x47, 0x6f, 0x51, 0x71, 0x5e, 0x7e, 0x57, 0x77, 0x5f, 0x7f,
+            0xa2, 0x18, 0xae, 0x16, 0x1f, 0xa7, 0x17, 0xaf, 0x01, 0xb2, 0x0e, 0xbe, 0x07, 0xb7, 0x0f, 0xbf,
+            0xe2, 0xca, 0xee, 0xc6, 0xcf, 0xe7, 0xc7, 0xef, 0xd2, 0xf2, 0xde, 0xfe, 0xd7, 0xf7, 0xdf, 0xff
+        };
+        private static readonly byte[] sbox_8_inv = {
+            0xac, 0xe8, 0x68, 0x3c, 0x6c, 0x38, 0xa8, 0xec, 0xaa, 0xae, 0x3a, 0x3e, 0x6a, 0x6e, 0xea, 0xee,
+            0xa6, 0xa3, 0x33, 0x36, 0x66, 0x63, 0xe3, 0xe6, 0xe1, 0xa4, 0x61, 0x34, 0x31, 0x64, 0xa1, 0xe4,
+            0x8d, 0xc9, 0x49, 0x1d, 0x4d, 0x19, 0x89, 0xcd, 0x8b, 0x8f, 0x1b, 0x1f, 0x4b, 0x4f, 0xcb, 0xcf,
+            0x85, 0xc0, 0x40, 0x15, 0x45, 0x10, 0x80, 0xc5, 0x82, 0x87, 0x12, 0x17, 0x42, 0x47, 0xc2, 0xc7,
+            0x96, 0x93, 0x03, 0x06, 0x56, 0x53, 0xd3, 0xd6, 0xd1, 0x94, 0x51, 0x04, 0x01, 0x54, 0x91, 0xd4,
+            0x9c, 0xd8, 0x58, 0x0c, 0x5c, 0x08, 0x98, 0xdc, 0x9a, 0x9e, 0x0a, 0x0e, 0x5a, 0x5e, 0xda, 0xde,
+            0x95, 0xd0, 0x50, 0x05, 0x55, 0x00, 0x90, 0xd5, 0x92, 0x97, 0x02, 0x07, 0x52, 0x57, 0xd2, 0xd7,
+            0x9d, 0xd9, 0x59, 0x0d, 0x5d, 0x09, 0x99, 0xdd, 0x9b, 0x9f, 0x0b, 0x0f, 0x5b, 0x5f, 0xdb, 0xdf,
+            0x16, 0x13, 0x83, 0x86, 0x46, 0x43, 0xc3, 0xc6, 0x41, 0x14, 0xc1, 0x84, 0x11, 0x44, 0x81, 0xc4,
+            0x1c, 0x48, 0xc8, 0x8c, 0x4c, 0x18, 0x88, 0xcc, 0x1a, 0x1e, 0x8a, 0x8e, 0x4a, 0x4e, 0xca, 0xce,
+            0x35, 0x60, 0xe0, 0xa5, 0x65, 0x30, 0xa0, 0xe5, 0x32, 0x37, 0xa2, 0xa7, 0x62, 0x67, 0xe2, 0xe7,
+            0x3d, 0x69, 0xe9, 0xad, 0x6d, 0x39, 0xa9, 0xed, 0x3b, 0x3f, 0xab, 0xaf, 0x6b, 0x6f, 0xeb, 0xef,
+            0x26, 0x23, 0xb3, 0xb6, 0x76, 0x73, 0xf3, 0xf6, 0x71, 0x24, 0xf1, 0xb4, 0x21, 0x74, 0xb1, 0xf4,
+            0x2c, 0x78, 0xf8, 0xbc, 0x7c, 0x28, 0xb8, 0xfc, 0x2a, 0x2e, 0xba, 0xbe, 0x7a, 0x7e, 0xfa, 0xfe,
+            0x25, 0x70, 0xf0, 0xb5, 0x75, 0x20, 0xb0, 0xf5, 0x22, 0x27, 0xb2, 0xb7, 0x72, 0x77, 0xf2, 0xf7,
+            0x2d, 0x79, 0xf9, 0xbd, 0x7d, 0x29, 0xb9, 0xfd, 0x2b, 0x2f, 0xbb, 0xbf, 0x7b, 0x7f, 0xfb, 0xff
         };
 
-        static byte[,] M00 = new byte[8, 8] {
-            {54 ,55 ,41 ,14 ,82 ,12 ,0 ,11},
-            {98 ,15 ,132 ,72 ,71 ,10 ,2 ,4},
-            {74 ,51 ,64 ,69 ,61 ,122 ,172 ,44},
-            {95 ,164 ,61 ,11 ,201 ,12 ,145 ,14},
-            {96 ,66 ,64 ,12 ,92 ,60 ,64 ,12},
-            {8 ,45 ,58 ,16 ,71 ,61 ,17 ,75},
-            {6 ,31 ,10 ,52 ,34 ,43 ,22 ,74},
-            {94 ,0 ,72 ,63 ,78 ,88 ,81 ,45}
+        // ShiftAndSwitchRows permütasyonu
+        private static readonly byte[] P = { 0, 1, 2, 3, 7, 4, 5, 6, 10, 11, 8, 9, 13, 14, 15, 12 };
+        private static readonly byte[] P_inv = { 0, 1, 2, 3, 5, 6, 7, 4, 10, 11, 8, 9, 15, 12, 13, 14 };
+
+        // Tweakey permütasyonu
+        private static readonly byte[] TWEAKEY_P = { 9, 15, 8, 13, 10, 14, 12, 11, 0, 1, 2, 3, 4, 5, 6, 7 };
+        private static readonly byte[] TWEAKEY_P_inv = { 8, 9, 10, 11, 12, 13, 14, 15, 2, 0, 4, 7, 6, 3, 5, 1 };
+
+        // Round sabitler
+        private static readonly byte[] RC = {
+            0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3E, 0x3D, 0x3B, 0x37, 0x2F,
+            0x1E, 0x3C, 0x39, 0x33, 0x27, 0x0E, 0x1D, 0x3A, 0x35, 0x2B,
+            0x16, 0x2C, 0x18, 0x30, 0x21, 0x02, 0x05, 0x0B, 0x17, 0x2E,
+            0x1C, 0x38, 0x31, 0x23, 0x06, 0x0D, 0x1B, 0x36, 0x2D, 0x1A,
+            0x34, 0x29, 0x12, 0x24, 0x08, 0x11, 0x22, 0x04, 0x09, 0x13,
+            0x26, 0x0C, 0x19, 0x32, 0x25, 0x0A, 0x15, 0x2A, 0x14, 0x28,
+            0x10, 0x20
         };
 
 
-        // SKINNY algoritmasının S-box tablosu
-        static byte[] Sbox = new byte[16] {
-            12, 6, 9, 0,
-            1, 14, 2, 11,
-            4, 5, 3, 15,
-            13, 10, 7, 8
-        };
-
-        public Skinny(string text) : base(text)
+        private static string print_chipers(byte[,] state, byte[,] keyCells)
         {
+            return "S = " + BitConverter.ToString(state.Cast<byte>().ToArray()) + (keyCells == null ? "" : " - TK = " + BitConverter.ToString(keyCells.Cast<byte>().ToArray()));
         }
 
-        protected override void Initial(string text, string inputKey)
+
+        // Alt anahtarı çıkarın ve dahili duruma uygulayın (birlikte XORlanmış iki üst satır olmalıdır), ardından tweakey durumunu güncelleyin
+        private static void AddKey(byte[,] state, byte[,] keyCells)
         {
-            // test verileri
-            byte[] plaintext = System.Text.Encoding.UTF8.GetBytes(text);
-                //new byte[] {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,0x88, 0x99, 0xaa, 0xbb,0xcc, 0xdd, 0xee, 0xff};
+            int i, j, k;
+            byte pos;
+            byte[,] keyCells_tmp = new byte[4, 4];
 
-            byte[] key = new byte[] {0x00, 0x0a, 0xb2, 0xc3,
-                             0x14, 0xba, 0xaa, 0x71,
-                             0xe8, 0xa9, 0xa0, 0xba,
-                             0x0c, 0xed, 0x07, 0x0f};
+            // alt anahtarı dahili duruma uygula
+            for (i = 0; i <= 1; i++)
+            {
+                for (j = 0; j < 4; j++)
+                {
+                    state[i, j] ^= keyCells[i, j];
+                }
+            }
 
+            // alt anahtar durumlarını permütasyon ile güncelleyin
 
-            // girdilerin uzunluklarını kontrol et
-            if (plaintext.Length != BLOCK_SIZE / 8)
-                throw new ArgumentException("Text boyutu " + BLOCK_SIZE + " bit uzunluğunda olmalı");
-            if (key.Length != KEY_SIZE / 8)
-                throw new ArgumentException("Key " + KEY_SIZE + " bit uzunluğunda olmalı");
-
-
-            // rastgele bir tweak girdisi oluştur
-            RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
-            byte[] tweak = new byte[TWEAK_SIZE / 8];
-            rng.GetBytes(tweak);
-
-            AddStep("Düz metin: ", BitConverter.ToString(plaintext));
-            AddStep("Düz metin: " , toBinaryString(plaintext));
-            //Console.WriteLine("Düz metin: " + BitConverter.ToString(plaintext));
-            //Console.WriteLine("Düz metin: " + toBinaryString(plaintext));
+            for (i = 0; i < 4; i++)
+            {
+                for (j = 0; j < 4; j++)
+                {
+                    // TWEAKEY permütasyonunun uygulanması
+                    pos = TWEAKEY_P[j + 4 * i];
+                    keyCells_tmp[i, j] = keyCells[pos >> 2, pos & 0x3];
+                }
+            }
 
 
-            AddStep("Anahtar: ", BitConverter.ToString(key));
-            AddStep("Anahtar: ", toBinaryString(key));
 
-            //Console.WriteLine("Anahtar: " + BitConverter.ToString(key));
 
-            AddStep("Tweak: ", BitConverter.ToString(tweak));
-            AddStep("Tweak: ", toBinaryString(tweak));
-            //Console.WriteLine("     Tweak: " + BitConverter.ToString(tweak));
+            for (i = 0; i < 4; i++)
+            {
+                for (j = 0; j < 4; j++)
+                {
+                    keyCells[i, j] = keyCells_tmp[i, j];
+                }
+            }
 
-            byte[] ciphertext = Encrypt(plaintext, key, tweak);
+        }
 
-            // Şifreli metni ekrana yazdırın
-            AddStep("Şifreli metin: ", BitConverter.ToString(ciphertext));
-            AddStep("Şifreli metin: ", toBinaryString(ciphertext));
-            //Console.WriteLine("Şifreli metin: " + BitConverter.ToString(ciphertext));
 
-            // deşifreleme işlemi 
-            byte[] decryptedtext = Decrypt(ciphertext, key, tweak);
 
-            // Çözülmüş düz metni ekrana yazdırın
-            AddStep("Çözülmüş metin: ", BitConverter.ToString(decryptedtext));
-            AddStep("Çözülmüş metin: ", toBinaryString(decryptedtext));
-            //Console.WriteLine("Çözülmüş metin: " + BitConverter.ToString(decryptedtext));
+        // Alt anahtarı çıkarın ve dahili duruma uygulayın (birlikte XORlanmış iki üst satır olmalıdır), ardından tweakey durumunu güncelleyin (ters fonksiyon}
+        private static void AddKey_inv(byte[,] state, byte[,] keyCells)
+        {
+            int i, j, k;
+            byte pos;
+            byte[,] keyCells_tmp = new byte[4, 4];
 
+            // alt anahtar durumlarını permütasyon ile güncelleyin
+
+            for (i = 0; i < 4; i++)
+            {
+                for (j = 0; j < 4; j++)
+                {
+                    //ters TWEAKEY permütasyonunun uygulaması
+                    pos = TWEAKEY_P_inv[j + 4 * i];
+                    keyCells_tmp[i, j] = keyCells[pos >> 2, pos & 0x3];
+                }
+            }
+
+
+
+
+            for (i = 0; i < 4; i++)
+            {
+                for (j = 0; j < 4; j++)
+                {
+                    keyCells[i, j] = keyCells_tmp[i, j];
+                }
+            }
+
+
+
+            // alt anahtarı dahili duruma uygula
+            for (i = 0; i <= 1; i++)
+            {
+                for (j = 0; j < 4; j++)
+                {
+                    state[i, j] ^= keyCells[i, j];
+
+                }
+            }
+        }
+
+
+
+        // Sabitleri uygulayın: 6 bit üzerinde bir LFSR sayacı kullanarak, 6 biti dahili durumun ilk 6 bitine XORlarız
+        public void AddConstants(byte[,] state, int r)
+        {
+            state[0, 0] = (byte)(state[0, 0] ^ (RC[r] & 0xf));
+            state[1, 0] = (byte)(state[1, 0] ^ ((RC[r] >> 4) & 0x3));
+            state[2, 0] = (byte)(state[2, 0] ^ 0x2);
+        }
+
+
+
+        // 8 bit Sbox uygulayın
+        public void SubCell8(byte[,] state)
+        {
+            int i, j;
+            for (i = 0; i < 4; i++)
+                for (j = 0; j < 4; j++)
+                    state[i, j] = sbox_8[state[i, j]];
+        }
+
+        // 8 bit ters Sbox uygulayın
+        public void SubCell8_inv(byte[,] state)
+        {
+            int i, j;
+            for (i = 0; i < 4; i++)
+                for (j = 0; j < 4; j++)
+                    state[i, j] = sbox_8_inv[state[i, j]];
+        }
+
+
+        // ShiftRows işlevini uygulayın
+        public void ShiftRows(byte[,] state)
+        {
+            int i, j, pos;
+
+            byte[,] state_tmp = new byte[4, 4];
+
+            for (i = 0; i < 4; i++)
+            {
+                for (j = 0; j < 4; j++)
+                {
+                    //ShiftRows permütasyonunun uygulanması
+                    pos = P[j + 4 * i];
+                    state_tmp[i, j] = state[pos >> 2, pos & 0x3];
+                }
+            }
+
+            for (i = 0; i < 4; i++)
+            {
+                for (j = 0; j < 4; j++)
+                {
+                    state[i, j] = state_tmp[i, j];
+                }
+            }
+        }
+
+
+        // Ters ShiftRows işlevini uygulayın
+        public void ShiftRows_inv(byte[,] state)
+        {
+            int i, j, pos;
+
+            byte[,] state_tmp = new byte[4, 4];
+
+            for (i = 0; i < 4; i++)
+            {
+                for (j = 0; j < 4; j++)
+                {
+                    //ters ShiftRows permütasyonunun uygulanması
+                    pos = P_inv[j + 4 * i];
+                    state_tmp[i, j] = state[pos >> 2, pos & 0x3];
+                }
+            }
+
+            for (i = 0; i < 4; i++)
+            {
+                for (j = 0; j < 4; j++)
+                {
+                    state[i, j] = state_tmp[i, j];
+                }
+            }
+        }
+
+
+        // Doğrusal difüzyon matrisini uygulayın
+        //M =
+        //1 0 1 1
+        //1 0 0 0
+        //0 1 1 0
+        //1 0 1 0
+        public void MixColumn(byte[,] state)
+        {
+            int j;
+            byte temp;
+
+            for (j = 0; j < 4; j++)
+            {
+                state[1, j] ^= state[2, j];
+                state[2, j] ^= state[0, j];
+                state[3, j] ^= state[2, j];
+
+                temp = state[3, j];
+                state[3, j] = state[2, j];
+                state[2, j] = state[1, j];
+                state[1, j] = state[0, j];
+                state[0, j] = temp;
+            }
+        }
+
+
+        // Ters doğrusal difüzyon matrisini uygulayın
+        public void MixColumn_inv(byte[,] state)
+        {
+            int j;
+            byte temp;
+
+            for (j = 0; j < 4; j++)
+            {
+                temp = state[3, j];
+                state[3, j] = state[0, j];
+                state[0, j] = state[1, j];
+                state[1, j] = state[2, j];
+                state[2, j] = temp;
+
+                state[3, j] ^= state[2, j];
+                state[2, j] ^= state[0, j];
+                state[1, j] ^= state[2, j];
+            }
+        }
+
+
+        // Skinny'nin şifreleme işlevi
+        public void decrypt(int partno, byte[] input, byte[] userkey)
+        {
+
+            byte[,] state = new byte[4, 4];
+            byte[,] dummy = new byte[4, 4];
+            byte[,] keyCells = new byte[4, 4];
+            int i;
+
+
+            Array.Clear(keyCells, 0, keyCells.Length);
+            //memset(keyCells, 0, 16);
+
+            for (i = 0; i < 16; i++)
+            {
+
+                state[i >> 2, i & 0x3] = (byte)(input[i] & 0xFF);
+                keyCells[i >> 2, i & 0x3] = (byte)(userkey[i] & 0xFF);
+
+            }
+
+            for (i = ROUND - 1; i >= 0; i--)
+            {
+                AddKey(dummy, keyCells);
+            }
+
+
+            AddStep("Decryption Part (" + partno.ToString() + ") - Başlangıç :" + print_chipers(state, null), toBinaryString(state));
+
+
+            for (i = ROUND - 1; i >= 0; i--)
+            {
+                MixColumn_inv(state);
+
+                ShiftRows_inv(state);
+
+                AddKey_inv(state, keyCells);
+
+                AddConstants(state, i);
+
+                SubCell8_inv(state);
+
+                AddStep("Decryption Part (" + partno.ToString() + ")  Round : (" + i.ToString() + ") " + print_chipers(state, null), toBinaryString(state));
+
+            }
+
+
+
+            for (i = 0; i < 16; i++)
+                input[i] = (byte)(state[i >> 2, i & 0x3] & 0xFF);
+
+        }
+
+
+
+        // Skinny'nin şifreleme fonksiyonu
+        public void encrypt(int partno, byte[] input, byte[] userkey)
+        {
+
+
+            byte[,] state = new byte[4, 4];
+            byte[,] keyCells = new byte[4, 4];
+            int i;
+
+
+            Array.Clear(keyCells, 0, keyCells.Length);
+
+            for (i = 0; i < 16; i++)
+            {
+
+                state[i >> 2, i & 0x3] = input[i];
+                keyCells[i >> 2, i & 0x3] = userkey[i];
+
+
+            }
+
+            AddStep("Encryption Part (" + partno.ToString() + ") - Başlangıç : " + print_chipers(state, null), toBinaryString(state));
+
+
+            for (i = 0; i < ROUND; i++)
+            {
+                SubCell8(state);
+
+                AddConstants(state, i);
+
+                AddKey(state, keyCells);
+
+                ShiftRows(state);
+
+                MixColumn(state);
+
+                AddStep("Encryption Part (" + partno.ToString() + ") Round : (" + i.ToString() + ") " + print_chipers(state, null), toBinaryString(state));
+
+            }
+
+
+            for (i = 0; i < 16; i++)
+                input[i] = (byte)(state[i >> 2, i & 0x3] & 0xFF);
+
+        }
+
+
+        public static void clearlast0(ref Byte[] chiperText)
+        {
+            if (chiperText.Length == 0)
+                return;
+
+            int clearcount = 0;
+
+            for (int i = (chiperText.Length - 1); i >= (chiperText.Length - WORDSIZE); i--)
+            {
+                if (chiperText[i] == 0x00)
+                    clearcount++;
+                else
+                    break;
+            }
+
+            if (clearcount > 0)
+                Array.Resize<Byte>(ref chiperText, chiperText.Length - clearcount);
+        }
+
+        public string toBinaryString(byte[,] data)
+        {
+            return toBinaryString(data.Cast<byte>().ToArray());
         }
 
         public string toBinaryString(byte[] data)
@@ -120,146 +437,78 @@ namespace Algorithms
             return binaryString.ToString();
         }
 
-        // Bir UInt64 sayısını bir 8x8 byte matrisi ile çarpan fonksiyon
-        private UInt64 Multiply(UInt64 x, byte[,] M)
+        // Bir diziyi byte'dan bir dizeye dönüştüren işlev (ASCII cinsinden)
+        public String bytesToString(byte[] array)
         {
-            // sonucu tutacak değişken
-            UInt64 y = 0;
-            // x'in bitlerini sağdan sola doğru işle
-            for (int i = 0; i < 8; i++)
-            {
-                // x'in i. bitini al
-                UInt64 xi = (x >> i) & 1;
-                // xi ile M matrisinin i. sütununu XOR'la
-                UInt64 yi = 0;
-                for (int j = 0; j < 8; j++)
-                {
-                    // M matrisinin j. satırının i. elemanını al
-                    byte Mji = M[j, i];
-                    // yi'nin j. bitini Mji ile XOR'la
-                    yi ^= (UInt64)Mji << (j * 8);
-                }
-                // yi'yi xi ile çarp ve y'ye ekle
-                y ^= yi * xi;
-            }
-            // sonucu döndür
-            return y;
+            return Encoding.UTF8.GetString(array, 0, array.Length);
+
         }
 
-        // Bir UInt64 sayısının her 4 bitlik parçasını S-box tablosu ile değiştiren fonksiyon
-        private UInt64 SubBytes(UInt64 x)
+        public Skinny(string text) : base(text)
         {
-            // sonucu tutacak değişken
-            UInt64 y = 0;
-            // x'in 4 bitlik parçalarını işle
-            for (int i = 0; i < 16; i++)
-            {
-                // x'in i. parçasını al
-                byte xi = (byte)((x >> (i * 4)) & 0xF);
-                // xi'yi S-box tablosunda bulunan değerle değiştir
-                byte yi = Sbox[xi];
-                // yi'yi y'nin i. parçası yap
-                y |= (UInt64)yi << (i * 4);
-            }
-            // sonucu döndür
-            return y;
         }
 
-        // SKINNY algoritmasının yuvarlama fonksiyonu
-        private UInt64 F(UInt64 x, UInt64 K, UInt64 T)
-        {
-            // x'i dört farklı işlemden geçir
-            // Birinci işlem: x'i M matrisi ile çarp
-            UInt64 y = Multiply(x, M0);
-            // İkinci işlem: x'i S-box tablosu ile değiştir
-            UInt64 z = SubBytes(y);
-            // Üçüncü işlem: z'yi M matrisinin tersi ile çarp
-            UInt64 w = Multiply(z, M00);
-            // Dördüncü işlem: w'yi alt anahtar ve alt tweak ile XOR'la
-            UInt64 v = w ^ K ^ T;
-            // Sonucu döndür
-            return v;
-        }
-
-        // SKINNY algoritmasının şifreleme fonksiyonu
-        private byte[] Encrypt(byte[] plaintext, byte[] key, byte[] tweak)
+        protected override void Initial(string text, string _key)
         {
 
-            // girdileri UInt64 olarak oku
-            UInt64 L = BitConverter.ToUInt64(plaintext, 0); // bloğun sol yarısı
-            UInt64 R = BitConverter.ToUInt64(plaintext, 8); // bloğun sağ yarısı
-            UInt64 K = BitConverter.ToUInt64(key, 0); // anahtar            
-            UInt64 T = BitConverter.ToUInt64(tweak, 0); // tweak girdisi
+            byte[] plainText;
+            if (text.Equals("-"))
+                plainText = new byte[WORDSIZE] { 0xf2, 0x0a, 0xdb, 0x0e, 0xb0, 0x8b, 0x64, 0x8a, 0x3b, 0x2e, 0xee, 0xd1, 0xf0, 0xad, 0xda, 0x14 };
+            else
+                plainText = Encoding.ASCII.GetBytes(text);
 
-            // şifreli metni byte dizisi olarak döndür
-            byte[] ciphertext = new byte[BLOCK_SIZE / 8];
 
-            // yuvarlama işlemleri
-            for (int i = 0; i < ROUND_COUNT; i++)
+            byte[] key = { 0x4f, 0x55, 0xcf, 0xb0, 0x52, 0x0c, 0xac, 0x52, 0xfd, 0x92, 0xc1, 0x5f, 0x37, 0x07, 0x3e, 0x93 };
+
+
+            byte[] chiperText = new byte[plainText.Length % WORDSIZE == 0 ? plainText.Length : plainText.Length + (WORDSIZE - (plainText.Length % WORDSIZE))];
+
+            plainText.CopyTo(chiperText, 0);
+
+            for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
             {
-                // anahtardan ve tweak girdisinden türetilen alt anahtar ve alt tweak
-                UInt64 Ki = K ^ (UInt64)i;
-                UInt64 Ti = T ^ (UInt64)i;
-                // Feistel ağı uygula
-                UInt64 Li = R;
-                UInt64 Ri = L ^ F(R, Ki, Ti);
-                L = Li;
-                R = Ri;
+                byte[] tmp = new byte[WORDSIZE];
 
-                Buffer.BlockCopy(BitConverter.GetBytes(L), 0, ciphertext, 0, 8);
-                Buffer.BlockCopy(BitConverter.GetBytes(R), 0, ciphertext, 8, 8);
-                AddStep("Encryption Round : (" + i.ToString() + ") ", toBinaryString(ciphertext));                
+                Array.Copy(chiperText, i * WORDSIZE, tmp, 0, WORDSIZE);
+
+                encrypt(i + 1, tmp, key);
+
+                Array.Copy(tmp, 0, chiperText, i * WORDSIZE, WORDSIZE);
             }
 
-            //Buffer.BlockCopy(BitConverter.GetBytes(L), 0, ciphertext, 0, 8);
-            //Buffer.BlockCopy(BitConverter.GetBytes(R), 0, ciphertext, 8, 8);
-            return ciphertext;
-        }
+            byte[] encrytpText = new byte[chiperText.Length];
 
-        // SKINNY algoritmasının deşifreleme fonksiyonu
-        private byte[] Decrypt(byte[] ciphertext, byte[] key, byte[] tweak)
-        {
-            // girdilerin uzunluklarını kontrol et
-            if (ciphertext.Length != BLOCK_SIZE / 8)
-                throw new ArgumentException("Ciphertext " + BLOCK_SIZE + " bit bit uzunluğunda olmalı");
-            if (key.Length != KEY_SIZE / 8)
-                throw new ArgumentException("Key " + KEY_SIZE + " bit uzunluğunda olmalı");
-            if (tweak.Length != TWEAK_SIZE / 8)
-                throw new ArgumentException("Tweak " + TWEAK_SIZE + " bit uzunluğunda olmalı");
+            chiperText.CopyTo(encrytpText, 0);
 
-            // girdileri UInt64 olarak oku
-            UInt64 L = BitConverter.ToUInt64(ciphertext, 0); // bloğun sol yarısı
-            UInt64 R = BitConverter.ToUInt64(ciphertext, 8); // bloğun sağ yarısı
-            UInt64 K = BitConverter.ToUInt64(key, 0); // anahtar
-            UInt64 T = BitConverter.ToUInt64(tweak, 0); // tweak girdisi
-
-            // düz metni byte dizisi olarak döndür
-            byte[] plaintext = new byte[BLOCK_SIZE / 8];
-
-            // yuvarlama işlemleri (ters sırada)
-            for (int i = ROUND_COUNT - 1; i >= 0; i--)
+            for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
             {
-                // anahtardan ve tweak girdisinden türetilen alt anahtar ve alt tweak
-                UInt64 Ki = K ^ (UInt64)i;
-                UInt64 Ti = T ^ (UInt64)i;
-                // Feistel ağı uygula (ters yönde)
-                UInt64 Li = R ^ F(L, Ki, Ti);
-                UInt64 Ri = L;
-                L = Li;
-                R = Ri;
+                byte[] tmp = new byte[WORDSIZE];
 
-                Buffer.BlockCopy(BitConverter.GetBytes(L), 0, plaintext, 0, 8);
-                Buffer.BlockCopy(BitConverter.GetBytes(R), 0, plaintext, 8, 8);
-                AddStep("Decryption Round : (" + i.ToString() + ") ", toBinaryString(plaintext));
-                //Console.WriteLine("DEC " + i.ToString() + (i < 10 ? " " : "") + ":" + BitConverter.ToString(plaintext));
+                Array.Copy(chiperText, i * WORDSIZE, tmp, 0, WORDSIZE);
+
+                decrypt(i + 1, tmp, key);
+
+                Array.Copy(tmp, 0, chiperText, i * WORDSIZE, WORDSIZE);
+
             }
 
+            clearlast0(ref chiperText);
 
-            //Buffer.BlockCopy(BitConverter.GetBytes(L), 0, plaintext, 0, 8);
-            //Buffer.BlockCopy(BitConverter.GetBytes(R), 0, plaintext, 8, 8);
-            return plaintext;
+
+            AddStep("Düz metin      : " + BitConverter.ToString(plainText), toBinaryString(plainText));
+
+            AddStep("Anahtar        : " + BitConverter.ToString(key), toBinaryString(key));
+
+            AddStep("Şifreli metin  : " + BitConverter.ToString(encrytpText), toBinaryString(encrytpText));
+
+            AddStep("Çözülmüş metin : " + BitConverter.ToString(chiperText), toBinaryString(chiperText));
+
+
+
+
+
+
         }
-
 
 
 
