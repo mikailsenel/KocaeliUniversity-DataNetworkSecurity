@@ -13,22 +13,23 @@ public class RoadRunneR : EncryptionAlgorithm
         
     }
 
-    protected override void Initial(string input,string inputKey)
+    protected override void Initial(string input, string inputKey)
     {
-        byte[] expectedKey = {
+        byte[] key = {
             0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
             0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF
         };
 
-        string message = "Hello World Hello World Hello World Hello World!   !";
+        string message = input;
+        AddStep( "Şifrelenecek girdi", message);
 
-        byte[] enc = RoadRunneR.EncryptString(message, expectedKey);
-        AddStep( "Şifrelenecek girdi:", BitConverter.ToString(enc));
+        byte[] enc = EncryptString(message, key);
+        AddStep( "Şifrelenmiş input", BitConverter.ToString(enc));
         Console.WriteLine(BitConverter.ToString(enc));
 
-        string dec = RoadRunneR.DecryptString(enc, expectedKey);
-        AddStep( "Şifrelenecek girdi:", dec);
-        Console.WriteLine(dec);
+        // string dec = RoadRunneR.DecryptString(enc, key);
+        // AddStep( "Şifrelenecek girdi:", dec);
+        // Console.WriteLine(dec);
     }
 
     const int READ_RAM_DATA_BYTE = 0;
@@ -57,7 +58,7 @@ public class RoadRunneR : EncryptionAlgorithm
         data[2] ^= temp;
     }
 
-    static void rrr_L(ref byte[] data)
+    void rrr_L(ref byte[] data)
     {
         byte temp = data[0];
         temp = ROTL(temp);
@@ -66,7 +67,7 @@ public class RoadRunneR : EncryptionAlgorithm
         data[0] ^= temp;
     }
 
-    static void rrr_SLK(ref byte[] data, IntPtr key_part)
+    void rrr_SLK(ref byte[] data, IntPtr key_part)
     {
         byte i;
         rrr_sbox(ref data);
@@ -77,7 +78,7 @@ public class RoadRunneR : EncryptionAlgorithm
         }
     }
 
-    static void rrr_enc_dec_round(ref byte[] block, IntPtr roundKey, byte round, ref byte[] key_ctr, byte mode)
+    void rrr_enc_dec_round(ref byte[] block, IntPtr roundKey, byte round, ref byte[] key_ctr, byte mode)
     {
         byte i;
         byte[] temp = new byte[4];
@@ -101,7 +102,7 @@ public class RoadRunneR : EncryptionAlgorithm
             block[i + 4] = temp[i];
     }
 
-    public static byte[] Encrypt(byte[] block, IntPtr roundKeys)
+    public byte[] Encrypt(byte[] block, IntPtr roundKeys)
     {
         byte i;
         byte[] temp = new byte[4] { 0, 0, 0, 0 };
@@ -124,7 +125,7 @@ public class RoadRunneR : EncryptionAlgorithm
         return block;
     }
 
-    public static byte[] Decrypt(byte[] block, IntPtr roundKeys)
+    public byte[] Decrypt(byte[] block, IntPtr roundKeys)
     {
         byte i;
         byte[] temp = new byte[4] { 0, 0, 0, 0 };
@@ -159,7 +160,7 @@ public class RoadRunneR : EncryptionAlgorithm
         return true;
     }
 
-    public static byte[] EncryptString(string plaintext, byte[] key)
+    public byte[] EncryptString(string plaintext, byte[] key)
     {
         byte[] plaintextBytes = Encoding.UTF8.GetBytes(plaintext);
         byte[] block = new byte[BLOCK_SIZE];
@@ -179,8 +180,9 @@ public class RoadRunneR : EncryptionAlgorithm
         for (int i = 0; i < numBlocks; i++)
         {
             Array.Copy(plaintextBytes, i * BLOCK_SIZE, block, 0, BLOCK_SIZE);
-            RoadRunneR.Encrypt(block, roundKeys.AddrOfPinnedObject());
+            Encrypt(block, roundKeys.AddrOfPinnedObject());
             Array.Copy(block, 0, plaintextBytes, i * BLOCK_SIZE, BLOCK_SIZE);
+            AddStep( "Şifrelenmiş blok "+i, BitConverter.ToString(block));
         }
         roundKeys.Free();
 
@@ -188,7 +190,7 @@ public class RoadRunneR : EncryptionAlgorithm
         return plaintextBytes;
     }
 
-    public static string DecryptString(byte[] ciphertext, byte[] key)
+    public string DecryptString(byte[] ciphertext, byte[] key)
     {
         // byte[] ciphertextBytes = Convert.FromBase64String(ciphertext);
         byte[] ciphertextBytes = ciphertext;
@@ -204,7 +206,7 @@ public class RoadRunneR : EncryptionAlgorithm
         for (int i = 0; i < numBlocks; i++)
         {
             Array.Copy(ciphertextBytes, i * BLOCK_SIZE, block, 0, BLOCK_SIZE);
-            RoadRunneR.Decrypt(block, roundKeys.AddrOfPinnedObject());
+            Decrypt(block, roundKeys.AddrOfPinnedObject());
             Array.Copy(block, 0, ciphertextBytes, i * BLOCK_SIZE, BLOCK_SIZE);
         }
         // Marshal.FreeHGlobal(roundKeys);

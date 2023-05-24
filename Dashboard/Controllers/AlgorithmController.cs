@@ -78,9 +78,12 @@ public class AlgorithmController : Controller
         return Ok(new Sparx(text).GetSteps());
     }
 
+    // ----------------------------------------------------------------
 
-
-
-
-
+    [HttpGet("/roadrunner/{text}", Name = nameof(GetRoadRunner))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    public async Task<IActionResult> GetRoadRunner([FromRoute] string text)
+    {
+        return Ok(new RoadRunneR(text).GetSteps());
+    }
 }
