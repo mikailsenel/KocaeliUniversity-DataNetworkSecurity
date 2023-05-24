@@ -16,8 +16,8 @@ public class Prince : EncryptionAlgorithm
     {
         byte[] key = { 0x01, 0xc4, 0x41, 0x63, 0x8d, 0xcb, 0x70, 0xa6, 0x01, 0xc4, 0x41, 0x63, 0x8d, 0xcb, 0x70, 0xa6 };
         byte[] data = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
-        string datastr = "hello world asdf asdf asdf";
-        AddStep("Şifrelenecek Metin: ", datastr);
+        string datastr = input;
+        AddStep("Şifrelenecek Metin", datastr);
 
         // Console.WriteLine(BitConverter.ToString(data).Replace("-", " "));
 
@@ -29,12 +29,12 @@ public class Prince : EncryptionAlgorithm
         // Console.WriteLine(BitConverter.ToString(decrypted).Replace("-", " "));
 
         byte[] strencrypted = this.EncryptString(key, datastr);
-        AddStep("Şifrelenmiş Metin: ", BitConverter.ToString(strencrypted));
+        AddStep("Şifrelenmiş Metin", BitConverter.ToString(strencrypted));
         Console.WriteLine(BitConverter.ToString(strencrypted));
 
-        string strdecrypted = this.DecryptString(key, strencrypted);
-        AddStep("Deşifrelenmiş Metin: ", strdecrypted);
-        Console.WriteLine(strdecrypted);
+        // string strdecrypted = this.DecryptString(key, strencrypted);
+        // AddStep("Deşifrelenmiş Metin: ", strdecrypted);
+        // Console.WriteLine(strdecrypted);
 
         // Console.WriteLine(strdecrypted);
     }
@@ -77,6 +77,7 @@ public class Prince : EncryptionAlgorithm
 
         // Beginning of actual cipher
         datablock = AddKey(extendedKey, datablock);
+        AddStep("İlk XOR işlemi", BitConverter.ToString(datablock));
 
         // PrintByteArray(datablock);
 
@@ -87,12 +88,14 @@ public class Prince : EncryptionAlgorithm
             datablock = MLayer(datablock);
             datablock = AddRoundConstant(i, datablock);
             datablock = AddKey(extendedKey, datablock);
+            AddStep("Round işlemi 5/"+i, BitConverter.ToString(datablock));
         }
 
         // Middle round
         datablock = SubNibbles(datablock);
         datablock = MPrimeLayer(datablock);
         datablock = InvSubNibbles(datablock);
+        AddStep("Middle round", BitConverter.ToString(datablock));
 
         // Five inverse rounds
         for (int i = 6; i <= 10; i++)
@@ -101,6 +104,7 @@ public class Prince : EncryptionAlgorithm
             datablock = AddRoundConstant(i, datablock);
             datablock = InvMLayer(datablock);
             datablock = InvSubNibbles(datablock);
+            AddStep("Inverse rounds 10/"+i, BitConverter.ToString(datablock));
         }
 
         datablock = AddRoundConstant(11, datablock);
@@ -112,6 +116,7 @@ public class Prince : EncryptionAlgorithm
         {
             datablock[i] ^= extendedKey[i + 8];
         }
+        AddStep("Key whitening", BitConverter.ToString(datablock));
         // PrintByteArray(datablock);
 
         return datablock;
@@ -321,6 +326,7 @@ public class Prince : EncryptionAlgorithm
             Array.Copy(plaintextBytes, startIndex, block, 0, blockLength);
 
             byte[] encryptedBlock = Encrypt(key, block);
+            AddStep("Şifrelenmiş blok", BitConverter.ToString(encryptedBlock));
             ciphertext.AddRange(encryptedBlock);
         }
 

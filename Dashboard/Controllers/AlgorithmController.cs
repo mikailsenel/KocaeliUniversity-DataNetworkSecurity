@@ -86,4 +86,13 @@ public class AlgorithmController : Controller
     {
         return Ok(new RoadRunneR(text).GetSteps());
     }
+
+    [HttpGet("/prince/{text}", Name = nameof(GetPrince))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    public async Task<IActionResult> GetPrince([FromRoute] string text)
+    {
+        return Ok(new Prince(text).GetSteps());
+    }
+
+    // ----------------------------------------------------------------
 }
