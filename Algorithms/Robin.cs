@@ -5,6 +5,10 @@ using System.Text;
 
 namespace Algorithms;
 
+// ----------------------------------------------------------------
+// TAMAMLANDI
+// ----------------------------------------------------------------
+
 public class Robin : EncryptionAlgorithm
 {
     public Robin(string text) : base(text)
@@ -29,13 +33,13 @@ public class Robin : EncryptionAlgorithm
         // byte[] decrypted = this.Decrypt(encrypted, KEY);
         // Console.WriteLine(BitConverter.ToString(decrypted));
 
-        string plain = "Hello world!!!! Hello world!!!! Hello world!!!! Hello world!!!!";
-        AddStep( "Şifrelenecek girdi:", plain);
+        string plain = input;
+        AddStep( "Şifrelenecek metin", plain);
         Console.WriteLine(plain);
         
         byte[] strenc = this.EncryptString(KEY, plain);
+        AddStep( "Şifrelenmiş metin", BitConverter.ToString(strenc));
         Console.WriteLine(BitConverter.ToString(strenc));
-        AddStep( "Şifrelenecek girdi:", BitConverter.ToString(strenc));
     
         string strdec = this.DecryptString(KEY, strenc);
         Console.WriteLine(strdec);
@@ -156,6 +160,7 @@ public class Robin : EncryptionAlgorithm
         // Initial key addition
         for (int j = 0; j < 8; j++)
             data[j] ^= k[j];
+        AddStep( "Initial key addition", BitConverter.ToString(ushortToBytes(data)));
 
         for (int i = 0; i < 16; i++)
         {
@@ -164,14 +169,17 @@ public class Robin : EncryptionAlgorithm
 
             // SBox layer (bitsliced)
             SBOX(data);
+            AddStep( "SBOX Sonrası", BitConverter.ToString(ushortToBytes(data)));
 
             // LBox layer (tables)
             for (int j = 0; j < 8; j++)
                 data[j] = (ushort)(LBox2[data[j] >> 8] ^ LBox1[data[j] & 0xff]);
+            AddStep( "LBox layer Sonrası", BitConverter.ToString(ushortToBytes(data)));
 
             // Key addition
             for (int j = 0; j < 8; j++)
                 data[j] ^= k[j];
+            AddStep( "Key addition Sonrası", BitConverter.ToString(ushortToBytes(data)));
 
             /* printf("%2d:\n",i); */
             /* print_state(data); */
@@ -183,6 +191,12 @@ public class Robin : EncryptionAlgorithm
         byte[] data2 = new byte[16];
         Buffer.BlockCopy(data, 0, data2, 0, 16);
         return data2;
+    }
+
+    byte[] ushortToBytes(ushort[] input){
+        byte[] data = new byte[16];
+        Buffer.BlockCopy(input, 0, data, 0, 16);
+        return data;
     }
 
     byte[] Decrypt(byte[] input, byte[] key)

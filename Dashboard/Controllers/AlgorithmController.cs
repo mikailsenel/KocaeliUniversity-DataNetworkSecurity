@@ -94,5 +94,12 @@ public class AlgorithmController : Controller
         return Ok(new Prince(text).GetSteps());
     }
 
+    [HttpGet("/robin/{text}", Name = nameof(GetRobin))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    public async Task<IActionResult> GetRobin([FromRoute] string text)
+    {
+        return Ok(new Robin(text).GetSteps());
+    }
+
     // ----------------------------------------------------------------
 }
