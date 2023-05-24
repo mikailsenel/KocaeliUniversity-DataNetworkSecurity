@@ -6,6 +6,10 @@ using System;
 using System.Text;
 using System.Runtime.InteropServices;
 
+// ----------------------------------------------------------------
+// TAMAMLANDI
+// ----------------------------------------------------------------
+
 public class RoadRunneR : EncryptionAlgorithm
 {
     public RoadRunneR(string text) : base(text)

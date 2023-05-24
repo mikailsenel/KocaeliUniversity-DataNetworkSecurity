@@ -4,6 +4,10 @@ using System;
 
 namespace Algorithms;
 
+// ----------------------------------------------------------------
+// TAMAMLANDI
+// ----------------------------------------------------------------
+
 public class Prince : EncryptionAlgorithm
 {
     public Prince(string text) : base(text)
