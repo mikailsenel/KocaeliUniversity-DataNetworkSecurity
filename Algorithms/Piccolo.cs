@@ -178,12 +178,12 @@ namespace Algorithms
             Array.Copy(data, paddedData, data.Length);
 
             // 128 bit üzerinde veri girişi kontrolü
-            if (data.Length > MaxInputLength)
+           /* if (data.Length > MaxInputLength)
             {
                 Console.WriteLine("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.");
                 AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", BitConverter.ToString(data));
                 return;
-            }
+            }*/
 
             SetKey(key);
             string binaryStringkey = GetBinaryString(key);

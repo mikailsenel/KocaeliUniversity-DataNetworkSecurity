@@ -56,12 +56,12 @@ public class Mysterion : EncryptionAlgorithm
         const int MaxInputLength = 16; // 16 byte = 128 bit
         byte[] data = System.Text.Encoding.UTF8.GetBytes(input);
         // 128 bit üzerinde veri girişi kontrolü
-        if (data.Length > MaxInputLength)
+       /* if (data.Length > MaxInputLength)
         {
             Console.WriteLine("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.");
             AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", BitConverter.ToString(data));
             return;
-        }
+        }*/
         AddStep( "Şifrelenecek girdi texti", BitConverter.ToString(data));
         Console.WriteLine("Şifrelenecek girdi texti :" + BitConverter.ToString(data));
 
@@ -212,9 +212,6 @@ private  void DecryptBlock(uint[] block)
         AddStep($"Şifreleme Bloğu çözülen içerik binary :{binary0}-{binary1}", $" {binary0}-{binary1}");
     }
     
-
-
-
     private   void Mix()
     {
         if (_state == null)

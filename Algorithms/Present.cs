@@ -25,12 +25,12 @@ public class Present : EncryptionAlgorithm
        
         byte[] plaintext = Encoding.ASCII.GetBytes("Merhaba Dunya");
         // 128 bit üzerinde veri girişi kontrolü
-        if (plaintext.Length > MaxInputLength)
+       /* if (plaintext.Length > MaxInputLength)
         {
             Console.WriteLine("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.");
             AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", BitConverter.ToString(plaintext));
             return;
-        }
+        }*/
         Console.WriteLine("Girilen Metin: " + BitConverter.ToString(plaintext));
             AddStep("Girilen Metin: " , BitConverter.ToString(plaintext));
             Console.WriteLine("Girilen Metin Binary Gösterimi: " + GetBinaryString(plaintext));

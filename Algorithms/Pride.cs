@@ -26,12 +26,12 @@ string plaintext = "This is a secret message";
         const int MaxInputLength = 16; // 16 byte = 128 bit
 
         // 128 bit üzerinde veri girişi kontrolü
-        if (plaintext.Length > MaxInputLength)
+       /* if (plaintext.Length > MaxInputLength)
         {
             Console.WriteLine("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.");
             AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", plaintext);
             return;
-        }
+        }*/
         // Düz metni ve anahtarı ekrana yazdırın
         Console.WriteLine("Girilen metin: " + plaintext);
         AddStep("Girilen metin: " , plaintext);

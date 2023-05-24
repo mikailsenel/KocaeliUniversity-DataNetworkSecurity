@@ -37,12 +37,12 @@ public class Noekeon : EncryptionAlgorithm
     
         const int MaxInputLength = 16; // 16 byte = 128 bit
 
-        if (input.Length > MaxInputLength)
+       /* if (input.Length > MaxInputLength)
         {
             Console.WriteLine("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.");
             AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", input);
             return;
-        }
+        }*/
         string inputText = input;
 
         
