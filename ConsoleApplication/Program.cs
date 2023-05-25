@@ -31,6 +31,11 @@ A5.Initial("p3");*/
 // Prince prince = new Prince("");
 // prince.test();
 
-RoadRunneR rr = new RoadRunneR("");
+//RoadRunneR rr = new RoadRunneR("");
 
 // Robin rr = new Robin("");
+
+Console.WriteLine(11.ToString("X"));
+Console.WriteLine(int.Parse("B", System.Globalization.NumberStyles.HexNumber));
+//Console.WriteLine(new Mysterion("deneme", "").ini);
+Console.ReadLine();
