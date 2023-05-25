@@ -53,15 +53,27 @@ public class Mysterion : EncryptionAlgorithm
     protected  override void Initial(string input,string inputKey)
 
     {
-        const int MaxInputLength = 16; // 16 byte = 128 bit
-        byte[] data = System.Text.Encoding.UTF8.GetBytes(input);
+        const int MaxInputLength = 16; // 16 byte = 128 bit,
+
+        /* string[] hexValues = input.Split('-');
+         byte[] byteData = new byte[hexValues.Length];
+
+         for (int i = 0; i < hexValues.Length; i++)
+         {
+             byteData[i] = Convert.ToByte(hexValues[i], 16);
+         }
+
+
+
+         byte[] data = byteData;   Hexadecimal veri girişi kodu */
         // 128 bit üzerinde veri girişi kontrolü
-       /* if (data.Length > MaxInputLength)
-        {
-            Console.WriteLine("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.");
-            AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", BitConverter.ToString(data));
-            return;
-        }*/
+        /* if (data.Length > MaxInputLength)
+         {
+             Console.WriteLine("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.");
+             AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", BitConverter.ToString(data));
+             return;
+         }*/
+        byte[] data = System.Text.Encoding.UTF8.GetBytes(input);
         AddStep( "Şifrelenecek girdi texti", BitConverter.ToString(data));
         Console.WriteLine("Şifrelenecek girdi texti :" + BitConverter.ToString(data));
 
