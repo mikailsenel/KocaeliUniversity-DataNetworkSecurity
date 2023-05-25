@@ -114,7 +114,7 @@ public class Mysterion : EncryptionAlgorithm
         return encrypted;
     }
 
-    private  void Initialize(byte[] key)
+    private  void Initialize(byte[] key) //key 128 bit olması isteniyorsa burada dizi boyutları yarıya düşürülmeli
     {
         _key = new uint[8];
         _state = new uint[8];
