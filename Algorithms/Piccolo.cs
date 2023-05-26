@@ -6,12 +6,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Algorithms.Common.Enums;
 //Decyrption metodu yanlış çalışıyor
 namespace Algorithms
 {
     public class Piccolo : EncryptionAlgorithm
     {
-        public Piccolo(string text) : base(text)
+        public Piccolo(InputDto inputDto) : base(inputDto)
         {
 
         }
@@ -164,13 +165,13 @@ namespace Algorithms
 
         return plaintext;
     }
-        protected override void Initial(string input, string inputKey)
+        protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
         {
             const int MaxInputLength = 16; // 16 byte = 128 bit
             byte[] key = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
             // Giriş metnini UTF-8 olarak byte dizisine dönüştür
-            byte[] data = Encoding.UTF8.GetBytes(input);
+            byte[] data = ByteValue;
 
             // Giriş metnini gereken uzunluğa tamamla
             int requiredLength = (BlockSize / 8) * (int)Math.Ceiling((double)data.Length / (BlockSize / 8));
@@ -192,9 +193,9 @@ namespace Algorithms
             byte[] ciphertext = Encrypt(paddedData);
             string decryptedText = DecryptToString(ciphertext);
 
-            Console.WriteLine("Girilen Metin..:  " + input);
-            AddStep("Girilen Metin..:", input);
-            AddStep("Girilen Metin Binary", ConvertToBinary(input));
+            Console.WriteLine("Girilen Metin..:  " + HexValue);
+            AddStep("Girilen Metin..:", HexValue);
+            AddStep("Girilen Metin Binary", ConvertToBinary(HexValue));
 
             Console.WriteLine("Şifreli Metin..: " + BitConverter.ToString(ciphertext).Replace("-", " "));
             AddStep("Şifreli Metin..: ", BitConverter.ToString(ciphertext).Replace("-", " "));

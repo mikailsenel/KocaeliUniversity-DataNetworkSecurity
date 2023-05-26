@@ -17,7 +17,7 @@ namespace Algorithms;
 
 public class Noekeon : EncryptionAlgorithm
 {
-    public Noekeon(string text) : base(text)
+    public Noekeon(InputDto inputDto) : base(inputDto)
     {
     }
     public string GetByteArrayAsBinaryString(byte[] byteArray)

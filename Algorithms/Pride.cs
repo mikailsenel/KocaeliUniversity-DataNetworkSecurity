@@ -6,6 +6,8 @@ using System.Security.Cryptography;
 using System.Text;
 using Algorithms.Common.Abstract;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Algorithms.Common.DataTransferObjects;
+using Algorithms.Common.Enums;
 /*Algoritma tamamlanmıştır.Algoritma Sağlıklı çalışmaktadır.*/
 
 
@@ -13,12 +15,12 @@ namespace Algorithms;
 
 public class Pride : EncryptionAlgorithm
 {
-    public Pride(string input) : base(input)
+    public Pride(InputDto inputDto) : base(inputDto)
     {
 
     }
 string plaintext = "This is a secret message";
-    protected override void Initial(string plaintext, string inputKey)
+    protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
     {
         // Düz metin ve anahtarı belirleyin
         

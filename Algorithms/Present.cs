@@ -1,4 +1,6 @@
 using Algorithms.Common.Abstract;
+using Algorithms.Common.DataTransferObjects;
+using Algorithms.Common.Enums;
 using System;
 using System.Security.Cryptography;
 using System.Text;
@@ -9,12 +11,12 @@ namespace Algorithms;
 
 public class Present : EncryptionAlgorithm
 {
-    public Present(string input) : base(input)
+    public Present(InputDto inputDto) : base(inputDto)
     {
 
     }
 
-    protected override void Initial(string input,string inputKey)
+    protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
     {
          const int MaxInputLength = 16; // 16 byte = 128 bit
        // Anahtar 16 byte

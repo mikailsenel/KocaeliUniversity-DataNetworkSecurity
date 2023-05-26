@@ -1,6 +1,8 @@
 using Algorithms.Common.Abstract;
 using System.Text;
 using System;
+using Algorithms.Common.DataTransferObjects;
+using Algorithms.Common.Enums;
 
 namespace Algorithms;
 
@@ -10,13 +12,13 @@ namespace Algorithms;
 
 public class Prince : EncryptionAlgorithm
 {
-    public Prince(string text) : base(text)
+    public Prince(InputDto inputDto) : base(inputDto)
     {
 
     }
 
 
-    protected override void Initial(string input,string inputKey)
+    protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
     {
         byte[] key = { 0x01, 0xc4, 0x41, 0x63, 0x8d, 0xcb, 0x70, 0xa6, 0x01, 0xc4, 0x41, 0x63, 0x8d, 0xcb, 0x70, 0xa6 };
         byte[] data = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
