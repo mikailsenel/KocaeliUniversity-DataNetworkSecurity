@@ -10,7 +10,7 @@ using System.Text;
 using System.Reflection.Metadata;
 using Algorithms.Common.Abstract;
 using Algorithms.Common.Enums;
-/*Algoritma tamamlanmıştır.*/
+/*Algoritma tamamlanmıştır. 256 bit key uzunluğu kullanır */
 namespace Algorithms;
 
 public class Mysterion : EncryptionAlgorithm
@@ -75,16 +75,25 @@ public class Mysterion : EncryptionAlgorithm
              AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", BitConverter.ToString(data));
              return;
          }*/
-        //byte[] data = System.Text.Encoding.UTF8.GetBytes(input);  Akif burayı kapattım
+
         byte[] data = ByteValue;
         AddStep("Şifrelenecek girdi texti", BitConverter.ToString(data));
         Console.WriteLine("Şifrelenecek girdi texti :" + BitConverter.ToString(data));
 
         AddStep("Şifrelenecek girdi texti binary gösterimi: ", GetBinaryString(data));
+
         Console.WriteLine("Şifrelenecek girdi texti binary gösterimi: " + GetBinaryString(data));
-
-        byte[] key = new byte[] { 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0 };
-
+        string keyHexString = inputKey;
+        // Anahtar uzunluğu 32 byte (256 bit) olmadığında istisna fırlatma örnek anahtar:0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF
+        if (keyHexString.Length != 64) // Her bir byte 2 hexadecimal karakterle temsil edilir
+        {
+            throw new ArgumentException("Geçersiz anahtar uzunluğu. Anahtar 256 bit (32 byte) olmalıdır.");
+        }
+        byte[] key = new byte[] { };
+        key = Enumerable.Range(0, keyHexString.Length / 2)
+                      .Select(x => Convert.ToByte(keyHexString.Substring(x * 2, 2), 16))
+                      .ToArray();
+        AddStep("Key: ", inputKey);
         byte[] encrypted = Encrypt(data, key);
         AddStep("Şifrelenmiş data: ", BitConverter.ToString(encrypted));
         Console.WriteLine("Şifrelenmiş data: " + BitConverter.ToString(encrypted));
@@ -117,7 +126,7 @@ public class Mysterion : EncryptionAlgorithm
         return encrypted;
     }
 
-    private void Initialize(byte[] key) //key 128 bit olması isteniyorsa burada dizi boyutları yarıya düşürülmeli
+    private void Initialize(byte[] key)
     {
         _key = new uint[8];
         _state = new uint[8];
@@ -246,7 +255,3 @@ public class Mysterion : EncryptionAlgorithm
     }
 
 }
-
-
-
-

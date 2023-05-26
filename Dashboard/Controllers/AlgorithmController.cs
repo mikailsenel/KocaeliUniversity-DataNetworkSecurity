@@ -17,32 +17,33 @@ public class AlgorithmController : BaseController
         return Ok(new Mysterion(input).GetSteps());
     }
 
-    [HttpGet("/noekeon/{text}", Name = nameof(GetNoekeon))]
+    [HttpGet("/noekeon/", Name = nameof(GetNoekeon))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    public async Task<IActionResult> GetNoekeon([FromRoute] string text)
+    public async Task<IActionResult> GetNoekeon([FromQuery] InputDto input)
     {
-        return Ok(new Noekeon(text).GetSteps());
+        return Ok(new Noekeon(input).GetSteps());
     }
 
-    [HttpGet("/piccolo/{text}", Name = nameof(GetPiccolo))]
+    [HttpGet("/piccolo/", Name = nameof(GetPiccolo))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    public async Task<IActionResult> GetPiccolo([FromRoute] string text)
+    public async Task<IActionResult> GetPiccolo([FromQuery] InputDto input)
     {
-        return Ok(new Piccolo(text).GetSteps());
+        return Ok(new Piccolo(input).GetSteps());
     }
 
     [HttpGet("/pride/{text}", Name = nameof(GetPride))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    public async Task<IActionResult> GetPride([FromRoute] string text)
+    public async Task<IActionResult> GetPride([FromQuery] InputDto input)
     {
-        return Ok(new Pride(text).GetSteps());
+        return Ok(new Pride(input).GetSteps());
     }
     [HttpGet("/present/{text}", Name = nameof(GetPresent))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    public async Task<IActionResult> GetPresent([FromRoute] string text)
+    public async Task<IActionResult> GetPresent([FromQuery] InputDto input)
     {
-        return Ok(new Pride(text).GetSteps());
+        return Ok(new Pride(input).GetSteps());
     }
+
 
     [HttpGet("/sea/{text}", Name = nameof(GetSea))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
