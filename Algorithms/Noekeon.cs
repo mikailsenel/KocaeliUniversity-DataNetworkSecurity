@@ -1,5 +1,6 @@
 ﻿using Algorithms.Common.Abstract;
 using Algorithms.Common.DataTransferObjects;
+using Algorithms.Common.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ public class Noekeon : EncryptionAlgorithm
 
         return binaryString;
     }
-    protected override void Initial(string input,string inputKey)
+    protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
     {
     
         const int MaxInputLength = 16; // 16 byte = 128 bit
