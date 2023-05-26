@@ -5,7 +5,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-/*Algoritma sağıklı çalışmaktadır.Algoritma tamamlanmıştır.*/
+/*Algoritma sağıklı çalışmaktadır.Algoritma tamamlanmıştır.16 byte  128 bit key alır */
 
 namespace Algorithms;
 
@@ -25,7 +25,7 @@ public class Present : EncryptionAlgorithm
                 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0
             };
        
-        byte[] plaintext = Encoding.ASCII.GetBytes("Merhaba Dunya");
+        byte[] plaintext = Encoding.ASCII.GetBytes(StringValue);
         // 128 bit üzerinde veri girişi kontrolü
        /* if (plaintext.Length > MaxInputLength)
         {

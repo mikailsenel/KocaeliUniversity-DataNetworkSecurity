@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Algorithms.Common.Enums;
-//Decyrption metodu yanlış çalışıyor
+//Algoritma Sağlıklı Çalışmaktadır.128 bit key alır
 namespace Algorithms
 {
     public class Piccolo : EncryptionAlgorithm

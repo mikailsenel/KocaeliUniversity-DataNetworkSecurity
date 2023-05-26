@@ -13,7 +13,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Algorithms;
 
 
-/*Algoritma tamamlanmıştır. Sağlıklı çalışmaktadır*/
+/*Algoritma tamamlanmıştır. Sağlıklı çalışmaktadır. 64 bit key alır ör:4d79536563726574*/
 
 
 public class Noekeon : EncryptionAlgorithm
@@ -33,45 +33,66 @@ public class Noekeon : EncryptionAlgorithm
 
         return binaryString;
     }
+
+    public byte[] GetBinaryDataFromHexString(string hexString)
+    {
+        int length = hexString.Length;
+        byte[] binaryData = new byte[length / 2];
+
+        for (int i = 0; i < length; i += 2)
+        {
+            string hexByte = hexString.Substring(i, 2);
+            byte value = Convert.ToByte(hexByte, 16);
+            binaryData[i / 2] = value;
+        }
+
+        return binaryData;
+    }
     protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
     {
-    
-        const int MaxInputLength = 16; // 16 byte = 128 bit
 
-       /* if (input.Length > MaxInputLength)
+       
+
+        /* if (input.Length > MaxInputLength)
+         {
+             Console.WriteLine("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.");
+             AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", input);
+             return;
+         }*/
+        string inputText = StringValue;
+
+
+        string key = inputKey; //64 bit key alır ör:4d79536563726574
+        if (key.Length != 16)
         {
-            Console.WriteLine("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.");
-            AddStep("Hata: Giriş metni 128 bit (16 byte) üzerinde olamaz.", input);
+            throw new ArgumentException("Key uzunluğu 64 bit (16 karakter) olmalıdır.");
             return;
-        }*/
-        string inputText = input;
+        }
 
-        
-        string key = "mysecretkey12345";
-
-
-        
-        AddStep("Girilen Key..: ", key);
-        byte[] binaryDatakey = GetBinaryDataFromString(key);
+        byte[] binaryDatakey = GetBinaryDataFromHexString(key);
         string binaryStringkey = GetBinaryString(binaryDatakey);
+
+
+        AddStep("Girilen Key..: ", key);
+
         AddStep("Girilen Key Binary..: ", binaryStringkey);
 
         string encryptedText = Encrypt(inputText, key);
-        
+
         Console.WriteLine("Girdi Metin datasi..: " + inputText);
         AddStep("Girdi Metin datasi..: ", inputText);
         byte[] binaryData = GetBinaryDataFromString(inputText);
         string binaryString = GetBinaryString(binaryData);
 
-        AddStep("Girdi Metin datasi Binary data..: ", binaryString); 
+        AddStep("Girdi Metin datasi Binary data..: ", binaryString);
 
         Console.WriteLine("Şifrelenmiş Text: " + encryptedText);
         AddStep("Şifrelenmiş Text..: ", encryptedText);
 
         byte[] binaryDataenc = GetBinaryDataFromString(encryptedText);
-         string binaryStringenc = GetBinaryString(binaryDataenc);
+        string binaryStringenc = GetBinaryString(binaryDataenc);
 
-        AddStep("Şifrelenmiş Text Binary data..: ", binaryStringenc); 
+        AddStep("Şifrelenmiş Text Binary data..: ", binaryStringenc);
 
     }
     public string GetBinaryString(byte[] binaryData)
@@ -221,7 +242,3 @@ public class Noekeon : EncryptionAlgorithm
         return (value << count) | (value >> (32 - count));
     }
 }
-
-
-
-

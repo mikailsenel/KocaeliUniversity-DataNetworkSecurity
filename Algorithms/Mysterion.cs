@@ -10,7 +10,7 @@ using System.Text;
 using System.Reflection.Metadata;
 using Algorithms.Common.Abstract;
 using Algorithms.Common.Enums;
-/*Algoritma tamamlanmıştır. 256 bit key uzunluğu kullanır */
+/*Algoritma tamamlanmıştır. 256 bit key uzunluğu kullanır örnek anahtar:0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF */
 namespace Algorithms;
 
 public class Mysterion : EncryptionAlgorithm
