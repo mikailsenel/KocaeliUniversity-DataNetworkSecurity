@@ -41,7 +41,7 @@ public class Mysterion : EncryptionAlgorithm
 
         return stringBuilder.ToString();
     }
-    public string GetBinaryString(byte[] data)
+    public string GetBinaryString(byte[] data) //binary metodu
     {
         StringBuilder binaryString = new StringBuilder();
         foreach (byte b in data)
@@ -51,6 +51,28 @@ public class Mysterion : EncryptionAlgorithm
         }
         return binaryString.ToString();
     }
+    static byte[] ConvertStringToByteArray(string metin)
+    {
+        // UTF-8 kodlamasını kullanarak string'i byte dizisine dönüştürme
+        byte[] byteDizi = Encoding.UTF8.GetBytes(metin);
+
+        return byteDizi;
+    }
+
+    private byte[] ConvertHexToByteArray(string hex)
+    {
+        int length = hex.Length;
+        byte[] byteArray = new byte[length / 2];
+
+        for (int i = 0; i < length; i += 2)
+        {
+            byteArray[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+        }
+
+        return byteArray;
+    }
+
+
 
     protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
     {
@@ -76,7 +98,23 @@ public class Mysterion : EncryptionAlgorithm
              return;
          }*/
 
-        byte[] data = ByteValue;
+        byte[] data;
+        switch (inputTypes)
+        {
+            case DataTypes.Byte:
+                data = ByteValue;
+                break;
+            case DataTypes.String:
+                string text = StringValue; // Örneğin, "Hello, World!" gibi bir string değeri alıyoruz
+                data = ConvertStringToByteArray(text);
+                break;
+
+            default:
+                throw new ArgumentException("Geçersiz giriş veri tipi.");
+        }
+
+
+
         AddStep("Şifrelenecek girdi texti", BitConverter.ToString(data));
         Console.WriteLine("Şifrelenecek girdi texti :" + BitConverter.ToString(data));
 
