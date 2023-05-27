@@ -20,9 +20,15 @@ public class Prince : EncryptionAlgorithm
 
     protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
     {
-        byte[] key = { 0x01, 0xc4, 0x41, 0x63, 0x8d, 0xcb, 0x70, 0xa6, 0x01, 0xc4, 0x41, 0x63, 0x8d, 0xcb, 0x70, 0xa6 };
-        byte[] data = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
-        string datastr = input;
+        if (inputKey.Length != 16)
+        {
+            throw new ArgumentException("Key uzunluğu (16 byte, 128 bit) olmalı.");
+        }
+
+        byte[] key = Encoding.ASCII.GetBytes(inputKey);
+        // byte[] key = { 0x01, 0xc4, 0x41, 0x63, 0x8d, 0xcb, 0x70, 0xa6, 0x01, 0xc4, 0x41, 0x63, 0x8d, 0xcb, 0x70, 0xa6 };
+        string datastr = StringValue;
+        Console.WriteLine(StringValue);
         AddStep("Şifrelenecek Metin", datastr);
 
         // Console.WriteLine(BitConverter.ToString(data).Replace("-", " "));
@@ -38,9 +44,9 @@ public class Prince : EncryptionAlgorithm
         AddStep("Şifrelenmiş Metin", BitConverter.ToString(strencrypted));
         Console.WriteLine(BitConverter.ToString(strencrypted));
 
-        // string strdecrypted = this.DecryptString(key, strencrypted);
-        // AddStep("Deşifrelenmiş Metin: ", strdecrypted);
-        // Console.WriteLine(strdecrypted);
+        string strdecrypted = this.DecryptString(key, strencrypted);
+        AddStep("Deşifrelenmiş Metin: ", strdecrypted);
+        Console.WriteLine(strdecrypted);
 
         // Console.WriteLine(strdecrypted);
     }

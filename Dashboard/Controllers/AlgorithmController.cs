@@ -85,25 +85,25 @@ public class AlgorithmController : Controller
 
     //// ----------------------------------------------------------------
 
-    [HttpGet("/roadrunner/{text}", Name = nameof(GetRoadRunner))]
+    [HttpGet("/roadrunner/", Name = nameof(GetRoadRunner))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    public async Task<IActionResult> GetRoadRunner([FromRoute] string text)
+    public async Task<IActionResult> GetRoadRunner([FromQuery] InputDto input)
     {
-        return Ok(new RoadRunneR(text).GetSteps());
+        return Ok(new RoadRunneR(input).GetSteps());
     }
 
-    [HttpGet("/prince/{text}", Name = nameof(GetPrince))]
+    [HttpGet("/prince/", Name = nameof(GetPrince))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    public async Task<IActionResult> GetPrince([FromRoute] string text)
+    public async Task<IActionResult> GetPrince([FromQuery] InputDto input)
     {
-        return Ok(new Prince(text).GetSteps());
+        return Ok(new Prince(input).GetSteps());
     }
 
-    [HttpGet("/robin/{text}", Name = nameof(GetRobin))]
+    [HttpGet("/robin/", Name = nameof(GetRobin))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    public async Task<IActionResult> GetRobin([FromRoute] string text, [FromRoute] DataTypes inputType, [FromRoute] DataTypes outputType)
+    public async Task<IActionResult> GetRobin([FromQuery] InputDto input)
     {
-        return Ok(new Robin(text).GetSteps());
+        return Ok(new Robin(input).GetSteps());
     }
 
     // ----------------------------------------------------------------

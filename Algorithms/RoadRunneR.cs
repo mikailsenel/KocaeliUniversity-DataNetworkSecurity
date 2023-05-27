@@ -5,6 +5,8 @@ namespace Algorithms;
 using System;
 using System.Text;
 using System.Runtime.InteropServices;
+using Algorithms.Common.Enums;
+using Algorithms.Common.DataTransferObjects;
 
 // ----------------------------------------------------------------
 // TAMAMLANDI
@@ -12,28 +14,34 @@ using System.Runtime.InteropServices;
 
 public class RoadRunneR : EncryptionAlgorithm
 {
-    public RoadRunneR(string text) : base(text)
+    public RoadRunneR(InputDto inputDto) : base(inputDto)
     {
         
     }
 
-    protected override void Initial(string input, string inputKey)
+    protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
     {
-        byte[] key = {
-            0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
-            0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF
-        };
+        // byte[] key = {
+        //     0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
+        //     0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF
+        // };
+        if (inputKey.Length != 16)
+        {
+            throw new ArgumentException("Key uzunluğu (16 byte, 128 bit) olmalı.");
+        }
+        byte[] key = Encoding.ASCII.GetBytes(inputKey);
+        string plaintext = StringValue;
 
-        string message = input;
-        AddStep( "Şifrelenecek girdi", message);
+        Console.WriteLine("Şifrelenecek girdi: " + plaintext);
+        AddStep( "Şifrelenecek girdi", plaintext);
+        byte[] ciphertext = EncryptString(plaintext, key);
 
-        byte[] enc = EncryptString(message, key);
-        AddStep( "Şifrelenmiş input", BitConverter.ToString(enc));
-        Console.WriteLine(BitConverter.ToString(enc));
+        AddStep( "Şifrelenmiş input", BitConverter.ToString(ciphertext));
+        Console.WriteLine(BitConverter.ToString(ciphertext));
 
-        // string dec = RoadRunneR.DecryptString(enc, key);
-        // AddStep( "Şifrelenecek girdi:", dec);
-        // Console.WriteLine(dec);
+        string decryptedtext = DecryptString(ciphertext, key);
+        AddStep( "Şifrelenecek girdi:", decryptedtext);
+        Console.WriteLine("Deşifrelenmiş girdi: " + decryptedtext);
     }
 
     const int READ_RAM_DATA_BYTE = 0;
