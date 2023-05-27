@@ -65,7 +65,24 @@ public abstract class BaseCoding
     /// <param name="ınputTypes"></param>
     private void convert(string data, DataTypes inputTypes)
     {
-
+        switch (inputTypes)
+        {
+            case DataTypes.String:
+                StringValue = data;
+                HexValue = DataConverter.Instance.ConvertStringToHex(data);
+                ByteValue = DataConverter.Instance.ConvertStringToByte(data);
+                break;
+            case DataTypes.Hex:
+                HexValue = data;
+                StringValue = DataConverter.Instance.ConvertHexToString(data);
+                ByteValue = DataConverter.Instance.ConvertHexToByte(StringValue);
+                break;
+            case DataTypes.Byte:
+                ByteValue = DataConverter.Instance.ConvertStringToByte(data);
+                StringValue = DataConverter.Instance.ConvertByteToString(ByteValue);
+                HexValue = DataConverter.Instance.ConvertStringToHex(StringValue);
+                break;
+        }
     }
 
     /// <summary>
