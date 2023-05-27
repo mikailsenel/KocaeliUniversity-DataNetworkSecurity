@@ -2,6 +2,8 @@ using Algorithms.Common.Abstract;
 using System;
 
 namespace Algorithms;
+using Algorithms.Common.DataTransferObjects;
+using Algorithms.Common.Enums;
 
 
 public class Rectangle: EncryptionAlgorithm
@@ -12,7 +14,7 @@ public class Rectangle: EncryptionAlgorithm
     private ushort[] mainKey;
     private ushort rc;
 
-    protected override void Initial(string input,string inputKey)
+    protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
     {
         ushort[] key = new ushort[] { 0xffff, 0xffff, 0xffff, 0xffff, 0xaaaa };
         ushort[] plainText = new ushort[] { 0xabca, 0x4611, 0xffff, 0x1234};
@@ -22,6 +24,9 @@ public class Rectangle: EncryptionAlgorithm
 
         this.cipherText = new ushort[plainText.Length];
         Array.Copy(plainText, this.cipherText, plainText.Length);
+
+        ushort[] message = StringTouShortArray(StringValue);
+        Console.WriteLine("Message:" + this.UshortArrToString(message));
 
         this.key = new ushort[key.Length];
         Array.Copy(key, this.key, key.Length);
@@ -36,12 +41,12 @@ public class Rectangle: EncryptionAlgorithm
         Console.WriteLine("Plain Text: " + this.UshortArrToString(this.plainText));
 
         this.Encrypt();
-        Console.WriteLine("Cipher Text:" + this.UshortArrToString(this.cipherText));
-        AddStep( "Şifrelenecek girdi:", UshortArrToString(this.cipherText));
+        Console.WriteLine("Cipher Text" + this.UshortArrToString(this.cipherText));
+        AddStep( "Şifrelenmiş metin", UshortArrToString(this.cipherText));
 
         this.Decrypt();
-        Console.WriteLine("Plain Text after decryption: " + this.UshortArrToString(this.cipherText));
-        AddStep( "Şifrelenecek girdi:", UshortArrToString(this.cipherText));
+        Console.WriteLine("Plain Text after decryption" + this.UshortArrToString(this.cipherText));
+        AddStep( "Deşifrelenmiş metin:", UshortArrToString(this.cipherText));
     }
 
 
@@ -54,7 +59,7 @@ public class Rectangle: EncryptionAlgorithm
         return texttmp;
     }
 
-    public Rectangle(string text): base(text)
+    public Rectangle(InputDto inputDto) : base(inputDto)
     {
         this.rc = 0;
     }

@@ -1,4 +1,6 @@
 ﻿using Algorithms;
+using Algorithms.Common.DataTransferObjects;
+using Algorithms.Common.Enums;
 // See https://aka.ms/new-console-template for more information
 /*Noekeon A1 = new Noekeon();
 A1.Initial("b");*/
@@ -28,14 +30,19 @@ A5.Initial("p3");*/
 // Rectangle rectangle = new Rectangle("");
 // rectangle.test();
 
-// Prince prince = new Prince("");
-// prince.test();
+InputDto inputDto = new InputDto();
+inputDto.Key = "asdfasdfasdfasdf";
+inputDto.Data = "This is a secret message! Hello world!";
+inputDto.InputTypes = DataTypes.String;
+inputDto.OutputTypes = DataTypes.String;
 
-//RoadRunneR rr = new RoadRunneR("");
+// Prince prince = new Prince(inputDto);
+// Robin rr = new Robin(inputDto);
+// RoadRunneR rr = new RoadRunneR(inputDto);
 
-// Robin rr = new Robin("");
 
-Console.WriteLine(11.ToString("X"));
-Console.WriteLine(int.Parse("B", System.Globalization.NumberStyles.HexNumber));
-//Console.WriteLine(new Mysterion("deneme", "").ini);
-Console.ReadLine();
+
+// Console.WriteLine(11.ToString("X"));
+// Console.WriteLine(int.Parse("B", System.Globalization.NumberStyles.HexNumber));
+// //Console.WriteLine(new Mysterion("deneme", "").ini);
+// Console.ReadLine();

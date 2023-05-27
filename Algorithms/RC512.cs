@@ -1,6 +1,8 @@
 using System;
 using Algorithms.Common.Abstract;
 using System.Text;
+using Algorithms.Common.DataTransferObjects;
+using Algorithms.Common.Enums;
 
 public class RC512: EncryptionAlgorithm
 {
@@ -10,30 +12,33 @@ public class RC512: EncryptionAlgorithm
 
     private uint[] _roundKey = null;
 
-    public RC512(string text): base(text)
+    public RC512(InputDto inputDto) : base(inputDto)
     {
-        if (text.Length != KeySize)
-        {
-            throw new ArgumentException("Invalid key size. Key size must be 16 bytes. Yours: " + text.Length);
-        }
 
-        InitializeKey(Encoding.ASCII.GetBytes(text));
     }
 
-    protected override void Initial(string input,string inputKey)
+    protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
     {
+        if (inputKey.Length != 16)
+        {
+            throw new ArgumentException("Key uzunluğu (16 byte, 128 bit) olmalı.");
+        }
+
+        byte[] key = Encoding.ASCII.GetBytes(inputKey);
+        InitializeKey(Encoding.ASCII.GetBytes(inputKey));
+
         byte[] data = new byte[]{
             0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0,
             0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0
         };
 
-        RC512 rc5 = new RC512("asdfasdfasdfasdf");
+        // RC512 rc5 = new RC512("asdfasdfasdfasdf");
         AddStep("Şifrelenecek Metin binary gösterimi: ", BitConverter.ToString(data));
 
-        byte[] encryptedData = rc5.Encrypt(data);
+        byte[] encryptedData = Encrypt(data);
         AddStep("Şifrelenecek Metin binary gösterimi: ", BitConverter.ToString(encryptedData));
 
-        byte[] decryptedData = rc5.Decrypt(encryptedData);
+        byte[] decryptedData = Decrypt(encryptedData);
         AddStep("Şifrelenecek Metin binary gösterimi: ", BitConverter.ToString(decryptedData));
 
         Console.WriteLine("Data:           " + BitConverter.ToString(data));

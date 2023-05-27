@@ -2,6 +2,8 @@ using Algorithms.Common.Abstract;
 
 using System;
 using System.Text;
+using Algorithms.Common.Enums;
+using Algorithms.Common.DataTransferObjects;
 
 namespace Algorithms;
 
@@ -11,21 +13,18 @@ namespace Algorithms;
 
 public class Robin : EncryptionAlgorithm
 {
-    public Robin(string text) : base(text)
+    public Robin(InputDto inputDto) : base(inputDto)
     {
 
     }
 
-    protected override void Initial(string input,string inputKey)
+    protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
     {
-        byte[] PLAIN = {
-            0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10,
-            0xFE, 0xDC, 0xBA, 0x98, 0x76, 0x54, 0x32, 0x10
-        };
-        byte[] KEY = {
-            0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF,
-            0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF
-        };
+        if (inputKey.Length != 16)
+        {
+            throw new ArgumentException("Key uzunluğu (16 byte, 128 bit) olmalı.");
+        }
+        byte[] key = Encoding.ASCII.GetBytes(inputKey);
 
         // Console.WriteLine(BitConverter.ToString(PLAIN));
         // byte[] encrypted = this.Encrypt(PLAIN, KEY);
@@ -33,17 +32,17 @@ public class Robin : EncryptionAlgorithm
         // byte[] decrypted = this.Decrypt(encrypted, KEY);
         // Console.WriteLine(BitConverter.ToString(decrypted));
 
-        string plain = input;
-        AddStep( "Şifrelenecek metin", plain);
-        Console.WriteLine(plain);
+        string plaintext = StringValue;
+        AddStep( "Şifrelenecek metin", plaintext);
+        Console.WriteLine(plaintext);
         
-        byte[] strenc = this.EncryptString(KEY, plain);
-        AddStep( "Şifrelenmiş metin", BitConverter.ToString(strenc));
-        Console.WriteLine(BitConverter.ToString(strenc));
+        byte[] ciphertext = this.EncryptString(key, plaintext);
+        AddStep( "Şifrelenmiş metin", BitConverter.ToString(ciphertext));
+        Console.WriteLine(BitConverter.ToString(ciphertext));
     
-        string strdec = this.DecryptString(KEY, strenc);
-        Console.WriteLine(strdec);
-        AddStep( "Şifrelenecek girdi:", strdec);
+        string descryptedtext = this.DecryptString(key, ciphertext);
+        Console.WriteLine(descryptedtext);
+        AddStep( "Şifrelenecek girdi:", descryptedtext);
     }
 
 
