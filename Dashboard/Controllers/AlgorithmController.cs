@@ -35,7 +35,7 @@ public class AlgorithmController : Controller
     }
 
     [HttpGet("/pride/{text}", Name = nameof(GetPride))]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepSSDto[]))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
     public async Task<IActionResult> GetPride([FromQuery] InputDto input)
     {
         return Ok(new Pride(input).GetSteps());
