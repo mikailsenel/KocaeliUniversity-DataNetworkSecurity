@@ -37,27 +37,7 @@ internal class DataConverter
     {
         return Encoding.ASCII.GetBytes(data);
     }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
-    public string ConvertIntToHex(int data)
-    {
-        return data.ToString("X");
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
-    public int ConvertHexToInt(string data)
-    {
-        return int.Parse(data, System.Globalization.NumberStyles.HexNumber);
-    }
-
+    
     /// <summary>
     /// 
     /// </summary>
@@ -65,7 +45,13 @@ internal class DataConverter
     /// <returns></returns>
     public string ConvertHexToString(string data)
     {
-        return int.Parse(data, System.Globalization.NumberStyles.HexNumber).ToString();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < data.Length;i++)
+        {
+            stringBuilder.Append(int.Parse(data.Substring(i,1), System.Globalization.NumberStyles.HexNumber));
+
+        }
+        return stringBuilder.ToString();
     }
 
     /// <summary>
