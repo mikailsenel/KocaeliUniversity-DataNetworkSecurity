@@ -65,7 +65,13 @@ internal class DataConverter
     /// <returns></returns>
     public string ConvertHexToString(string data)
     {
-        return int.Parse(data, System.Globalization.NumberStyles.HexNumber).ToString();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < data.Length;i++)
+        {
+            stringBuilder.Append(int.Parse(data.Substring(1), System.Globalization.NumberStyles.HexNumber));
+
+        }
+        return stringBuilder.ToString();
     }
 
     /// <summary>
