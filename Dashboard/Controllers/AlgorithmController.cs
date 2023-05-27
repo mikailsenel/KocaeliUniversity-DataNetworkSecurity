@@ -87,6 +87,8 @@ public class AlgorithmController : Controller
 
     [HttpGet("/roadrunner/", Name = nameof(GetRoadRunner))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BusinessProblemDetail))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(InternalServerErrorProblemDetails))]
     public async Task<IActionResult> GetRoadRunner([FromQuery] InputDto input)
     {
         return Ok(new RoadRunneR(input).GetSteps());
@@ -94,6 +96,8 @@ public class AlgorithmController : Controller
 
     [HttpGet("/prince/", Name = nameof(GetPrince))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BusinessProblemDetail))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(InternalServerErrorProblemDetails))]
     public async Task<IActionResult> GetPrince([FromQuery] InputDto input)
     {
         return Ok(new Prince(input).GetSteps());
@@ -101,6 +105,8 @@ public class AlgorithmController : Controller
 
     [HttpGet("/robin/", Name = nameof(GetRobin))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BusinessProblemDetail))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(InternalServerErrorProblemDetails))]
     public async Task<IActionResult> GetRobin([FromQuery] InputDto input)
     {
         return Ok(new Robin(input).GetSteps());
