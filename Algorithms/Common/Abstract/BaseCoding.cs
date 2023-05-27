@@ -1,5 +1,6 @@
 ﻿using Algorithms.Common.DataTransferObjects;
 using Algorithms.Common.Enums;
+using Algorithms.Common.Exceptions;
 using Algorithms.Common.Services;
 
 namespace Algorithms.Common.Abstract;
@@ -80,5 +81,15 @@ public abstract class BaseCoding
                 HexValue = DataConverter.Instance.ConvertStringToHex(StringValue);
                 break;
         }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
+    /// <exception cref="BusinessException"></exception>
+    protected void ThrowBusinessException(string message)
+    {
+        throw new BusinessException(message);
     }
 }
