@@ -2,6 +2,8 @@
 using Algorithms.Common.Enums;
 using Algorithms.Common.Exceptions;
 using Algorithms.Common.Services;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Algorithms.Common.Abstract;
 
@@ -15,10 +17,10 @@ public abstract class BaseCoding
     protected string StringValue;
     protected byte[] ByteValue;
 
-   /// <summary>
-   /// 
-   /// </summary>
-   /// <param name="input"></param>
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="input"></param>
     public BaseCoding(InputDto input)
     {
         Steps = new List<StepDto>();
@@ -63,25 +65,44 @@ public abstract class BaseCoding
     /// <param name="ınputTypes"></param>
     private void convert(string data, DataTypes inputTypes)
     {
-        switch (inputTypes)
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="ınputTypes"></param>
+    protected void FinalStep(string data, DataTypes sourceType, DataTypes destinationType)
+    {
+        string plainText = "";
+        switch (sourceType)
         {
             case DataTypes.String:
-                StringValue = data;
-                HexValue = DataConverter.Instance.ConvertStringToHex(data);
-                ByteValue = DataConverter.Instance.ConvertStringToByte(data);
+                plainText = data;
                 break;
             case DataTypes.Hex:
-                HexValue = data;
-                StringValue = DataConverter.Instance.ConvertHexToString(data);
-                ByteValue = DataConverter.Instance.ConvertHexToByte(StringValue);
+                plainText = DataConverter.Instance.ConvertHexToString(data);
                 break;
             case DataTypes.Byte:
-                ByteValue = DataConverter.Instance.ConvertStringToByte(data);
-                StringValue = DataConverter.Instance.ConvertByteToString(ByteValue);
-                HexValue = DataConverter.Instance.ConvertStringToHex(StringValue);
+                plainText = DataConverter.Instance.ConvertByteToString(ByteValue);
+                break;
+        }
+        string pattern = "{0} türünde çıktı:";
+        switch (destinationType)
+        {
+            case DataTypes.String:
+                AddStep(String.Format(pattern, "Plain text"), plainText);
+                break;
+            case DataTypes.Hex:
+                AddStep(String.Format(pattern, "Hex"), DataConverter.Instance.ConvertStringToHex(plainText));
+                break;
+            case DataTypes.Byte:
+                AddStep(String.Format(pattern, "Byte"), DataConverter.Instance.ConvertStringToByte(plainText).ToString());
                 break;
         }
     }
+
 
     /// <summary>
     /// 
