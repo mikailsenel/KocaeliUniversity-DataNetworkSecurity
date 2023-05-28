@@ -48,40 +48,40 @@ public class AlgorithmController : Controller
     }
 
 
-    [HttpGet("/sea/{text}", Name = nameof(GetSea))]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    public async Task<IActionResult> GetSea([FromRoute] string text)
-    {
-        return Ok(new Sea(text).GetSteps());
-    }
+    // [HttpGet("/sea/{text}", Name = nameof(GetSea))]
+    // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    // public async Task<IActionResult> GetSea([FromRoute] string text)
+    // {
+    //     return Ok(new Sea(text).GetSteps());
+    // }
 
-    [HttpGet("/simeck/{text}", Name = nameof(GetSimeck))]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    public async Task<IActionResult> GetSimeck([FromRoute] string text)
-    {
-        return Ok(new Simeck(text).GetSteps());
-    }
+    // [HttpGet("/simeck/{text}", Name = nameof(GetSimeck))]
+    // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    // public async Task<IActionResult> GetSimeck([FromRoute] string text)
+    // {
+    //     return Ok(new Simeck(text).GetSteps());
+    // }
 
-    [HttpGet("/simon/{text}", Name = nameof(GetSimon))]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    public async Task<IActionResult> GetSimon([FromRoute] string text)
-    {
-        return Ok(new Simon(text).GetSteps());
-    }
+    // [HttpGet("/simon/{text}", Name = nameof(GetSimon))]
+    // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    // public async Task<IActionResult> GetSimon([FromRoute] string text)
+    // {
+    //     return Ok(new Simon(text).GetSteps());
+    // }
 
-    [HttpGet("/skinny/{text}", Name = nameof(GetSkinny))]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    public async Task<IActionResult> GetSkinny([FromRoute] string text)
-    {
-        return Ok(new Skinny(text).GetSteps());
-    }
+    // [HttpGet("/skinny/{text}", Name = nameof(GetSkinny))]
+    // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    // public async Task<IActionResult> GetSkinny([FromRoute] string text)
+    // {
+    //     return Ok(new Skinny(text).GetSteps());
+    // }
 
-    [HttpGet("/sparx/{text}", Name = nameof(GetSparx))]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    public async Task<IActionResult> GetSparx([FromRoute] string text)
-    {
-        return Ok(new Sparx(text).GetSteps());
-    }
+    // [HttpGet("/sparx/{text}", Name = nameof(GetSparx))]
+    // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    // public async Task<IActionResult> GetSparx([FromRoute] string text)
+    // {
+    //     return Ok(new Sparx(text).GetSteps());
+    // }
 
     //// ----------------------------------------------------------------
 
@@ -110,6 +110,15 @@ public class AlgorithmController : Controller
     public async Task<IActionResult> GetRobin([FromQuery] InputDto input)
     {
         return Ok(new Robin(input).GetSteps());
+    }
+
+    [HttpGet("/rectangle/", Name = nameof(GetRectangle))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BusinessProblemDetail))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(InternalServerErrorProblemDetails))]
+    public async Task<IActionResult> GetRectangle([FromQuery] InputDto input)
+    {
+        return Ok(new Rectangle(input).GetSteps());
     }
 
     // ----------------------------------------------------------------

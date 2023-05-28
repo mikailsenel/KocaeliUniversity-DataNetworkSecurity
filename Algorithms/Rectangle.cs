@@ -11,38 +11,17 @@ using Algorithms.Common.Enums;
 
 public class Rectangle: EncryptionAlgorithm
 {
-    public Rectangle(InputDto inputDto) : base(inputDto)
-    {
-
-    }
-
-    protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
-    {
-        ushort[] Key = RectangleCipher.stringTouShortArray(inputKey);
-        RectangleCipher rec = new RectangleCipher(
-            RectangleCipher.stringTouShortArray(StringValue),
-            Key
-        );
-
-        // --------------------------------------------------
-        Console.WriteLine($"Şifrelenecek girdi: {StringValue}");
-        AddStep( "Şifrelenecek girdi:", StringValue);
-
-        ushort[] cipher1 = rec.EncryptString(Key, StringValue);
-        Console.WriteLine($"cipher: {BitConverter.ToString(RectangleCipher.uShortArrayToBytes(cipher1))}");
-
-        string plain1    = rec.DecryptString(Key, cipher1);
-        Console.WriteLine($"plain: {plain1}");
-    }
-}
-
-public class RectangleCipher
-{
     public ushort[] plainText;
     public ushort[] cipherText;
     public ushort[] key; // private
     public ushort[] mainKey; // private
     public ushort rc; // private
+
+    public Rectangle(InputDto inputDto) : base(inputDto)
+    // public Rectangle(ushort[] plainText, ushort[] key)
+    {
+
+    }
 
     public void printdbg() {
         Console.WriteLine(
@@ -54,21 +33,49 @@ public class RectangleCipher
         );
     }
 
-    public RectangleCipher(ushort[] plainText, ushort[] key)
-    {
-        this.plainText = new ushort[plainText.Length];
-        Array.Copy(plainText, this.plainText, plainText.Length);
+    private void Prepare(ushort[] Key)
+    {   
+        ushort[] Data =  new ushort[] { 0x00, 0x00, 0x00, 0x00};
 
-        this.cipherText = new ushort[plainText.Length];
-        Array.Copy(plainText, this.cipherText, plainText.Length);
+        // --------------------------------------------------------
 
-        this.key = new ushort[key.Length];
-        Array.Copy(key, this.key, key.Length);
+        this.plainText = new ushort[Data.Length];
+        Array.Copy(Data, this.plainText, Data.Length);
 
-        this.mainKey = new ushort[key.Length];
-        Array.Copy(key, this.mainKey, key.Length);
+        this.cipherText = new ushort[Data.Length];
+        Array.Copy(Data, this.cipherText, Data.Length);
+
+        // --------------------------------------------------------
+
+        this.key = new ushort[Key.Length];
+        Array.Copy(Key, this.key, Key.Length);
+
+        this.mainKey = new ushort[Key.Length];
+        Array.Copy(Key, this.mainKey, Key.Length);
 
         this.rc = 0;
+    }
+
+    protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
+    {
+        ushort[] Key = Rectangle.stringTouShortArray(inputKey);
+        this.Prepare(Key);
+
+        // this.printdbg();
+        // --------------------------------------------------
+        Console.WriteLine($"Şifrelenecek girdi: {StringValue}");
+        AddStep( "Şifrelenecek girdi:", StringValue);
+        // this.printdbg();
+
+        ushort[] ciphertext = this.EncryptString(Key, StringValue);
+        Console.WriteLine($"cipher: {BitConverter.ToString(Rectangle.uShortArrayToBytes(ciphertext))}");
+        AddStep( "Şifrelenecek girdi:", BitConverter.ToString(Rectangle.uShortArrayToBytes(ciphertext)));
+        // this.printdbg();
+
+        string plaintext    = this.DecryptString(Key, ciphertext);
+        Console.WriteLine($"plain: {plaintext}");
+        AddStep( "Şifrelenecek girdi:", plaintext);
+        // this.printdbg();
     }
 
     private ushort Clsh(ushort num, int shift)
@@ -116,7 +123,9 @@ public class RectangleCipher
 
     private ushort[] GenerateRoundKey(bool final = false)
     {
-        ushort[] roundKey = new ushort[key.Length];
+        ushort[] roundKey = new ushort[
+            key.Length
+        ];
         Array.Copy(key, roundKey, key.Length);
 
         if (!final)
@@ -190,6 +199,10 @@ public class RectangleCipher
             AddRoundKey(roundKey);
             SubColumn(ref cipherText);
             ShiftRow();
+            AddStep(
+                $"Encryption Round {i}",
+                BitConverter.ToString(Rectangle.uShortArrayToBytes(cipherText))
+            );
         }
 
         ushort[] finalRoundKey = GenerateRoundKey(true);
@@ -224,6 +237,10 @@ public class RectangleCipher
             AddRoundKey(roundKey);
             ShiftRow(16);
             SubColumn(ref cipherText, 16, InverseSBox);
+            AddStep(
+                $"Decryption Round {i}",
+                BitConverter.ToString(Rectangle.uShortArrayToBytes(cipherText))
+            );
         }
 
         ushort[] finalRoundKey = roundKeys[0];
@@ -259,11 +276,10 @@ public class RectangleCipher
     }
 
 
-    public ushort[] EncryptString(ushort[] key, string plaintext)
+    public ushort[] EncryptString(ushort[] Key, string plaintext)
     {
-        RectangleCipher rec;
         List<ushort> ciphertext = new List<ushort>();
-        ushort[] _plaintext = RectangleCipher.stringTouShortArray(plaintext);
+        ushort[] _plaintext = Rectangle.stringTouShortArray(plaintext);
 
         int blockSize = 4;
         int totalBlocks = (int)Math.Ceiling((double)_plaintext.Length / blockSize);
@@ -277,17 +293,23 @@ public class RectangleCipher
             ushort[] block = new ushort[blockSize];
             Array.Copy(_plaintext, startIndex, block, 0, blockLength);
 
-            rec = new RectangleCipher(block, key);
-            rec.Encrypt();
-            ciphertext.AddRange(rec.cipherText);
+            // rec = new Rectangle(block, key);
+            
+            this.rc = 0;
+            this.cipherText = block;
+            this.plainText = block;
+            Array.Copy(Key, this.key, Key.Length);
+            Array.Copy(Key, this.mainKey, Key.Length);
+            this.Encrypt();
+            AddStep($"Şifrelenmiş blockIndex {blockIndex}", BitConverter.ToString(Rectangle.uShortArrayToBytes(this.cipherText)));
+            ciphertext.AddRange(this.cipherText);
         }
 
         return ciphertext.ToArray();
     }
 
-    public string DecryptString(ushort[] key, ushort[] ciphertext)
+    public string DecryptString(ushort[] Key, ushort[] ciphertext)
     {
-        RectangleCipher rec;
         List<ushort> plaintextBytes = new List<ushort>();
         // ushort[] _ciphertext = StringTouShortArray(ciphertext);
 
@@ -301,13 +323,19 @@ public class RectangleCipher
             ushort[] block = new ushort[blockSize];
             Array.Copy(ciphertext, startIndex, block, 0, blockSize);
 
-            rec = new RectangleCipher(block, key);
-            rec.Decrypt();
-            plaintextBytes.AddRange(rec.cipherText);
+            // rec = new Rectangle(block, key);
+            this.cipherText = block;
+            this.Decrypt();
+            this.rc = 0;
+            Array.Copy(Key, this.key, Key.Length);
+            // this.printdbg();
+
+            AddStep($"Şifrelenmiş blockIndex {blockIndex}", BitConverter.ToString(Rectangle.uShortArrayToBytes(this.cipherText)));
+            plaintextBytes.AddRange(this.cipherText);
         }
 
         // return Encoding.UTF8.GetString();
-        return RectangleCipher.uShortArrayToString(plaintextBytes.ToArray());
+        return Rectangle.uShortArrayToString(plaintextBytes.ToArray());
     }
 }
 
