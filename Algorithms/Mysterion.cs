@@ -98,20 +98,7 @@ public class Mysterion : EncryptionAlgorithm
              return;
          }*/
 
-        byte[] data;
-        switch (inputTypes)
-        {
-            case DataTypes.Byte:
-                data = ByteValue;
-                break;
-            case DataTypes.String:
-                string text = StringValue; // Örneğin, "Hello, World!" gibi bir string değeri alıyoruz
-                data = ConvertStringToByteArray(text);
-                break;
-
-            default:
-                throw new ArgumentException("Geçersiz giriş veri tipi.");
-        }
+        byte[] data = ByteValue;
 
 
 

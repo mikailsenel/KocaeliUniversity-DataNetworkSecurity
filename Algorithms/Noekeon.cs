@@ -51,7 +51,7 @@ public class Noekeon : EncryptionAlgorithm
     protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
     {
 
-       
+
 
         /* if (input.Length > MaxInputLength)
          {

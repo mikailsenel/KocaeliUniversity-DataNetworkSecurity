@@ -11,7 +11,7 @@ namespace Dashboard.Controllers;
 [Route("[controller]")]
 public class AlgorithmController : Controller
 {
-    [HttpGet("/mysterion/", Name = nameof(GetMysterion))]
+    [HttpGet("/mysterion/ 256 bit (32) byte key girilmelidir.", Name = nameof(GetMysterion))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BusinessProblemDetail))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(InternalServerErrorProblemDetails))]
@@ -20,27 +20,27 @@ public class AlgorithmController : Controller
         return Ok(new Mysterion(input).GetSteps());
     }
 
-    [HttpGet("/noekeon/", Name = nameof(GetNoekeon))]
+    [HttpGet("/noekeon/ 64 bit (8) byte key girilmelidir.", Name = nameof(GetNoekeon))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
     public async Task<IActionResult> GetNoekeon([FromQuery] InputDto input)
     {
         return Ok(new Noekeon(input).GetSteps());
     }
 
-    [HttpGet("/piccolo/", Name = nameof(GetPiccolo))]
+    [HttpGet("/piccolo/ 128 bit (16) byte key girilmelidir.", Name = nameof(GetPiccolo))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
     public async Task<IActionResult> GetPiccolo([FromQuery] InputDto input)
     {
         return Ok(new Piccolo(input).GetSteps());
     }
 
-    [HttpGet("/pride/{text}", Name = nameof(GetPride))]
+    [HttpGet("/pride/ 64 bit (8) byte key girilmelidir.", Name = nameof(GetPride))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
     public async Task<IActionResult> GetPride([FromQuery] InputDto input)
     {
         return Ok(new Pride(input).GetSteps());
     }
-    [HttpGet("/present/{text}", Name = nameof(GetPresent))]
+    [HttpGet("/present/ 64 bit (8) byte key girilmelidir.", Name = nameof(GetPresent))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
     public async Task<IActionResult> GetPresent([FromQuery] InputDto input)
     {
