@@ -31,19 +31,20 @@ A5.Initial("p3");*/
 // rectangle.test();
 
 InputDto inputDto = new InputDto();
-inputDto.Key = "asdfasdfas";
-inputDto.Data = "Hello world 123 ! Hello world";
+inputDto.Key = "asdfasdfasdfasdf";
+inputDto.Data = "Hello world 123 ! Hello world 123 123 123 .";
 inputDto.InputTypes = DataTypes.String;
 inputDto.OutputTypes = DataTypes.String;
 
 // Prince prince = new Prince(inputDto);
 // Robin rr = new Robin(inputDto);
 // RoadRunneR rr = new RoadRunneR(inputDto);
+RC512 rc5 = new RC512(inputDto);
 
-ushort[] Key = new ushort[] { 0xffff, 0xffff, 0xffff, 0xffff, 0xaaaa };
-inputDto.Key = Rectangle.uShortArrayToString(Key);
+// ushort[] Key = new ushort[] { 0xffff, 0xffff, 0xffff, 0xffff, 0xaaaa };
+// inputDto.Key = Rectangle.uShortArrayToString(Key);
 // inputDto.Data = Rectangle.uShortArrayToString(new ushort[] { 0xabca, 0x4611, 0xffff, 0x1234});
-Rectangle rectangle = new Rectangle(inputDto);
+// Rectangle rectangle = new Rectangle(inputDto);
 
 
 // Console.WriteLine(11.ToString("X"));

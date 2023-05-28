@@ -121,5 +121,14 @@ public class AlgorithmController : Controller
         return Ok(new Rectangle(input).GetSteps());
     }
 
+    [HttpGet("/rc5/", Name = nameof(GetRC512))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BusinessProblemDetail))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(InternalServerErrorProblemDetails))]
+    public async Task<IActionResult> GetRC512([FromQuery] InputDto input)
+    {
+        return Ok(new RC512(input).GetSteps());
+    }
+
     // ----------------------------------------------------------------
 }
