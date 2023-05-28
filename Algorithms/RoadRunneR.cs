@@ -43,7 +43,7 @@ public class RoadRunneR : EncryptionAlgorithm
         AddStep( "Şifrelenecek girdi:", decryptedtext);
         Console.WriteLine("Deşifrelenmiş girdi: " + decryptedtext);
 
-        FinalStep("Deneme", inputTypes, outputTypes);
+        FinalStep(decryptedtext, DataTypes.String, outputTypes);
     }
 
     const int READ_RAM_DATA_BYTE = 0;

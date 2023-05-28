@@ -49,7 +49,7 @@ public class Prince : EncryptionAlgorithm
         Console.WriteLine(strdecrypted);
 
         // Console.WriteLine(strdecrypted);
-        FinalStep("Deneme", inputTypes, outputTypes);
+        FinalStep(strdecrypted, DataTypes.String, outputTypes);
     }
 
     private byte[] SBOX = new byte[]

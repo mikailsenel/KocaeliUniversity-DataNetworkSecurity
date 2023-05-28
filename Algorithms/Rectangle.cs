@@ -81,6 +81,8 @@ public class Rectangle: EncryptionAlgorithm
         Console.WriteLine($"plain: {plaintext}");
         AddStep( "Şifrelenecek girdi:", plaintext);
         // this.printdbg();
+
+        FinalStep(plaintext, DataTypes.String, outputTypes);
     }
 
     private ushort Clsh(ushort num, int shift)
