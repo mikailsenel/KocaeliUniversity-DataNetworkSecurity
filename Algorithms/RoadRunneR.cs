@@ -42,6 +42,8 @@ public class RoadRunneR : EncryptionAlgorithm
         string decryptedtext = DecryptString(ciphertext, key);
         AddStep( "Şifrelenecek girdi:", decryptedtext);
         Console.WriteLine("Deşifrelenmiş girdi: " + decryptedtext);
+
+        FinalStep("Deneme", inputTypes, outputTypes);
     }
 
     const int READ_RAM_DATA_BYTE = 0;

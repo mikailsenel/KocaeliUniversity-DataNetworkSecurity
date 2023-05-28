@@ -43,6 +43,8 @@ public class Robin : EncryptionAlgorithm
         string descryptedtext = this.DecryptString(key, ciphertext);
         Console.WriteLine(descryptedtext);
         AddStep( "Şifrelenecek girdi:", descryptedtext);
+
+        FinalStep("Deneme", inputTypes, outputTypes);
     }
 
 
