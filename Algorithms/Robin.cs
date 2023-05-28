@@ -278,7 +278,7 @@ public class Robin : EncryptionAlgorithm
             plaintextBytes.AddRange(decryptedBlock);
         }
 
-        return Encoding.UTF8.GetString(plaintextBytes.ToArray());
+        return Encoding.UTF8.GetString(plaintextBytes.ToArray()).TrimEnd('\0');
     }
 
 }

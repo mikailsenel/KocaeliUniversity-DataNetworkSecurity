@@ -58,9 +58,9 @@ public class Rectangle: EncryptionAlgorithm
 
     protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
     {
-        if (inputKey.Length != 5)
+        if (inputKey.Length != 10)
         {
-            throw new ArgumentException("Key uzunluğu (10 byte, 80 bit) olmalı.");
+            throw new ArgumentException($"Key uzunluğu (10 byte, 80 bit) olmalı. Yours: {inputKey.Length}");
         }
 
         ushort[] Key = Rectangle.stringTouShortArray(inputKey);
@@ -342,7 +342,7 @@ public class Rectangle: EncryptionAlgorithm
         }
 
         // return Encoding.UTF8.GetString();
-        return Rectangle.uShortArrayToString(plaintextBytes.ToArray());
+        return Rectangle.uShortArrayToString(plaintextBytes.ToArray()).TrimEnd('\0');
     }
 }
 

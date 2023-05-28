@@ -260,6 +260,6 @@ public class RC512: EncryptionAlgorithm
             AddStep($"Deşifrelenmiş Blok {blockIndex}", BitConverter.ToString(decryptedBlock));
         }
 
-        return Encoding.ASCII.GetString(plaintextBytes.ToArray()).Trim('\0');
+        return Encoding.ASCII.GetString(plaintextBytes.ToArray()).TrimEnd('\0');
     }
 }
