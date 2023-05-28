@@ -101,10 +101,34 @@ public abstract class BaseCoding
             case DataTypes.Hex:
                 plainText = DataConverter.Instance.ConvertHexToString(data);
                 break;
-            case DataTypes.Byte:
-                plainText = DataConverter.Instance.ConvertByteToString(ByteValue);
+            default:
+                ThrowBusinessException("Beklenmeyen data tipi");
                 break;
         }
+        string pattern = "{0} türünde çıktı:";
+        switch (destinationType)
+        {
+            case DataTypes.String:
+                AddStep(String.Format(pattern, "Plain text"), plainText);
+                break;
+            case DataTypes.Hex:
+                AddStep(String.Format(pattern, "Hex"), DataConverter.Instance.ConvertStringToHex(plainText));
+                break;
+            case DataTypes.Byte:
+                AddStep(String.Format(pattern, "Byte"), DataConverter.Instance.ConvertStringToByte(plainText).ToString());
+                break;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="ınputTypes"></param>
+    protected void FinalStep(byte[] data,  DataTypes destinationType)
+    {
+        string plainText = "";
+        plainText = DataConverter.Instance.ConvertByteToString(data);
         string pattern = "{0} türünde çıktı:";
         switch (destinationType)
         {
