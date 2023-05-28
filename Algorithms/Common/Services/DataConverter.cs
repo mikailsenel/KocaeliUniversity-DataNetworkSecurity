@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Algorithms.Common.Services;
 
-internal class DataConverter
+public class DataConverter
 {
     private static readonly Lazy<DataConverter> obj = new Lazy<DataConverter>(() => new DataConverter());
     public static DataConverter Instance
@@ -37,7 +38,7 @@ internal class DataConverter
     {
         return Encoding.ASCII.GetBytes(data);
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -46,9 +47,9 @@ internal class DataConverter
     public string ConvertHexToString(string data)
     {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < data.Length;i++)
+        for (int i = 0; i < data.Length; i++)
         {
-            stringBuilder.Append(int.Parse(data.Substring(i,1), System.Globalization.NumberStyles.HexNumber));
+            stringBuilder.Append(int.Parse(data.Substring(i, 1), System.Globalization.NumberStyles.HexNumber));
 
         }
         return stringBuilder.ToString();
@@ -61,8 +62,18 @@ internal class DataConverter
     /// <returns></returns>
     public string ConvertStringToHex(string data)
     {
-        byte[] bytes = Encoding.UTF8.GetBytes(data);
+        byte[] bytes = Encoding.ASCII.GetBytes(data);
         return Convert.ToHexString(bytes);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    public string ConvertByteToHex(byte[] data)
+    {
+        return Convert.ToHexString(data);
     }
 
     /// <summary>

@@ -127,19 +127,17 @@ public abstract class BaseCoding
     /// <param name="ınputTypes"></param>
     protected void FinalStep(byte[] data,  DataTypes destinationType)
     {
-        string plainText = "";
-        plainText = DataConverter.Instance.ConvertByteToString(data);
         string pattern = "{0} türünde çıktı:";
         switch (destinationType)
         {
             case DataTypes.String:
-                AddStep(String.Format(pattern, "Plain text"), plainText);
+                AddStep(String.Format(pattern, "Plain text"), DataConverter.Instance.ConvertByteToString(data));
                 break;
             case DataTypes.Hex:
-                AddStep(String.Format(pattern, "Hex"), DataConverter.Instance.ConvertStringToHex(plainText));
+                AddStep(String.Format(pattern, "Hex"), DataConverter.Instance.ConvertByteToHex(data));
                 break;
             case DataTypes.Byte:
-                AddStep(String.Format(pattern, "Byte"), DataConverter.Instance.ConvertStringToByte(plainText).ToString());
+                AddStep(String.Format(pattern, "Byte"), DataConverter.Instance.ConvertByteToString(data));
                 break;
         }
     }
