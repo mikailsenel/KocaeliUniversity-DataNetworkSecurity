@@ -85,14 +85,11 @@ public class Noekeon : EncryptionAlgorithm
         string binaryString = GetBinaryString(binaryData);
 
         AddStep("Girdi Metin datasi Binary data..: ", binaryString);
-
+        byte[] binaryDataenc = GetBinaryDataFromString(encryptedText);
         Console.WriteLine("Şifrelenmiş Text: " + encryptedText);
         AddStep("Şifrelenmiş Text..: ", encryptedText);
         FinalStep(encryptedText, DataTypes.String, outputTypes);
-        FinalStep(encryptedText, DataTypes.Hex, outputTypes);
-        byte[] binaryDataenc = GetBinaryDataFromString(encryptedText);
-        FinalStep(binaryDataenc,outputTypes);
-        
+       
         string binaryStringenc = GetBinaryString(binaryDataenc);
 
         AddStep("Şifrelenmiş Text Binary data..: ", binaryStringenc);
