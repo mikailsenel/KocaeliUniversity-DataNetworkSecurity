@@ -238,12 +238,24 @@ public class Mysterion : EncryptionAlgorithm
             DecryptBlock(block);
             byte[] blockBytes = new byte[8];
             Buffer.BlockCopy(block, 0, blockBytes, 0, 8);
-            Buffer.BlockCopy(blockBytes, 0, decrypted, i * 8, Math.Min(8, decrypted.Length - i * 8));
+            Buffer.BlockCopy(blockBytes, 0, decrypted, i * 8, 8);
         }
 
-        return decrypted;
-    }
+        // Trim trailing zeros from the decrypted data
+        int trimLength = decrypted.Length;
+        for (int i = decrypted.Length - 1; i >= 0; i--)
+        {
+            if (decrypted[i] != 0x00)
+            {
+                break;
+            }
+            trimLength--;
+        }
 
+        byte[] trimmedDecrypted = new byte[trimLength];
+        Buffer.BlockCopy(decrypted, 0, trimmedDecrypted, 0, trimLength);
+        return trimmedDecrypted;
+    }
 
     private void DecryptBlock(uint[] block)
     {
