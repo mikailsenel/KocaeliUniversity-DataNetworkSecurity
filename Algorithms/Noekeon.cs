@@ -89,7 +89,10 @@ public class Noekeon : EncryptionAlgorithm
         Console.WriteLine("Şifrelenmiş Text: " + encryptedText);
         AddStep("Şifrelenmiş Text..: ", encryptedText);
         FinalStep(encryptedText, DataTypes.String, outputTypes);
+        FinalStep(encryptedText, DataTypes.Hex, outputTypes);
         byte[] binaryDataenc = GetBinaryDataFromString(encryptedText);
+        FinalStep(binaryDataenc,outputTypes);
+        
         string binaryStringenc = GetBinaryString(binaryDataenc);
 
         AddStep("Şifrelenmiş Text Binary data..: ", binaryStringenc);

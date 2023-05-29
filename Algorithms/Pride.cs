@@ -77,6 +77,9 @@ public class Pride : EncryptionAlgorithm
         Console.WriteLine("Çözülmüş metin Binary Gösterimi: " + binaryString3);
         AddStep("Çözülmüş metin Binary Gösterimi: ", binaryString3);
         FinalStep(GetBinaryString(decryptedTextBytes), DataTypes.String, outputTypes);
+        // FinalStep(GetBinaryString(decryptedTextBytes), DataTypes.Hex, outputTypes);
+        FinalStep(GetBinaryString(decryptedTextBytes), DataTypes.Byte, outputTypes);
+
     }
 
     public string Encrypt(string plaintext, string key)

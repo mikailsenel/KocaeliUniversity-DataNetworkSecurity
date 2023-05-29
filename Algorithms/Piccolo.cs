@@ -21,7 +21,7 @@ namespace Algorithms
         {
             if (key.Length != KeySize / 8)
             {
-                ThrowBusinessException($"Key  {KeySize} olmalı bit.");
+                ThrowBusinessException($"Key  {KeySize} olmalı .");
             }
 
             subkeys = GenerateSubkeys(key);
@@ -231,6 +231,8 @@ namespace Algorithms
             Console.WriteLine("Deşifrelenmiş Metin..:  " + decryptedText.TrimEnd('\0'));
             AddStep("Deşifrelenmiş Metin..:  ", decryptedText.TrimEnd('\0'));
             FinalStep(decryptedText.TrimEnd('\0'), DataTypes.String, outputTypes);
+            //FinalStep(decryptedText.TrimEnd('\0'), DataTypes.Hex, outputTypes);
+            FinalStep(decryptedText.TrimEnd('\0'), DataTypes.Byte, outputTypes);
             AddStep("Deşifrelenmiş Metin Binary...:", ConvertToBinary(decryptedText.TrimEnd('\0')));
         }
 

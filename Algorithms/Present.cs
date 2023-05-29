@@ -58,7 +58,8 @@ public class Present : EncryptionAlgorithm
         Console.WriteLine("Decrypted Metin Binary Gösterimi: " + GetBinaryString(decryptedData));
         AddStep("Decrypted Metin Binary Gösterimi: ", GetBinaryString(decryptedData));
         FinalStep(decryptedData, outputTypes);
-
+        FinalStep(GetBinaryString(decryptedData), DataTypes.Hex,outputTypes);
+        FinalStep(GetBinaryString(decryptedData), DataTypes.String, outputTypes);
     }
     private readonly byte[] SBox = {
             0xC, 0x5, 0x6, 0xB, 0x9, 0x0, 0xA, 0xD,

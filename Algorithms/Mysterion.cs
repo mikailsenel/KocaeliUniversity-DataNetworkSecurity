@@ -127,8 +127,9 @@ public class Mysterion : EncryptionAlgorithm
         byte[] decrypted = Decrypt(encrypted, key);
         AddStep("Şifresi çözülmüş data: ", BitConverter.ToString(decrypted).TrimEnd('\0'));
         Console.WriteLine("Şifresi çözülmüş data: " + BitConverter.ToString(decrypted));
-        FinalStep(BitConverter.ToString(decrypted).TrimEnd('\0'), DataTypes.String, outputTypes);
-
+       // FinalStep(BitConverter.ToString(decrypted).TrimEnd('\0'), DataTypes.String, outputTypes);
+        FinalStep(BitConverter.ToString(decrypted).TrimEnd('\0'), DataTypes.Hex, outputTypes);
+        FinalStep(decrypted, outputTypes);
 
         //AddStep("Şifresi çözülmüş data binary gösterimi: ", GetBinaryString(decrypted));
         Console.WriteLine("Şifresi çözülmüş data binary gösterimi: " + GetBinaryString(decrypted));
