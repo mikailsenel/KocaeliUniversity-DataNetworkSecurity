@@ -29,7 +29,7 @@ public class Pride : EncryptionAlgorithm
 
         if (key.Length != 16)
         {
-            throw new ArgumentException("Key uzunluğu 64 bit (16 karakter) olmalıdır.");
+            ThrowBusinessException("Key uzunluğu 64 bit (16 karakter) olmalıdır.");
             return;
         }
         // 128 bit üzerinde veri girişi kontrolü
@@ -76,6 +76,7 @@ public class Pride : EncryptionAlgorithm
         string binaryString3 = GetBinaryString(decryptedTextBytes);
         Console.WriteLine("Çözülmüş metin Binary Gösterimi: " + binaryString3);
         AddStep("Çözülmüş metin Binary Gösterimi: ", binaryString3);
+        FinalStep(GetBinaryString(decryptedTextBytes), DataTypes.String, outputTypes);
     }
 
     public string Encrypt(string plaintext, string key)

@@ -10,6 +10,8 @@ using System.Text;
 using System.Reflection.Metadata;
 using Algorithms.Common.Abstract;
 using Algorithms.Common.Enums;
+using Algorithms.Common.Services;
+using System.ComponentModel.DataAnnotations;
 /*Algoritma tamamlanmıştır. 256 bit key uzunluğu kullanır örnek anahtar:0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF */
 namespace Algorithms;
 
@@ -28,7 +30,7 @@ public class Mysterion : EncryptionAlgorithm
 
         if (binaryString.Length % 8 != 0)
         {
-            throw new ArgumentException("Binary string length must be a multiple of 8.");
+            ThrowBusinessException("Binary string uzunlugu 8 in katı olmalıdır.");
         }
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -99,10 +101,7 @@ public class Mysterion : EncryptionAlgorithm
          }*/
 
         byte[] data = ByteValue;
-
-
-
-        AddStep("Şifrelenecek girdi texti", BitConverter.ToString(data));
+        AddStep("Şifrelenecek girdi texti", DataConverter.Instance.ConvertByteToHex(data));
         Console.WriteLine("Şifrelenecek girdi texti :" + BitConverter.ToString(data));
 
         AddStep("Şifrelenecek girdi texti binary gösterimi: ", GetBinaryString(data));
@@ -112,7 +111,7 @@ public class Mysterion : EncryptionAlgorithm
         // Anahtar uzunluğu 32 byte (256 bit) olmadığında istisna fırlatma örnek anahtar:0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF
         if (keyHexString.Length != 64) // Her bir byte 2 hexadecimal karakterle temsil edilir
         {
-            throw new ArgumentException("Geçersiz anahtar uzunluğu. Anahtar 256 bit (32 byte) olmalıdır.");
+            ThrowBusinessException("Geçersiz anahtar uzunluğu. Anahtar 256 bit (32 byte) olmalıdır.");
         }
         byte[] key = new byte[] { };
         key = Enumerable.Range(0, keyHexString.Length / 2)
@@ -126,9 +125,12 @@ public class Mysterion : EncryptionAlgorithm
         Console.WriteLine("Şifrelenmiş data binary gösterimi: " + GetBinaryString(encrypted));
 
         byte[] decrypted = Decrypt(encrypted, key);
-        AddStep("Şifresi çözülmüş data: ", BitConverter.ToString(decrypted));
+        AddStep("Şifresi çözülmüş data: ", BitConverter.ToString(decrypted).TrimEnd('\0'));
         Console.WriteLine("Şifresi çözülmüş data: " + BitConverter.ToString(decrypted));
-        AddStep("Şifresi çözülmüş data binary gösterimi: ", GetBinaryString(decrypted));
+        FinalStep(BitConverter.ToString(decrypted).TrimEnd('\0'), DataTypes.String, outputTypes);
+
+
+        //AddStep("Şifresi çözülmüş data binary gösterimi: ", GetBinaryString(decrypted));
         Console.WriteLine("Şifresi çözülmüş data binary gösterimi: " + GetBinaryString(decrypted));
 
 
@@ -225,7 +227,6 @@ public class Mysterion : EncryptionAlgorithm
         Console.WriteLine($"Şifreleme Bloğu içeriği: {binary0}-{binary1}");
         AddStep($"Şifreleme Bloğu içeriği binary :{binary0}-{binary1}", $" {binary0}-{binary1}");
     }
-
     public byte[] Decrypt(byte[] encrypted, byte[] key)
     {
         Initialize(key);
@@ -237,11 +238,12 @@ public class Mysterion : EncryptionAlgorithm
             DecryptBlock(block);
             byte[] blockBytes = new byte[8];
             Buffer.BlockCopy(block, 0, blockBytes, 0, 8);
-            Buffer.BlockCopy(blockBytes, 0, decrypted, i * 8, 8);
+            Buffer.BlockCopy(blockBytes, 0, decrypted, i * 8, Math.Min(8, decrypted.Length - i * 8));
         }
 
         return decrypted;
     }
+
 
     private void DecryptBlock(uint[] block)
     {

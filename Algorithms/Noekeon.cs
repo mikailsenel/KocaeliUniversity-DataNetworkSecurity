@@ -65,7 +65,7 @@ public class Noekeon : EncryptionAlgorithm
         string key = inputKey; //64 bit key alır ör:4d79536563726574
         if (key.Length != 16)
         {
-            throw new ArgumentException("Key uzunluğu 64 bit (16 karakter) olmalıdır.");
+            ThrowBusinessException("Key uzunluğu 64 bit (16 karakter) olmalıdır.");
             return;
         }
 
@@ -88,7 +88,7 @@ public class Noekeon : EncryptionAlgorithm
 
         Console.WriteLine("Şifrelenmiş Text: " + encryptedText);
         AddStep("Şifrelenmiş Text..: ", encryptedText);
-
+        FinalStep(encryptedText, DataTypes.String, outputTypes);
         byte[] binaryDataenc = GetBinaryDataFromString(encryptedText);
         string binaryStringenc = GetBinaryString(binaryDataenc);
 
@@ -149,7 +149,7 @@ public class Noekeon : EncryptionAlgorithm
     {
         if (key.Length != 16)
         {
-            throw new ArgumentException("Key uzunlugu 16 karakter olmali.");
+            ThrowBusinessException("Key uzunlugu 16 karakter olmali.");
         }
 
         roundKeys = GenerateRoundKeys(key);

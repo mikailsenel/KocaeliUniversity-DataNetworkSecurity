@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Algorithms.Common.Enums;
+using System.ComponentModel.DataAnnotations;
 //Algoritma Sağlıklı Çalışmaktadır.128 bit key alır
 namespace Algorithms
 {
@@ -20,7 +21,7 @@ namespace Algorithms
         {
             if (key.Length != KeySize / 8)
             {
-                throw new ArgumentException($"Key  {KeySize} olmalı bit.");
+                ThrowBusinessException($"Key  {KeySize} olmalı bit.");
             }
 
             subkeys = GenerateSubkeys(key);
@@ -123,7 +124,7 @@ namespace Algorithms
         {
             if (plaintext.Length % (BlockSize / 8) != 0)
             {
-                throw new ArgumentException($"Plaintext size must be a multiple of {BlockSize} bits.");
+                throw new ArgumentException($"Plaintext uzunluğu  {BlockSize}'ın katı bit uzunluğunda olmalıdır.");
             }
 
             byte[] ciphertext = new byte[plaintext.Length];
@@ -154,7 +155,7 @@ namespace Algorithms
         {
             if (ciphertext.Length % (BlockSize / 8) != 0)
             {
-                throw new ArgumentException($"Ciphertext size must be a multiple of {BlockSize} bits.");
+                ThrowBusinessException($"Ciphertext uzunluğu  {BlockSize}'ın katı bit uzunluğunda olmalıdır.");
             }
 
             byte[] plaintext = new byte[ciphertext.Length];
@@ -188,7 +189,7 @@ namespace Algorithms
             // Anahtar uzunluğu 16 byte (128 bit) olmadığında istisna fırlatma örnek anahtar:0123456789ABCDEF0123456789ABCDEF
             if (keyHexString.Length != 32) // Her bir byte 2 hexadecimal karakterle temsil edilir
             {
-                throw new ArgumentException("Geçersiz anahtar uzunluğu. Anahtar 128 bit (16 byte) olmalıdır.");
+                ThrowBusinessException("Geçersiz anahtar uzunluğu. Anahtar 128 bit (16 byte) olmalıdır.");
             }
             byte[] key = new byte[] { };
             key = Enumerable.Range(0, keyHexString.Length / 2)
@@ -225,13 +226,11 @@ namespace Algorithms
 
             Console.WriteLine("Şifreli Metin..: " + BitConverter.ToString(ciphertext).Replace("-", " "));
             AddStep("Şifreli Metin..: ", BitConverter.ToString(ciphertext).Replace("-", " "));
-
             string binarydec = GetBinaryString(ciphertext);
             AddStep("Şifreli Metin Binary..:", binarydec);
-
             Console.WriteLine("Deşifrelenmiş Metin..:  " + decryptedText.TrimEnd('\0'));
             AddStep("Deşifrelenmiş Metin..:  ", decryptedText.TrimEnd('\0'));
-
+            FinalStep(decryptedText.TrimEnd('\0'), DataTypes.String, outputTypes);
             AddStep("Deşifrelenmiş Metin Binary...:", ConvertToBinary(decryptedText.TrimEnd('\0')));
         }
 

@@ -20,10 +20,20 @@ public class Present : EncryptionAlgorithm
     {
         const int MaxInputLength = 16; // 16 byte = 128 bit
                                        // Anahtar 16 byte
-        byte[] key = new byte[16] {
-                0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0,
-                0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0
-            };
+        string keyHexString = inputKey;
+        // Anahtar uzunluğu 16 byte (128 bit) olmadığında istisna fırlatma örnek anahtar:0123456789ABCDEF
+        if (keyHexString.Length != 32) // Her bir byte 2 hexadecimal karakterle temsil edilir
+        {
+            ThrowBusinessException("Geçersiz anahtar uzunluğu. Anahtar 64 bit (8 byte) olmalıdır.");
+        }
+        byte[] key = new byte[] { };
+        key = Enumerable.Range(0, keyHexString.Length / 2)
+                      .Select(x => Convert.ToByte(keyHexString.Substring(x * 2, 2), 16))
+                      .ToArray();
+
+        string binaryStringkey = GetBinaryString(key);
+        AddStep("Girilen Key..:", BitConverter.ToString(key));
+        AddStep("Girilen Key Binary..:", binaryStringkey);
 
         byte[] plaintext = Encoding.ASCII.GetBytes(StringValue);
         // 128 bit üzerinde veri girişi kontrolü
@@ -47,6 +57,7 @@ public class Present : EncryptionAlgorithm
         AddStep("Decrypted Metin: ", BitConverter.ToString(decryptedData));
         Console.WriteLine("Decrypted Metin Binary Gösterimi: " + GetBinaryString(decryptedData));
         AddStep("Decrypted Metin Binary Gösterimi: ", GetBinaryString(decryptedData));
+        FinalStep(decryptedData, outputTypes);
 
     }
     private readonly byte[] SBox = {
