@@ -47,6 +47,26 @@ public class AlgorithmController : Controller
         return Ok(new Pride(input).GetSteps());
     }
 
+    [HttpGet("/Xtea/ 96 bit (12) byte key girilmelidir.", Name = nameof(GetXtea))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    public async Task<IActionResult> GetXtea([FromQuery] InputDto input)
+    {
+        return Ok(new Xtea(input).GetSteps());
+    }
+
+    [HttpGet("/Zorro/ 128 bit (16) byte key girilmelidir.", Name = nameof(GetZorro))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    public async Task<IActionResult> GetZorro([FromQuery] InputDto input)
+    {
+        return Ok(new Zorro(input).GetSteps());
+    }
+    
+    [HttpGet("/Speck/ 96 bit (12) byte key girilmelidir.", Name = nameof(GetSpeck))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    public async Task<IActionResult> GetSpeck([FromQuery] InputDto input)
+    {
+        return Ok(new Speck(input).GetSteps());
+    }
 
     // [HttpGet("/sea/{text}", Name = nameof(GetSea))]
     // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
