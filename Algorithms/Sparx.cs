@@ -42,7 +42,6 @@ namespace Algorithms
 
             plainText.CopyTo(chiperText, 0);
 
-
             UInt16[][] k = new UInt16[N_BRANCHES * N_STEPS + 1][];
             for (int i = 0; i < N_BRANCHES * N_STEPS + 1; i++)
             {
@@ -51,43 +50,87 @@ namespace Algorithms
 
             KeySchedule(ref k, usKey);
 
+
+            #region Counter (CTR) modu
+            //ctrsabit
+            byte[] nonce = GetByteArray(WORDSIZE);
+            uint ctrcounter = 0, ncounter;
+            //tmpsabit
+            byte[] tmpnonce = new byte[WORDSIZE];
+            //tmpsabit e ctrsabit kopyala
+            nonce.CopyTo(tmpnonce, 0);
+            #endregion
+
             for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
             {
-                byte[] tmp = new byte[WORDSIZE];
-                Array.Copy(chiperText, i * WORDSIZE, tmp, 0, WORDSIZE);
-                UInt16[] tmpplain = byteToUInt16(tmp, 0);
-                SparxEncrypt(i + 1, ref tmpplain, k);
-                tmp = uInt16ToByte(tmpplain);
-                Array.Copy(tmp, 0, chiperText, i * WORDSIZE, WORDSIZE);
+                byte[] tmpplain = new byte[WORDSIZE];
+                Array.Copy(chiperText, i * WORDSIZE, tmpplain, 0, WORDSIZE);
+
+                #region Counter (CTR) modu
+                //4 byte int32 ye cevir ve ctrcounter ekle
+                ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
+                //degeri sonraki adım icin arttır
+                ctrcounter++;
+                //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
+                Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
+                //tmpsabit i sifrele
+                byte[] tmpenc = SparxEncrypt(i + 1, tmpnonce, k);
+
+                //çıkan şifreli sabiti plain text ile xor la
+                tmpplain = Xor(tmpplain, tmpenc);
+                #endregion
+
+                //normal ctr siz hali
+                //tmpplain = SparxEncrypt(i + 1, tmpplain, k);
+
+                //blogu chiper text e yerlestir
+                Array.Copy(tmpplain, 0, chiperText, i * WORDSIZE, WORDSIZE);
             }
 
             byte[] encrytpText = new byte[chiperText.Length];
 
             chiperText.CopyTo(encrytpText, 0);
 
+
+            #region Counter (CTR) modu
+            ctrcounter = 0;
+            Array.Copy(nonce, 0, tmpnonce, 0, WORDSIZE);
+            #endregion
+
             for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
             {
-                byte[] tmp = new byte[WORDSIZE];
-                Array.Copy(chiperText, i * WORDSIZE, tmp, 0, WORDSIZE);
-                UInt16[] tmpchiper = byteToUInt16(tmp, 0);
-                SparxDecrypt(i + 1, ref tmpchiper, k);
-                tmp = uInt16ToByte(tmpchiper);
-                Array.Copy(tmp, 0, chiperText, i * WORDSIZE, WORDSIZE);
+                byte[] tmpcipher = new byte[WORDSIZE];
+                Array.Copy(chiperText, i * WORDSIZE, tmpcipher, 0, WORDSIZE);
+
+                #region Counter (CTR) modu
+                //4 byte int32 ye cevir ve ctrcounter ekle
+                ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
+                //degeri sonraki adım icin arttır
+                ctrcounter++;
+                //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
+                Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
+                //tmpsabit i sifrele
+                byte[] tmpenc = SparxEncrypt(i + 1, tmpnonce, k);
+
+                //çıkan şifreli sabiti plain text ile xor la
+                tmpcipher = Xor(tmpcipher, tmpenc);
+                #endregion
+
+                //normal ctr siz hali
+                //tmpchiper = SparxDecrypt(i + 1, tmpcipher, k);                
+                Array.Copy(tmpcipher, 0, chiperText, i * WORDSIZE, WORDSIZE);
+
             }
 
             clearlast0(ref chiperText);
 
-            AddStep("Düz metin      : " + BitConverter.ToString(plainText), toBinaryString(plainText));
+            AddStep("Düz metin      : " + toOut(plainText, outputTypes), toBinaryString(plainText));
 
             AddStep("Anahtar        : " + BitConverter.ToString(key), toBinaryString(key));
 
             AddStep("Şifreli metin  : " + BitConverter.ToString(encrytpText), toBinaryString(encrytpText));
 
-            AddStep("Çözülmüş metin : " + BitConverter.ToString(chiperText), toBinaryString(chiperText));
-
-            FinalStep(chiperText, outputTypes);
-
-
+            AddStep("Çözülmüş metin : " + toOut(chiperText, outputTypes), toBinaryString(chiperText));
         }
 
 
@@ -108,6 +151,55 @@ namespace Algorithms
 
             if (clearcount > 0)
                 Array.Resize<Byte>(ref chiperText, chiperText.Length - clearcount);
+        }
+
+        private string toOut(byte[] data, DataTypes outputTypes)
+        {
+            if (outputTypes == DataTypes.Hex)
+            {
+                return BitConverter.ToString(data);
+            }
+            else
+            if (outputTypes == DataTypes.String)
+            {
+                return Encoding.ASCII.GetString(data);
+            }
+            else
+            {
+                StringBuilder sonuc = new StringBuilder();
+
+                foreach (byte x in data)
+                {
+                    sonuc.Append((sonuc.Length == 0 ? "" : "-") + ((int)x).ToString("D3"));
+                };
+
+                return sonuc.ToString();
+
+            }
+
+        }
+
+        private byte[] GetByteArray(int size)
+        {
+            Random rnd = new Random();
+            byte[] b = new byte[size];
+            rnd.NextBytes(b);
+            return b;
+        }
+
+        private byte[] uinttoByte(uint deger)
+        {
+            return System.BitConverter.GetBytes(deger);
+        }
+
+        // Bitwise XOR operation
+        private byte[] Xor(byte[] a, byte[] b)
+        {
+            byte[] temp = new byte[a.Length];
+            for (int i = 0; i < a.Length; i++)
+                temp[i] = (byte)(a[i] ^ b[i]);
+
+            return temp;
         }
 
 
@@ -263,10 +355,11 @@ namespace Algorithms
         }
 
 
-        private void SparxEncrypt(int partno, ref UInt16[] x, UInt16[][] k)
+        private byte[] SparxEncrypt(int partno, byte[] x, UInt16[][] k)
         {
+            UInt16[] xplain = byteToUInt16(x, 0);
 
-            AddStep("Encryption Part (" + partno.ToString("D2") + ") - Başlangıç : " + print_chipers(uInt16ToByte(x), null), toBinaryString(uInt16ToByte(x)));
+            AddStep("Encryption Part (" + partno.ToString("D2") + ") - Başlangıç : " + print_chipers(uInt16ToByte(xplain), null), toBinaryString(uInt16ToByte(xplain)));
 
 
             for (int s = 0; s < N_STEPS; s++)
@@ -275,51 +368,58 @@ namespace Algorithms
                 {
                     for (int r = 0; r < ROUNDS_PER_STEPS; r++)
                     {
-                        x[2 * b] ^= k[N_BRANCHES * s + b][2 * r];
-                        x[2 * b + 1] ^= k[N_BRANCHES * s + b][2 * r + 1];
-                        A(ref x[2 * b], ref x[2 * b + 1]);
+                        xplain[2 * b] ^= k[N_BRANCHES * s + b][2 * r];
+                        xplain[2 * b + 1] ^= k[N_BRANCHES * s + b][2 * r + 1];
+                        A(ref xplain[2 * b], ref xplain[2 * b + 1]);
                     }
                 }
-                L4(ref x);
-                AddStep("Encryption Part (" + partno.ToString("D2") + ") Steps : (" + s.ToString("D2") + ") " + print_chipers(uInt16ToByte(x), null), toBinaryString(uInt16ToByte(x)));
+                L4(ref xplain);
+                AddStep("Encryption Part (" + partno.ToString("D2") + ") Steps : (" + s.ToString("D2") + ") " + print_chipers(uInt16ToByte(xplain), null), toBinaryString(uInt16ToByte(xplain)));
 
             }
             for (int b = 0; b < N_BRANCHES; b++)
             {
-                x[2 * b] ^= k[N_BRANCHES * N_STEPS][2 * b];
-                x[2 * b + 1] ^= k[N_BRANCHES * N_STEPS][2 * b + 1];
+                xplain[2 * b] ^= k[N_BRANCHES * N_STEPS][2 * b];
+                xplain[2 * b + 1] ^= k[N_BRANCHES * N_STEPS][2 * b + 1];
 
-                AddStep("Encryption Part (" + partno.ToString("D2") + ") Round : (" + b.ToString("D2") + ") " + print_chipers(uInt16ToByte(x), null), toBinaryString(uInt16ToByte(x)));
+                AddStep("Encryption Part (" + partno.ToString("D2") + ") Round : (" + b.ToString("D2") + ") " + print_chipers(uInt16ToByte(xplain), null), toBinaryString(uInt16ToByte(xplain)));
             }
+
+            return uInt16ToByte(xplain);
         }
 
-        private void SparxDecrypt(int partno, ref UInt16[] x, UInt16[][] k)
+        private byte[] SparxDecrypt(int partno, byte[] x, UInt16[][] k)
         {
-            AddStep("Decryption Part (" + partno.ToString("D2") + ") - Başlangıç : " + print_chipers(uInt16ToByte(x), null), toBinaryString(uInt16ToByte(x)));
+
+            UInt16[] xcipher = byteToUInt16(x, 0);
+
+            AddStep("Decryption Part (" + partno.ToString("D2") + ") - Başlangıç : " + print_chipers(uInt16ToByte(xcipher), null), toBinaryString(uInt16ToByte(xcipher)));
 
 
             for (int b = 0; b < N_BRANCHES; b++)
             {
-                x[2 * b] ^= k[N_BRANCHES * N_STEPS][2 * b];
-                x[2 * b + 1] ^= k[N_BRANCHES * N_STEPS][2 * b + 1];
-                AddStep("Decryption Part (" + partno.ToString("D2") + ") Round : (" + b.ToString("D2") + ") " + print_chipers(uInt16ToByte(x), null), toBinaryString(uInt16ToByte(x)));
+                xcipher[2 * b] ^= k[N_BRANCHES * N_STEPS][2 * b];
+                xcipher[2 * b + 1] ^= k[N_BRANCHES * N_STEPS][2 * b + 1];
+                AddStep("Decryption Part (" + partno.ToString("D2") + ") Round : (" + b.ToString("D2") + ") " + print_chipers(uInt16ToByte(xcipher), null), toBinaryString(uInt16ToByte(xcipher)));
             }
             for (int s = N_STEPS - 1; s >= 0; s--)
             {
-                L4_inv(ref x);
+                L4_inv(ref xcipher);
                 for (int b = 0; b < N_BRANCHES; b++)
                 {
                     for (int r = ROUNDS_PER_STEPS - 1; r >= 0; r--)
                     {
-                        A_inv(ref x[2 * b], ref x[2 * b + 1]);
-                        x[2 * b] ^= k[N_BRANCHES * s + b][2 * r];
-                        x[2 * b + 1] ^= k[N_BRANCHES * s + b][2 * r + 1];
+                        A_inv(ref xcipher[2 * b], ref xcipher[2 * b + 1]);
+                        xcipher[2 * b] ^= k[N_BRANCHES * s + b][2 * r];
+                        xcipher[2 * b + 1] ^= k[N_BRANCHES * s + b][2 * r + 1];
                     }
                 }
 
-                AddStep("Decryption Part (" + partno.ToString("D2") + ") Steps : (" + s.ToString("D2") + ") " + print_chipers(uInt16ToByte(x), null), toBinaryString(uInt16ToByte(x)));
+                AddStep("Decryption Part (" + partno.ToString("D2") + ") Steps : (" + s.ToString("D2") + ") " + print_chipers(uInt16ToByte(xcipher), null), toBinaryString(uInt16ToByte(xcipher)));
 
             }
+
+            return uInt16ToByte(xcipher);
         }
 
 

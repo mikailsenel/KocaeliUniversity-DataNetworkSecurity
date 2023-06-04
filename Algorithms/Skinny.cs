@@ -297,9 +297,9 @@ namespace Algorithms
 
 
         // Skinny'nin şifreleme işlevi
-        public void decrypt(int partno, byte[] input, byte[] userkey)
+        public byte[] Decrypt(int partno, byte[] input, byte[] userkey)
         {
-
+            byte[] decoded = new byte[input.Length];
             byte[,] state = new byte[4, 4];
             byte[,] dummy = new byte[4, 4];
             byte[,] keyCells = new byte[4, 4];
@@ -345,17 +345,18 @@ namespace Algorithms
 
 
             for (i = 0; i < 16; i++)
-                input[i] = (byte)(state[i >> 2, i & 0x3] & 0xFF);
+                decoded[i] = (byte)(state[i >> 2, i & 0x3] & 0xFF);
 
+            return decoded;
         }
 
 
 
         // Skinny'nin şifreleme fonksiyonu
-        public void encrypt(int partno, byte[] input, byte[] userkey)
+        public byte[] Encrypt(int partno, byte[] input, byte[] userkey)
         {
 
-
+            byte[] encoded = new byte[input.Length];
             byte[,] state = new byte[4, 4];
             byte[,] keyCells = new byte[4, 4];
             int i;
@@ -393,10 +394,59 @@ namespace Algorithms
 
 
             for (i = 0; i < 16; i++)
-                input[i] = (byte)(state[i >> 2, i & 0x3] & 0xFF);
+                encoded[i] = (byte)(state[i >> 2, i & 0x3] & 0xFF);
+
+            return encoded;
+        }
+
+        private string toOut(byte[] data, DataTypes outputTypes)
+        {
+            if (outputTypes == DataTypes.Hex)
+            {
+                return BitConverter.ToString(data);
+            }
+            else
+            if (outputTypes == DataTypes.String)
+            {
+                return Encoding.ASCII.GetString(data);
+            }
+            else
+            {
+                StringBuilder sonuc = new StringBuilder();
+
+                foreach (byte x in data)
+                {
+                    sonuc.Append((sonuc.Length == 0 ? "" : "-") + ((int)x).ToString("D3"));
+                };
+
+                return sonuc.ToString();
+
+            }
 
         }
 
+        private byte[] GetByteArray(int size)
+        {
+            Random rnd = new Random();
+            byte[] b = new byte[size];
+            rnd.NextBytes(b);
+            return b;
+        }
+
+        // Bitwise XOR operation
+        private byte[] Xor(byte[] a, byte[] b)
+        {
+            byte[] temp = new byte[a.Length];
+            for (int i = 0; i < a.Length; i++)
+                temp[i] = (byte)(a[i] ^ b[i]);
+
+            return temp;
+        }
+
+        private byte[] uinttoByte(uint deger)
+        {
+            return System.BitConverter.GetBytes(deger);
+        }
 
         public static void clearlast0(ref Byte[] chiperText)
         {
@@ -466,38 +516,87 @@ namespace Algorithms
 
             plainText.CopyTo(chiperText, 0);
 
+            #region Counter (CTR) modu
+            //ctrsabit
+            byte[] nonce = GetByteArray(WORDSIZE);
+            uint ctrcounter = 0, ncounter;
+            //tmpsabit
+            byte[] tmpnonce = new byte[WORDSIZE];
+            //tmpsabit e ctrsabit kopyala
+            nonce.CopyTo(tmpnonce, 0);
+            #endregion
+
             for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
             {
-                byte[] tmp = new byte[WORDSIZE];
-                Array.Copy(chiperText, i * WORDSIZE, tmp, 0, WORDSIZE);
-                encrypt(i + 1, tmp, key);
-                Array.Copy(tmp, 0, chiperText, i * WORDSIZE, WORDSIZE);
+                byte[] tmpplain = new byte[WORDSIZE];
+                Array.Copy(chiperText, i * WORDSIZE, tmpplain, 0, WORDSIZE);
+
+                #region Counter (CTR) modu
+                //4 byte int32 ye cevir ve ctrcounter ekle
+                ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
+                //degeri sonraki adım icin arttır
+                ctrcounter++;
+                //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
+                Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
+                //tmpsabit i sifrele                
+                byte[] tmpenc = Encrypt(i + 1, tmpnonce, key);
+                //çıkan şifreli sabiti plain text ile xor la
+                tmpplain = Xor(tmpplain, tmpenc);
+                #endregion
+
+                //normal ctr siz hali
+                //tmpplain=encrypt(i + 1, tmpplain, key);
+
+                //blogu chiper text e yerlestir
+                Array.Copy(tmpplain, 0, chiperText, i * WORDSIZE, WORDSIZE);
             }
 
             byte[] encrytpText = new byte[chiperText.Length];
 
             chiperText.CopyTo(encrytpText, 0);
 
+            #region Counter (CTR) modu
+            ctrcounter = 0;
+            Array.Copy(nonce, 0, tmpnonce, 0, WORDSIZE);
+            #endregion
+
             for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
             {
-                byte[] tmp = new byte[WORDSIZE];
-                Array.Copy(chiperText, i * WORDSIZE, tmp, 0, WORDSIZE);
-                decrypt(i + 1, tmp, key);
-                Array.Copy(tmp, 0, chiperText, i * WORDSIZE, WORDSIZE);
+                byte[] tmpcipher = new byte[WORDSIZE];
+                Array.Copy(chiperText, i * WORDSIZE, tmpcipher, 0, WORDSIZE);
+
+                #region Counter (CTR) modu
+                //4 byte int32 ye cevir ve ctrcounter ekle
+                ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
+                //degeri sonraki adım icin arttır
+                ctrcounter++;
+                //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
+                Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
+                //tmpsabit i sifrele                
+                byte[] tmpenc = Encrypt(i + 1, tmpnonce, key);
+                //çıkan şifreli sabiti plain text ile xor la
+                tmpcipher = Xor(tmpcipher, tmpenc);
+                #endregion
+
+                //normal ctr siz hali
+                //tmpcipher=Decrypt(i + 1, tmpcipher, key);
+
+                //blogu chiper text (plain) e yerlestir
+                Array.Copy(tmpcipher, 0, chiperText, i * WORDSIZE, WORDSIZE);
             }
 
             clearlast0(ref chiperText);
 
 
-            AddStep("Düz metin      : " + BitConverter.ToString(plainText), toBinaryString(plainText));
+            AddStep("Düz metin      : " + toOut(plainText, outputTypes), toBinaryString(plainText));
 
             AddStep("Anahtar        : " + BitConverter.ToString(key), toBinaryString(key));
 
             AddStep("Şifreli metin  : " + BitConverter.ToString(encrytpText), toBinaryString(encrytpText));
 
-            AddStep("Çözülmüş metin : " + BitConverter.ToString(chiperText), toBinaryString(chiperText));
+            AddStep("Çözülmüş metin : " + toOut(chiperText, outputTypes), toBinaryString(chiperText));
 
-            FinalStep(chiperText, outputTypes);
+
         }
 
 
