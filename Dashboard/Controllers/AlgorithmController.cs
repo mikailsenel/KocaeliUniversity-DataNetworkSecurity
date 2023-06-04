@@ -67,41 +67,55 @@ public class AlgorithmController : Controller
     {
         return Ok(new Speck(input).GetSteps());
     }
+    
+    //// ----------------------------------------------------------------
+    
+    [HttpGet("/sea/ 48 bit (6) byte key girilmelidir.", Name = nameof(GetSea))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BusinessProblemDetail))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(InternalServerErrorProblemDetails))]
+    public async Task<IActionResult> GetSea([FromQuery] InputDto input)
+    {
+        return Ok(new Sea(input).GetSteps());
+    }
 
-    // [HttpGet("/sea/{text}", Name = nameof(GetSea))]
-    // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    // public async Task<IActionResult> GetSea([FromRoute] string text)
-    // {
-    //     return Ok(new Sea(text).GetSteps());
-    // }
 
-    // [HttpGet("/simeck/{text}", Name = nameof(GetSimeck))]
-    // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    // public async Task<IActionResult> GetSimeck([FromRoute] string text)
-    // {
-    //     return Ok(new Simeck(text).GetSteps());
-    // }
+    [HttpGet("/simeck/ 128 bit (16) byte key girilmelidir.", Name = nameof(GetSimeck))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BusinessProblemDetail))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(InternalServerErrorProblemDetails))]
+    public async Task<IActionResult> GetSimeck([FromQuery] InputDto input)
+    {
+        return Ok(new Simeck(input).GetSteps());
+    }
 
-    // [HttpGet("/simon/{text}", Name = nameof(GetSimon))]
-    // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    // public async Task<IActionResult> GetSimon([FromRoute] string text)
-    // {
-    //     return Ok(new Simon(text).GetSteps());
-    // }
+    [HttpGet("/simon/ 128 bit (16) byte key girilmelidir.", Name = nameof(GetSimon))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BusinessProblemDetail))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(InternalServerErrorProblemDetails))]
+    public async Task<IActionResult> GetSimon([FromQuery] InputDto input)
+    {
+        return Ok(new Simon(input).GetSteps());
+    }
 
-    // [HttpGet("/skinny/{text}", Name = nameof(GetSkinny))]
-    // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    // public async Task<IActionResult> GetSkinny([FromRoute] string text)
-    // {
-    //     return Ok(new Skinny(text).GetSteps());
-    // }
+    [HttpGet("/skinny/ 128 bit (16) byte key girilmelidir.", Name = nameof(GetSkinny))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BusinessProblemDetail))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(InternalServerErrorProblemDetails))]
+    public async Task<IActionResult> GetSkinny([FromQuery] InputDto input)
+    {
+        return Ok(new Skinny(input).GetSteps());
+    }
 
-    // [HttpGet("/sparx/{text}", Name = nameof(GetSparx))]
-    // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
-    // public async Task<IActionResult> GetSparx([FromRoute] string text)
-    // {
-    //     return Ok(new Sparx(text).GetSteps());
-    // }
+    [HttpGet("/sparx/ 128 bit (16) byte key girilmelidir.", Name = nameof(GetSparx))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BusinessProblemDetail))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(InternalServerErrorProblemDetails))]
+    public async Task<IActionResult> GetSparx([FromQuery] InputDto input)
+    {
+        return Ok(new Sparx(input).GetSteps());
+    }
+
 
     //// ----------------------------------------------------------------
 

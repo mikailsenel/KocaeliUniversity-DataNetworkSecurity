@@ -1,70 +1,209 @@
 ﻿using Algorithms.Common.Abstract;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
+using Algorithms.Common.DataTransferObjects;
+using Algorithms.Common.Enums;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Algorithms
 {
-/// <summary>
-/// /
-/// </summary>
     public class Sea : EncryptionAlgorithm
     {
-        // SEA algoritmasının parametreleri 
-        const int KEY_LENGTH = 128; // şifreleme anahtarının uzunluğu (bit) 
-        const int BLOCK_SIZE = 128; // blok boyutu (bit) 
-        const int ROUND_COUNT = 16; // yuvarlama sayısı 
+        private const int WORDSIZE = 6; //byte
+        private const int HALFWORDSIZE = WORDSIZE / 2;
+        private const int LEFT = 0;
+        private const int RIGHT = 1;
+        private const int TEXT_KEY_LENGHT = 48; //Bit
+        private const int BYTEBIT = 8; // Bit cinsinden 1 bayt uzunluğu
+        private const int NUM_ROUNDS = (3 * TEXT_KEY_LENGHT / 4) + 2 * ((TEXT_KEY_LENGHT / (2 * BYTEBIT)) + (BYTEBIT / 2)) + 1; // Tur sayısı
+        private const int HALF_TK_LENGHT = TEXT_KEY_LENGHT / 2; // Blok bit sayısı
 
-       
-        public Sea(string input) : base(input)
+        public Sea(InputDto input) : base(input)
         {
         }
 
-
-        protected override void Initial(string input,string inputKey)
+        protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
         {
-            byte[] plaintext = System.Text.Encoding.UTF8.GetBytes(input);
 
-            byte[] key = new byte[] {0xDE, 0xAD, 0xBE, 0xEF,
-                                     0xCA, 0xFE, 0xBA, 0xBE,
-                                     0xFE, 0xED, 0xFA, 0xCE,
-                                     0xDE, 0xAF, 0xFA, 0xCE};
+            byte[] plainText = ByteValue;
+
+            string keyHexString = inputKey;
+
+            if (keyHexString.Length != (TEXT_KEY_LENGHT / 8) * 2) // Her bir byte 2 hexadecimal karakterle temsil edilir
+            {
+                throw new ArgumentException("Geçersiz anahtar uzunluğu. Anahtar " + TEXT_KEY_LENGHT.ToString() + " bit (" + WORDSIZE.ToString() + " byte) olmalıdır.");
+            }
+
+            byte[] key = Enumerable.Range(0, keyHexString.Length / 2)
+                          .Select(x => Convert.ToByte(keyHexString.Substring(x * 2, 2), 16))
+                          .ToArray();
+
+            byte[] chiperText = new byte[plainText.Length % WORDSIZE == 0 ? plainText.Length : plainText.Length + (WORDSIZE - (plainText.Length % WORDSIZE))];
+
+            plainText.CopyTo(chiperText, 0);
+
+            for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
+            {
+                byte[] tmp = new byte[WORDSIZE];
+                Array.Copy(chiperText, i * WORDSIZE, tmp, 0, WORDSIZE);
+                tmp = Encrypt(i + 1, byteToUints(tmp, 0), byteToUints(key, 0));
+                Array.Copy(tmp, 0, chiperText, i * WORDSIZE, WORDSIZE);
+            }
+
+            byte[] encrytpText = new byte[chiperText.Length];
+
+            chiperText.CopyTo(encrytpText, 0);
+
+            for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
+            {
+                byte[] tmp = new byte[WORDSIZE];
+                Array.Copy(chiperText, i * WORDSIZE, tmp, 0, WORDSIZE);
+                tmp = Decrypt(i + 1, byteToUints(tmp, 0), byteToUints(key, 0));
+                Array.Copy(tmp, 0, chiperText, i * WORDSIZE, WORDSIZE);
+
+            }
+
+            clearlast0(ref chiperText);
+
+            AddStep("Düz metin      : " + BitConverter.ToString(plainText), toBinaryString(plainText));
+
+            AddStep("Anahtar        : " + BitConverter.ToString(key), toBinaryString(key));
+
+            AddStep("Şifreli metin  : " + BitConverter.ToString(encrytpText), toBinaryString(encrytpText));
+
+            AddStep("Çözülmüş metin : " + BitConverter.ToString(chiperText), toBinaryString(chiperText));
+
+            FinalStep(chiperText, outputTypes);
+
+        }
+
+        // Bitwise XOR operation
+        private uint Xor(uint a, uint b)
+        {
+            return a ^ b;
+        }
+
+        public void clearlast0(ref Byte[] chiperText)
+        {
+            if (chiperText.Length == 0)
+                return;
+
+            int clearcount = 0;
+
+            for (int i = (chiperText.Length - 1); i >= (chiperText.Length - WORDSIZE); i--)
+            {
+                if (chiperText[i] == 0x00)
+                    clearcount++;
+                else
+                    break;
+            }
+
+            if (clearcount > 0)
+                Array.Resize<Byte>(ref chiperText, chiperText.Length - clearcount);
+        }
 
 
-            // girdilerin uzunluklarını kontrol et 
-            if (plaintext.Length != BLOCK_SIZE / 8)
-                throw new ArgumentException("Text boyutu " + BLOCK_SIZE + " bit uzunluğunda olmalı");
 
-            if (key.Length != KEY_LENGTH / 8)
-                throw new ArgumentException("Key " + KEY_LENGTH + " bit uzunluğunda olmalı");
+        private byte[] uinttoByte(uint deger)
+        {
+            return System.BitConverter.GetBytes(deger);
+        }
+
+        private byte[] uinttoByte(uint[] deger)
+        {
+            byte[] tmpreturn = new byte[deger.Length * HALFWORDSIZE];
+
+            for (int i = 0; i < deger.Length; i++)
+            {
+                byte[] barray = System.BitConverter.GetBytes(deger[i]);
+                for (int j = 0; j < HALFWORDSIZE; j++)
+                {
+                    tmpreturn[i * HALFWORDSIZE + j] = barray[j];
+                }
+            }
+
+            return tmpreturn;
+        }
+
+        // Bir bayt dizisini bir uint dizisine dönüştüren işlev
+        public uint[] byteToUints(byte[] bytes, int minBytes)
+        {
+            // Diziyi, 4 baytlık (32 bitlik uint) grupların oluşturduğu başka bir diziye geçiriyorum   
+            int cant = (bytes.Length % WORDSIZE == 0) ? bytes.Length : bytes.Length + (WORDSIZE - bytes.Length % WORDSIZE);
+            if (cant < minBytes) cant = minBytes;
+            byte[] b = new byte[cant];
+            bytes.CopyTo(b, 0);
 
 
-            AddStep("Düz metin: ", BitConverter.ToString(plaintext));
-            AddStep("Düz metin: ", toBinaryString(plaintext));
-            //Console.WriteLine("Düz metin: " + BitConverter.ToString(plaintext));
+            uint[] c = new uint[b.Length / HALFWORDSIZE];
 
-            AddStep("Anahtar: ", BitConverter.ToString(key));
-            AddStep("Anahtar: ", toBinaryString(key));
-            //Console.WriteLine("Anahtar: " + BitConverter.ToString(key));
+            for (int i = 0; i < c.Length; i++)
+            {
+                byte[] tmp = new byte[4];
 
-            
-            byte[] ciphertext = Encrypt(plaintext, key);
+                Array.Copy(b, i * HALFWORDSIZE, tmp, 0, HALFWORDSIZE);
 
-            // Şifreli metni ekrana yazdırın
-            AddStep("Şifreli metin: ", BitConverter.ToString(ciphertext));
-            AddStep("Şifreli metin: ", toBinaryString(ciphertext));
-            //Console.WriteLine("Şifreli metin: " + BitConverter.ToString(ciphertext));
+                c[i] = BitConverter.ToUInt32(tmp, 0);
+            }
 
-            // deşifreleme işlemi 
-            byte[] decryptedtext = Decrypt(ciphertext, key);
+            return c;
+        }
 
-            // Çözülmüş düz metni ekrana yazdırın
-            AddStep("Çözülmüş metin: ", BitConverter.ToString(decryptedtext));
-            AddStep("Çözülmüş metin: ", toBinaryString(decryptedtext));
-            //Console.WriteLine("Çözülmüş metin: " + BitConverter.ToString(decryptedtext));
+        // Toplama modulo 2^b işlemi
+        private uint AddModulo(uint a, uint b, uint blksize)
+        {
+
+            byte[] blkbytea = uinttoByte(a);
+            byte[] blkbyteb = uinttoByte(b);
+            byte[] blktmp = new byte[4];
+
+            for (int i = 0; i < 3; i++)
+            {
+                blktmp[i] = (byte)(((UInt16)(blkbytea[i] + blkbyteb[i])) % (1u << (int)blksize));
+            }
+
+            return BitConverter.ToUInt32(blktmp, 0);
+        }
+
+        // Sbox Yerine koyma işlemi
+        private uint SubstitutionBox(uint x)
+        {
+            uint[] substitutionTable = { 0, 5, 6, 7, 4, 3, 1, 2 };
+
+            uint result = 0;
+
+            //24 blok uzunluğu 3 er bit işleme al
+            for (int i = 0; i < (HALF_TK_LENGHT); i += 3)
+            {
+                uint word = (x >> i) & 0x7; //3 bitlik sözcüğü ayıkla                                            
+                result |= (substitutionTable[word] << i); // Yerine koyma uygulayın
+
+            }
+
+            return result;
+        }
+
+        // Kelime döndürme R işlemi
+        private uint RotateWord(uint x)
+        {
+            byte[] blkbytex = uinttoByte(x);
+
+            byte tmp = blkbytex[2];
+            blkbytex[2] = blkbytex[1];
+            blkbytex[1] = blkbytex[0];
+            blkbytex[0] = tmp;
+
+            return BitConverter.ToUInt32(blkbytex, 0);
+        }
+
+        private uint RotateWordInv(uint x)
+        {
+            byte[] blkbytex = uinttoByte(x);
+
+            byte tmp = blkbytex[0];
+            blkbytex[0] = blkbytex[1];
+            blkbytex[1] = blkbytex[2];
+            blkbytex[2] = tmp;
+
+            return BitConverter.ToUInt32(blkbytex, 0);
 
         }
 
@@ -74,93 +213,200 @@ namespace Algorithms
             foreach (byte r in data)
             {
                 string binary = Convert.ToString(r, 2).PadLeft(8, '0');
-                binaryString.Append(binary+" ");
+                binaryString.Append(binary + " ");
             }
             return binaryString.ToString();
         }
 
-
-
-        // SEA algoritmasının yuvarlama fonksiyonu 
-        private UInt64 F(UInt64 x, UInt64 k)
+        // Bit döndürme r işlemi
+        private uint RotateBits(uint x)
         {
-            // x ve k'nın XOR'u 
-            UInt64 y = x ^ k;
-            // y'nin sağa 8 bit kaydırılması 
-            UInt64 z = y >> 8;
-            // y ve z'nin XOR'u 
-            return y ^ z;
+            byte[] blkbytex = uinttoByte(x);
+
+            byte word1 = (byte)(blkbytex[0] & 0x7);
+            blkbytex[0] = (byte)((word1 << 5) | (blkbytex[0] >> 3));
+            byte word2 = (byte)(blkbytex[2] >> 5);
+            blkbytex[2] = (byte)(((blkbytex[2] << 3) & 0xFF) | word2);
+            return BitConverter.ToUInt32(blkbytex, 0);
         }
-        // SEA algoritmasının şifreleme fonksiyonu 
-        private byte[] Encrypt(byte[] plaintext, byte[] key)
+
+        //ROUND sayısı kadar Key listsi turetme 
+        private uint[,] KeyList(uint[] key)
         {
-            
-            // girdileri UInt64 olarak oku 
-            UInt64 L = BitConverter.ToUInt64(plaintext, 0); // bloğun sol yarısı 
-            UInt64 R = BitConverter.ToUInt64(plaintext, 8); // bloğun sağ yarısı 
-            UInt64 K = BitConverter.ToUInt64(key, 0); // anahtar 
+            uint KL = key[0];
+            uint KR = key[1];
 
-            // şifreli metni byte dizisi olarak döndür 
-            byte[] ciphertext = new byte[BLOCK_SIZE / 8];
+            uint[,] keylist = new uint[NUM_ROUNDS, 2];
+            uint to_down_nr = (uint)Math.Floor((decimal)NUM_ROUNDS / 2);
+            uint to_up_nr = (uint)Math.Ceiling((decimal)NUM_ROUNDS / 2);
 
-            // yuvarlama işlemleri 
-            for (int i = 0; i < ROUND_COUNT; i++)
+            keylist[0, 0] = KL;
+            keylist[0, 1] = KR;
+
+            for (uint i = 1; i <= to_down_nr; i++)
             {
-                // anahtardan türetilen alt anahtar 
-                UInt64 Ki = K ^ (UInt64)i;
-                // Feistel ağı uygula 
-                UInt64 Li = R;
-                UInt64 Ri = L ^ F(R, Ki);
-                L = Li;
-                R = Ri;
+                uint Ci = i;
 
-                Buffer.BlockCopy(BitConverter.GetBytes(L), 0, ciphertext, 0, 8);
-                Buffer.BlockCopy(BitConverter.GetBytes(R), 0, ciphertext, 8, 8);
+                uint AddM = (AddModulo(KR, Ci, 8));
+                uint SubBox = SubstitutionBox(AddM);
+                uint RotBit = RotateBits(SubBox);
+                uint RotWord = RotateWord(RotBit);
+                uint KRi = KL ^ RotWord;
+                uint KLi = KR;
+                KL = KLi;
+                KR = KRi;
+                keylist[i, 0] = KL;
+                keylist[i, 1] = KR;
 
-                AddStep("Encryption Round : (" + i.ToString() + ") ", toBinaryString(ciphertext));
             }
 
-            return ciphertext;
-        }
+            uint temp = KL;
+            KL = KR;
+            KR = temp;
 
-        // SEA algoritmasının deşifreleme fonksiyonu 
-        private byte[] Decrypt(byte[] ciphertext, byte[] key)
-        {
-            // girdilerin uzunluklarını kontrol et 
-            if (ciphertext.Length != BLOCK_SIZE / 8)
-                throw new ArgumentException("Ciphertext " + BLOCK_SIZE + " bit bit uzunluğunda olmalı");
-            if (key.Length != KEY_LENGTH / 8)
-                throw new ArgumentException("Key " + KEY_LENGTH  + " bit uzunluğunda olmalı");
-
-
-            // girdileri UInt64 olarak oku 
-            UInt64 L = BitConverter.ToUInt64(ciphertext, 0); // bloğun sol yarısı 
-            UInt64 R = BitConverter.ToUInt64(ciphertext, 8); // bloğun sağ yarısı 
-            UInt64 K = BitConverter.ToUInt64(key, 0); // anahtar 
-
-            // düz metni byte dizisi olarak döndür 
-            byte[] plaintext = new byte[BLOCK_SIZE / 8];
-
-            // yuvarlama işlemleri (ters sırada) 
-            for (int i = ROUND_COUNT - 1; i >= 0; i--)
+            for (uint i = to_up_nr; i < NUM_ROUNDS; i++)
             {
-                // anahtardan türetilen alt anahtar 
-                UInt64 Ki = K ^ (UInt64)i;
-                // Feistel ağı uygula (ters yönde) 
-                UInt64 Li = R ^ F(L, Ki);
-                UInt64 Ri = L;
-                L = Li;
-                R = Ri;
+                uint Ci = i;//(r - i);                 
+                uint AddM = (AddModulo(KR, Ci, 8));
+                uint SubBox = SubstitutionBox(AddM);
+                uint RotBit = RotateBits(SubBox);
+                uint RotWord = RotateWord(RotBit);
+                uint KRi = KL ^ RotWord;
+                uint KLi = KR;
+                KL = KLi;
+                KR = KRi;
 
-                Buffer.BlockCopy(BitConverter.GetBytes(L), 0, plaintext, 0, 8);
-                Buffer.BlockCopy(BitConverter.GetBytes(R), 0, plaintext, 8, 8);
+                keylist[i, 0] = KL;
+                keylist[i, 1] = KR;
 
-                AddStep("Decryption Round : (" + i.ToString() + ") ", toBinaryString(plaintext));
             }
 
-            
-            return plaintext;
+            return keylist;
         }
+
+
+        // SEA şi̇freleme turu
+        private void EncryptionRound(ref uint L, ref uint R, uint K)
+        {
+            uint temp = R;
+            R = Xor(RotateWord(L), RotateBits(SubstitutionBox(AddModulo(R, K, 8))));
+            L = temp;
+        }
+
+        // SEA şifre çözme turu
+        private void DecryptionRound(ref uint L, ref uint R, uint K)
+        {
+            uint temp = R;
+            R = RotateWordInv(Xor(L, RotateBits(SubstitutionBox(AddModulo(R, K, 8)))));
+            L = temp;
+
+        }
+
+        private string print_chipers(byte[] state, byte[] keyCells)
+        {
+            return "S = " + BitConverter.ToString(state.Cast<byte>().ToArray()) + (keyCells == null ? "" : " - TK = " + BitConverter.ToString(keyCells.Cast<byte>().ToArray()));
+        }
+
+
+        // SEA şifreleme işlevi 
+        private byte[] Encrypt(int partno, uint[] plaintext, uint[] key)
+        {
+            uint L = plaintext[LEFT];
+            uint R = plaintext[RIGHT];
+            uint KL;
+            uint KR;
+
+            uint[,] keylist = KeyList(key);
+
+            uint to_up_nr = (uint)Math.Ceiling((decimal)NUM_ROUNDS / 2);
+
+            Console.WriteLine();
+
+            AddStep("Encryption Part (" + partno.ToString("D2") + ") - Başlangıç  " + print_chipers(uinttoByte(plaintext), null), toBinaryString(uinttoByte(plaintext)));
+
+            int tur = 0;
+
+            for (uint i = 1; i <= to_up_nr; i++)
+            {
+                KR = keylist[i - 1, RIGHT];
+
+                EncryptionRound(ref L, ref R, KR);
+
+                plaintext[LEFT] = R;
+                plaintext[RIGHT] = L;
+                tur++;
+                AddStep("Encryption Part (" + partno.ToString("D2") + ") Round : (" + tur.ToString("D2") + ") " + print_chipers(uinttoByte(plaintext), null), toBinaryString(uinttoByte(plaintext)));
+            }
+
+            for (uint i = to_up_nr + 1; i <= NUM_ROUNDS; i++)
+            {
+                KL = keylist[i - 1, 0];
+
+                EncryptionRound(ref L, ref R, KL);
+
+                plaintext[LEFT] = R;
+                plaintext[RIGHT] = L;
+                tur++;
+                AddStep("Encryption Part (" + partno.ToString("D2") + ") Round : (" + tur.ToString("D2") + ") " + print_chipers(uinttoByte(plaintext), null), toBinaryString(uinttoByte(plaintext)));
+            }
+
+            plaintext[LEFT] = R;
+            plaintext[RIGHT] = L;
+
+            return uinttoByte(plaintext);
+        }
+
+        // SEA şifre çözme işlevi 
+        private byte[] Decrypt(int partno, uint[] ciphertext, uint[] key)
+        {
+            uint L = ciphertext[LEFT];
+            uint R = ciphertext[RIGHT];
+            uint KL;
+            uint KR;
+
+            uint[,] keylist = KeyList(key);
+
+            uint to_up_nr = (uint)Math.Ceiling((decimal)NUM_ROUNDS / 2);
+
+            Console.WriteLine();
+            AddStep("Decryption Part (" + partno.ToString("D2") + ") - Başlangıç  " + print_chipers(uinttoByte(ciphertext), null), toBinaryString(uinttoByte(ciphertext)));
+
+            int tur = 0;
+
+            for (uint i = NUM_ROUNDS; i >= to_up_nr + 1; i--)
+            {
+                KL = keylist[i - 1, LEFT];
+
+                DecryptionRound(ref L, ref R, KL);
+
+                ciphertext[LEFT] = R;
+                ciphertext[RIGHT] = L;
+                tur++;
+                AddStep("Decryption Part (" + partno.ToString("D2") + ") Round : (" + tur.ToString("D2") + ") " + print_chipers(uinttoByte(ciphertext), null), toBinaryString(uinttoByte(ciphertext)));
+            }
+
+
+            for (uint i = to_up_nr; i >= 1; i--)
+            {
+                KR = keylist[i - 1, RIGHT];
+
+                DecryptionRound(ref L, ref R, KR);
+
+                ciphertext[LEFT] = R;
+                ciphertext[RIGHT] = L;
+                tur++;
+                AddStep("Decryption Part (" + partno.ToString("D2") + ") Round : (" + tur.ToString("D2") + ") " + print_chipers(uinttoByte(ciphertext), null), toBinaryString(uinttoByte(ciphertext)));
+            }
+
+            ciphertext[LEFT] = R;
+            ciphertext[RIGHT] = L;
+
+            return uinttoByte(ciphertext);
+        }
+
+
 
     }
 }
+
+

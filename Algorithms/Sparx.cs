@@ -1,96 +1,63 @@
 ﻿using Algorithms.Common.Abstract;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Algorithms.Common.DataTransferObjects;
+using Algorithms.Common.Enums;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Algorithms
 {
     public class Sparx : EncryptionAlgorithm
     {
+        private const int KEYSIZE = 128;
         private const int N_STEPS = 8;
         private const int ROUNDS_PER_STEPS = 4;
         private const int N_BRANCHES = 4;
         private const int K_SIZE = 4;
         private const int WORDSIZE = 16; //byte
 
-        public Sparx(string text) : base(text)
+        public Sparx(InputDto input) : base(input)
         {
-            
         }
 
-        protected override void Initial(string text, string _key)
+        protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
         {
 
-            UInt16[] usKey;
-            //InitializeTestVectors(out x, out masterKey);
+            byte[] plainText = ByteValue;
 
-            //plainText = new UInt16[] { 0x0123, 0x4567, 0x89ab, 0xcdef, 0xfedc, 0xba98, 0x7654, 0x3210 };
-            //Key1 = new UInt16[] { 0x0011, 0x2233, 0x4455, 0x6677, 0x8899, 0xaabb, 0xccdd, 0xeeff };
-            //byte[] bplainText = new byte[16] { 0x23, 0x01, 0x67, 0x45, 0xab, 0x89, 0xef, 0xcd, 0xdc, 0xfe, 0x98, 0xba, 0x54, 0x76, 0x10, 0x32 };
-            //usplainText = byteToUInt16(bplainText, 0);
+            string keyHexString = inputKey;
+            // Anahtar uzunluğu 16 byte (128 bit) 
+            if (keyHexString.Length != (KEYSIZE / 8) * 2) // Her bir byte 2 hexadecimal karakterle temsil edilir
+            {
+                throw new ArgumentException("Geçersiz anahtar uzunluğu. Anahtar 128 bit (16 byte) olmalıdır.");
+            }
 
-            byte[] bkey = new byte[16] { 0x11, 0x00, 0x33, 0x22, 0x55, 0x44, 0x77, 0x66, 0x99, 0x88, 0xbb, 0xaa, 0xdd, 0xcc, 0xff, 0xee };
+            byte[] key = Enumerable.Range(0, keyHexString.Length / 2)
+                          .Select(x => Convert.ToByte(keyHexString.Substring(x * 2, 2), 16))
+                          .ToArray();
 
-            usKey = byteToUInt16(bkey, 0);
 
 
-            byte[] plainText;
-
-            if (text.Equals("-"))
-                plainText = new byte[WORDSIZE] { 0x23, 0x01, 0x67, 0x45, 0xab, 0x89, 0xef, 0xcd, 0xdc, 0xfe, 0x98, 0xba, 0x54, 0x76, 0x10, 0x32 };
-            else
-                plainText = Encoding.ASCII.GetBytes(text);
-
-            byte[] key = new byte[] { 0x11, 0x00, 0x33, 0x22, 0x55, 0x44, 0x77, 0x66, 0x99, 0x88, 0xbb, 0xaa, 0xdd, 0xcc, 0xff, 0xee };
-
+            UInt16[] usKey = byteToUInt16(key, 0);
 
             byte[] chiperText = new byte[plainText.Length % WORDSIZE == 0 ? plainText.Length : plainText.Length + (WORDSIZE - (plainText.Length % WORDSIZE))];
 
             plainText.CopyTo(chiperText, 0);
 
 
-
-
-            Console.Write("master = ");
-            for (int i = 0; i < 2 * K_SIZE; i++)
-            {
-                Console.Write($"{usKey[i]:X4} ");
-            }
-            Console.WriteLine();
-
             UInt16[][] k = new UInt16[N_BRANCHES * N_STEPS + 1][];
             for (int i = 0; i < N_BRANCHES * N_STEPS + 1; i++)
             {
                 k[i] = new UInt16[2 * ROUNDS_PER_STEPS];
             }
+
             KeySchedule(ref k, usKey);
-
-            for (int i = 0; i < N_BRANCHES * N_STEPS + 1; i++)
-            {
-                Console.Write($"\nk^{i,2} = ");
-                for (int j = 0; j < 2 * ROUNDS_PER_STEPS; j++)
-                {
-                    Console.Write($"{k[i][j]:X4} ");
-                }
-
-                //AddStep("TK : ", BitConverter.ToString(uInt16ToByte(k[i])));
-            }
-            
 
             for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
             {
                 byte[] tmp = new byte[WORDSIZE];
-
                 Array.Copy(chiperText, i * WORDSIZE, tmp, 0, WORDSIZE);
-
                 UInt16[] tmpplain = byteToUInt16(tmp, 0);
-
                 SparxEncrypt(i + 1, ref tmpplain, k);
-
                 tmp = uInt16ToByte(tmpplain);
-
                 Array.Copy(tmp, 0, chiperText, i * WORDSIZE, WORDSIZE);
             }
 
@@ -101,17 +68,11 @@ namespace Algorithms
             for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
             {
                 byte[] tmp = new byte[WORDSIZE];
-
                 Array.Copy(chiperText, i * WORDSIZE, tmp, 0, WORDSIZE);
-
                 UInt16[] tmpchiper = byteToUInt16(tmp, 0);
-
                 SparxDecrypt(i + 1, ref tmpchiper, k);
-
                 tmp = uInt16ToByte(tmpchiper);
-
                 Array.Copy(tmp, 0, chiperText, i * WORDSIZE, WORDSIZE);
-
             }
 
             clearlast0(ref chiperText);
@@ -124,7 +85,7 @@ namespace Algorithms
 
             AddStep("Çözülmüş metin : " + BitConverter.ToString(chiperText), toBinaryString(chiperText));
 
-
+            FinalStep(chiperText, outputTypes);
 
 
         }
@@ -307,7 +268,7 @@ namespace Algorithms
 
             AddStep("Encryption Part (" + partno.ToString("D2") + ") - Başlangıç : " + print_chipers(uInt16ToByte(x), null), toBinaryString(uInt16ToByte(x)));
 
-            
+
             for (int s = 0; s < N_STEPS; s++)
             {
                 for (int b = 0; b < N_BRANCHES; b++)
@@ -328,14 +289,14 @@ namespace Algorithms
                 x[2 * b] ^= k[N_BRANCHES * N_STEPS][2 * b];
                 x[2 * b + 1] ^= k[N_BRANCHES * N_STEPS][2 * b + 1];
 
-                AddStep("Encryption Part (" + partno.ToString("D2") + ") Round : (" + b.ToString("D2") + ") " + print_chipers(uInt16ToByte(x), null), toBinaryString(uInt16ToByte(x)));                
+                AddStep("Encryption Part (" + partno.ToString("D2") + ") Round : (" + b.ToString("D2") + ") " + print_chipers(uInt16ToByte(x), null), toBinaryString(uInt16ToByte(x)));
             }
         }
 
         private void SparxDecrypt(int partno, ref UInt16[] x, UInt16[][] k)
         {
             AddStep("Decryption Part (" + partno.ToString("D2") + ") - Başlangıç : " + print_chipers(uInt16ToByte(x), null), toBinaryString(uInt16ToByte(x)));
-           
+
 
             for (int b = 0; b < N_BRANCHES; b++)
             {
@@ -357,7 +318,7 @@ namespace Algorithms
                 }
 
                 AddStep("Decryption Part (" + partno.ToString("D2") + ") Steps : (" + s.ToString("D2") + ") " + print_chipers(uInt16ToByte(x), null), toBinaryString(uInt16ToByte(x)));
-                
+
             }
         }
 

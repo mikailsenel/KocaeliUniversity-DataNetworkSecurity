@@ -1,11 +1,7 @@
 ﻿using Algorithms.Common.Abstract;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Security.Cryptography;
+using Algorithms.Common.DataTransferObjects;
+using Algorithms.Common.Enums;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Algorithms
 {
@@ -128,7 +124,7 @@ namespace Algorithms
         // Alt anahtarı çıkarın ve dahili duruma uygulayın (birlikte XORlanmış iki üst satır olmalıdır), ardından tweakey durumunu güncelleyin (ters fonksiyon}
         private static void AddKey_inv(byte[,] state, byte[,] keyCells)
         {
-            int i, j, k;
+            int i, j;
             byte pos;
             byte[,] keyCells_tmp = new byte[4, 4];
 
@@ -444,21 +440,26 @@ namespace Algorithms
 
         }
 
-        public Skinny(string text) : base(text)
+
+        public Skinny(InputDto input) : base(input)
         {
         }
 
-        protected override void Initial(string text, string _key)
+        protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
         {
 
-            byte[] plainText;
-            if (text.Equals("-"))
-                plainText = new byte[WORDSIZE] { 0xf2, 0x0a, 0xdb, 0x0e, 0xb0, 0x8b, 0x64, 0x8a, 0x3b, 0x2e, 0xee, 0xd1, 0xf0, 0xad, 0xda, 0x14 };
-            else
-                plainText = Encoding.ASCII.GetBytes(text);
+            byte[] plainText = ByteValue;
 
+            string keyHexString = inputKey;
+            // Anahtar uzunluğu 16 byte (128 bit) 
+            if (keyHexString.Length != (KEYSIZE / 8) * 2) // Her bir byte 2 hexadecimal karakterle temsil edilir
+            {
+                throw new ArgumentException("Geçersiz anahtar uzunluğu. Anahtar 128 bit (16 byte) olmalıdır.");
+            }
 
-            byte[] key = { 0x4f, 0x55, 0xcf, 0xb0, 0x52, 0x0c, 0xac, 0x52, 0xfd, 0x92, 0xc1, 0x5f, 0x37, 0x07, 0x3e, 0x93 };
+            byte[] key = Enumerable.Range(0, keyHexString.Length / 2)
+                          .Select(x => Convert.ToByte(keyHexString.Substring(x * 2, 2), 16))
+                          .ToArray();
 
 
             byte[] chiperText = new byte[plainText.Length % WORDSIZE == 0 ? plainText.Length : plainText.Length + (WORDSIZE - (plainText.Length % WORDSIZE))];
@@ -468,11 +469,8 @@ namespace Algorithms
             for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
             {
                 byte[] tmp = new byte[WORDSIZE];
-
                 Array.Copy(chiperText, i * WORDSIZE, tmp, 0, WORDSIZE);
-
                 encrypt(i + 1, tmp, key);
-
                 Array.Copy(tmp, 0, chiperText, i * WORDSIZE, WORDSIZE);
             }
 
@@ -483,13 +481,9 @@ namespace Algorithms
             for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
             {
                 byte[] tmp = new byte[WORDSIZE];
-
                 Array.Copy(chiperText, i * WORDSIZE, tmp, 0, WORDSIZE);
-
                 decrypt(i + 1, tmp, key);
-
                 Array.Copy(tmp, 0, chiperText, i * WORDSIZE, WORDSIZE);
-
             }
 
             clearlast0(ref chiperText);
@@ -503,11 +497,7 @@ namespace Algorithms
 
             AddStep("Çözülmüş metin : " + BitConverter.ToString(chiperText), toBinaryString(chiperText));
 
-
-
-
-
-
+            FinalStep(chiperText, outputTypes);
         }
 
 
