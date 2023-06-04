@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Algorithms
 {
+/// <summary>
+/// /
+/// </summary>
     public class Sea : EncryptionAlgorithm
     {
         // SEA algoritmasının parametreleri 
