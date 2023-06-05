@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Algorithms.Common.Exceptions.BusinessException">
+    <Position X="22" Y="5.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Exceptions\BusinessException.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Common.Exceptions.BusinessProblemDetail" Collapsed="true">
+    <Position X="24.25" Y="7" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Exceptions\BusinessProblemDetail.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Common.Exceptions.ExceptionHandler" Collapsed="true">
+    <Position X="15" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>Common\Exceptions\ExceptionHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Common.Exceptions.HttpExceptionHandler" Collapsed="true">
+    <Position X="15" Y="3.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAACAAAAAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>Common\Exceptions\HttpExceptionHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Common.Exceptions.InternalServerErrorProblemDetails">
+    <Position X="24.5" Y="4.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Exceptions\InternalServerErrorProblemDetails.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Common.Exceptions.ProblemDetailsExtensions">
+    <Position X="22" Y="4.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Exceptions\ProblemDetailsExtensions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Common.Services.DataConverter" Collapsed="true">
+    <Position X="22.25" Y="7.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>EAAIAgAACAAAYAAAAAAAAAAAAAAAAAAAQAAAAAAACAA=</HashCode>
+      <FileName>Common\Services\DataConverter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Common.DataTransferObjects.StepDto">
+    <Position X="22.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAgAAAABAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\DataTransferObjects\StepDto.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Common.DataTransferObjects.InputDto">
+    <Position X="24" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAQAAAAAAAAEABAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\DataTransferObjects\InputDto.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Common.DataTransferObjects.ErrorResultDto">
+    <Position X="25.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAIAAAAAA=</HashCode>
+      <FileName>Common\DataTransferObjects\ErrorResultDto.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Common.Abstract.EncryptionAlgorithm" Collapsed="true">
+    <Position X="3" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Abstract\EncryptionAlgorithm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Common.Abstract.DecodingAlgorithm" Collapsed="true">
+    <Position X="5.75" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Abstract\DecodingAlgorithm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Common.Abstract.BaseCoding" Collapsed="true">
+    <Position X="4" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAABAAAAAAAAgAABAAIAAAQAAAAAAAIgAAABABAAAAA=</HashCode>
+      <FileName>Common\Abstract\BaseCoding.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Mysterion" Collapsed="true">
+    <Position X="0.5" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAEAAAAAAQAREACACAQAAAgAAAAAAAAAAAEAAAQ=</HashCode>
+      <FileName>Mysterion.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Noekeon" Collapsed="true">
+    <Position X="3" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QQACAAMAAGAAAAABAAAAAAQAAAgAAAAAAAAAAAMAIAA=</HashCode>
+      <FileName>Noekeon.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Piccolo" Collapsed="true">
+    <Position X="7.75" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQBAAAEAAAgAAACYAAAAAAQAAAgAAgEAAAAAAKMAIAA=</HashCode>
+      <FileName>Piccolo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Present" Collapsed="true">
+    <Position X="7.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CYAAABFAACAAAAQQAAAAAAQAAIAAAAAAIAAAAAAAAQA=</HashCode>
+      <FileName>Present.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Pride" Collapsed="true">
+    <Position X="0.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAEAAAAAAAAQAAAAAAQAAAAAAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>Pride.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Prince" Collapsed="true">
+    <Position X="2.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IwAAAAAQAQCKDAAQIAIACAQABAAEAAAAAAAIABDAAAA=</HashCode>
+      <FileName>Prince.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Rectangle" Collapsed="true">
+    <Position X="7.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AYwAAAAAgAACQAAQIEAEKBQAAABABIAgAFAAACAgEAA=</HashCode>
+      <FileName>Rectangle.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.RoadRunneR" Collapsed="true">
+    <Position X="7" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQACAAAACAICAAAQIAgAAARCgCQAIgAAAAAAAAAgAAA=</HashCode>
+      <FileName>RoadRunneR.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Robin" Collapsed="true">
+    <Position X="7.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAEFAAAAAACAAAQIAAAAAYAAAAAAAAAIAAAAACAAAE=</HashCode>
+      <FileName>Robin.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Sea" Collapsed="true">
+    <Position X="4.25" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAQAAAAIAQCAAAAQAAAAAAAEQAAAAA=</HashCode>
+      <FileName>Sea.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Simeck" Collapsed="true">
+    <Position X="0.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAQAAAAEAAAAAAAAEAAQCAIAAgAAggAAAAQAACEA=</HashCode>
+      <FileName>Simeck.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Simon" Collapsed="true">
+    <Position X="1" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAABAGAAAAQAAAAACQgAIAAAAABEgUAAQAAAEA=</HashCode>
+      <FileName>Simon.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Skinny" Collapsed="true">
+    <Position X="5.25" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAIAAIEAAAUICAACEAAAHCYIAIACAAAAAAAAAwFAAMA=</HashCode>
+      <FileName>Skinny.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Algorithms.Sparx" Collapsed="true">
+    <Position X="0.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAgAAMAAAAIAAAQAIQABIABAIAAgAAAIQQgAEQ=</HashCode>
+      <FileName>Sparx.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RC512" Collapsed="true">
+    <Position X="6" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQABAAAAAAgCAABYIAAAAQQAAAAAAAAAAAEAAAAAIAA=</HashCode>
+      <FileName>RC512.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="Algorithms.Common.Enums.DataTypes">
+    <Position X="20.25" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAQAAAAAAABAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Enums\DataTypes.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
