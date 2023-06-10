@@ -4,6 +4,7 @@ using Algorithms.Common.Exceptions;
 using Algorithms.Common.Services;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text;
 
 namespace Algorithms.Common.Abstract;
 
@@ -76,6 +77,9 @@ public abstract class BaseCoding
                 HexValue = data;
                 StringValue = DataConverter.Instance.ConvertHexToString(data);
                 ByteValue = DataConverter.Instance.ConvertHexToByte(StringValue);
+                //HexValue doğru çalışan kısım.
+                //ByteValue = DataConverter.Instance.ConvertHexToByte(HexValue);
+                //StringValue = Encoding.ASCII.GetString (ByteValue);
                 break;
             case DataTypes.Byte:
                 ByteValue = DataConverter.Instance.ConvertStringToByte(data);

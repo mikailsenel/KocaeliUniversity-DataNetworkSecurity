@@ -13,6 +13,7 @@ namespace Algorithms
         private const int N_BRANCHES = 4;
         private const int K_SIZE = 4;
         private const int WORDSIZE = 16; //byte
+        private bool CTRMODU = false;
 
         public Sparx(InputDto input) : base(input)
         {
@@ -66,23 +67,27 @@ namespace Algorithms
                 byte[] tmpplain = new byte[WORDSIZE];
                 Array.Copy(chiperText, i * WORDSIZE, tmpplain, 0, WORDSIZE);
 
-                #region Counter (CTR) modu
-                //4 byte int32 ye cevir ve ctrcounter ekle
-                ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
-                //degeri sonraki adım icin arttır
-                ctrcounter++;
-                //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
-                Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
-                //tmpsabit i sifrele
-                byte[] tmpenc = SparxEncrypt(i + 1, tmpnonce, k);
+                if (CTRMODU)
+                {
+                    #region Counter (CTR) modu
+                    //4 byte int32 ye cevir ve ctrcounter ekle
+                    ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
+                    //degeri sonraki adım icin arttır
+                    ctrcounter++;
+                    //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
+                    Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
+                    //tmpsabit i sifrele
+                    byte[] tmpenc = SparxEncrypt(i + 1, tmpnonce, k);
 
-                //çıkan şifreli sabiti plain text ile xor la
-                tmpplain = Xor(tmpplain, tmpenc);
-                #endregion
-
-                //normal ctr siz hali
-                //tmpplain = SparxEncrypt(i + 1, tmpplain, k);
-
+                    //çıkan şifreli sabiti plain text ile xor la
+                    tmpplain = Xor(tmpplain, tmpenc);
+                    #endregion
+                }
+                else
+                {
+                    //normal ctr siz hali
+                    tmpplain = SparxEncrypt(i + 1, tmpplain, k);
+                }
                 //blogu chiper text e yerlestir
                 Array.Copy(tmpplain, 0, chiperText, i * WORDSIZE, WORDSIZE);
             }
@@ -102,22 +107,27 @@ namespace Algorithms
                 byte[] tmpcipher = new byte[WORDSIZE];
                 Array.Copy(chiperText, i * WORDSIZE, tmpcipher, 0, WORDSIZE);
 
-                #region Counter (CTR) modu
-                //4 byte int32 ye cevir ve ctrcounter ekle
-                ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
-                //degeri sonraki adım icin arttır
-                ctrcounter++;
-                //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
-                Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
-                //tmpsabit i sifrele
-                byte[] tmpenc = SparxEncrypt(i + 1, tmpnonce, k);
+                if (CTRMODU)
+                {
+                    #region Counter (CTR) modu
+                    //4 byte int32 ye cevir ve ctrcounter ekle
+                    ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
+                    //degeri sonraki adım icin arttır
+                    ctrcounter++;
+                    //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
+                    Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
+                    //tmpsabit i sifrele
+                    byte[] tmpenc = SparxEncrypt(i + 1, tmpnonce, k);
 
-                //çıkan şifreli sabiti plain text ile xor la
-                tmpcipher = Xor(tmpcipher, tmpenc);
-                #endregion
-
-                //normal ctr siz hali
-                //tmpchiper = SparxDecrypt(i + 1, tmpcipher, k);                
+                    //çıkan şifreli sabiti plain text ile xor la
+                    tmpcipher = Xor(tmpcipher, tmpenc);
+                    #endregion
+                }
+                else
+                {
+                    //normal ctr siz hali
+                    tmpcipher = SparxDecrypt(i + 1, tmpcipher, k);
+                }
                 Array.Copy(tmpcipher, 0, chiperText, i * WORDSIZE, WORDSIZE);
 
             }
@@ -329,6 +339,7 @@ namespace Algorithms
                 {
                     subkeys[c][i] = masterKey[i];
                 }
+                Console.WriteLine(c.ToString("D2") + " = " + subkeys[c]);
                 K_perm_128_128(ref masterKey, (UInt16)(c + 1));
             }
         }

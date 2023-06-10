@@ -11,6 +11,7 @@ namespace Algorithms
         const int KEY_SIZE = 128; // key boyutu (bit)
         const int WORDSIZE = 8; //byte
         const int NUM_ROUNDS = 44;
+        bool CTRMODU = false;
 
         public Simeck(InputDto input) : base(input)
         {
@@ -51,24 +52,27 @@ namespace Algorithms
             {
                 byte[] tmpplain = new byte[WORDSIZE];
                 Array.Copy(chiperText, i * WORDSIZE, tmpplain, 0, WORDSIZE);
+                if (CTRMODU)
+                {
+                    #region Counter (CTR) modu
+                    //4 byte int32 ye cevir ve ctrcounter ekle
+                    ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
+                    //degeri sonraki adım icin arttır
+                    ctrcounter++;
+                    //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
+                    Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
+                    //tmpsabit i sifrele
+                    byte[] tmpenc = Encrypt(i + 1, tmpnonce, key);
 
-                #region Counter (CTR) modu
-                //4 byte int32 ye cevir ve ctrcounter ekle
-                ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
-                //degeri sonraki adım icin arttır
-                ctrcounter++;
-                //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
-                Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
-                //tmpsabit i sifrele
-                byte[] tmpenc = Encrypt(i + 1, tmpnonce, key);
-
-                //çıkan şifreli sabiti plain text ile xor la
-                tmpplain = Xor(tmpplain, tmpenc);
-                #endregion
-
-                //normal ctr siz hali
-                //tmpplain = Encrypt(i + 1, tmpplain, key);
-
+                    //çıkan şifreli sabiti plain text ile xor la
+                    tmpplain = Xor(tmpplain, tmpenc);
+                    #endregion
+                }
+                else
+                {
+                    //normal ctr siz hali
+                    tmpplain = Encrypt(i + 1, tmpplain, key);
+                }
                 //blogu chiper text (plain) e yerlestir
                 Array.Copy(tmpplain, 0, chiperText, i * WORDSIZE, WORDSIZE);
             }
@@ -86,29 +90,33 @@ namespace Algorithms
             {
                 byte[] tmpcipher = new byte[WORDSIZE];
                 Array.Copy(chiperText, i * WORDSIZE, tmpcipher, 0, WORDSIZE);
+                if (CTRMODU)
+                {
+                    #region Counter (CTR) modu
+                    //4 byte int32 ye cevir ve ctrcounter ekle
+                    ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
+                    //degeri sonraki adım icin arttır
+                    ctrcounter++;
+                    //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
+                    Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
+                    //tmpsabit i sifrele
+                    byte[] tmpenc = Encrypt(i + 1, tmpnonce, key);
 
-                #region Counter (CTR) modu
-                //4 byte int32 ye cevir ve ctrcounter ekle
-                ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
-                //degeri sonraki adım icin arttır
-                ctrcounter++;
-                //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
-                Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
-                //tmpsabit i sifrele
-                byte[] tmpenc = Encrypt(i + 1, tmpnonce, key);
-
-                //çıkan şifreli sabiti plain text ile xor la
-                tmpcipher = Xor(tmpcipher, tmpenc);
-                #endregion
-
-                //normal ctr siz hali
-                //tmpchiper = Decrypt(i + 1, tmpcipher, key);
-
+                    //çıkan şifreli sabiti plain text ile xor la
+                    tmpcipher = Xor(tmpcipher, tmpenc);
+                    #endregion
+                }
+                else
+                {
+                    //normal ctr siz hali
+                    tmpcipher = Decrypt(i + 1, tmpcipher, key);
+                }
                 //blogu chiper text (plain) e yerlestir
                 Array.Copy(tmpcipher, 0, chiperText, i * WORDSIZE, WORDSIZE);
             }
 
             clearlast0(ref chiperText);
+
 
 
             AddStep("Düz metin      : " + toOut(plainText, outputTypes), toBinaryString(plainText));

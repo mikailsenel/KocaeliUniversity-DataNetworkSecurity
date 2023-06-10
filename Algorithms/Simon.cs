@@ -11,6 +11,7 @@ namespace Algorithms
         private const int BLOCKSIZE = 128; //bit
         private const int KEYSIZE = 128; //bit
         private const int WORDSIZE = 16; //byte
+        private bool CTRMODU = false;
 
         private static readonly ulong[] z = { 0b11111010001001010110000111001101111101000100101011000011100110,
                           0b10001110111110010011000010110101000111011111001001100001011010,
@@ -69,23 +70,28 @@ namespace Algorithms
                 byte[] tmpplain = new byte[WORDSIZE];
                 Array.Copy(chiperText, i * WORDSIZE, tmpplain, 0, WORDSIZE);
 
-                #region Counter (CTR) modu
-                //4 byte int32 ye cevir ve ctrcounter ekle
-                ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
-                //degeri sonraki adım icin arttır
-                ctrcounter++;
-                //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
-                Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
-                //tmpsabit i sifrele
-                byte[] tmpenc = Encrypt(i + 1, tmpnonce, key);
+                if (CTRMODU)
+                {
+                    #region Counter (CTR) modu
+                    //4 byte int32 ye cevir ve ctrcounter ekle
+                    ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
+                    //degeri sonraki adım icin arttır
+                    ctrcounter++;
+                    //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
+                    Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
+                    //tmpsabit i sifrele
+                    byte[] tmpenc = Encrypt(i + 1, tmpnonce, key);
 
-                //çıkan şifreli sabiti plain text ile xor la
-                tmpplain = Xor(tmpplain, tmpenc);
-                #endregion
+                    //çıkan şifreli sabiti plain text ile xor la
+                    tmpplain = Xor(tmpplain, tmpenc);
+                    #endregion
+                }
+                else
+                {
 
-                //normal ctr siz hali
-                //tmpplain = Encrypt(i + 1, tmpplain, key);
-
+                    //normal ctr siz hali
+                    tmpplain = Encrypt(i + 1, tmpplain, key);
+                }
                 //blogu chiper text e yerlestir
                 Array.Copy(tmpplain, 0, chiperText, i * WORDSIZE, WORDSIZE);
             }
@@ -104,23 +110,27 @@ namespace Algorithms
                 byte[] tmpcipher = new byte[WORDSIZE];
                 Array.Copy(chiperText, i * WORDSIZE, tmpcipher, 0, WORDSIZE);
 
-                #region Counter (CTR) modu
-                //4 byte int32 ye cevir ve ctrcounter ekle
-                ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
-                //degeri sonraki adım icin arttır
-                ctrcounter++;
-                //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
-                Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
-                //tmpsabit i sifrele
-                byte[] tmpenc = Encrypt(i + 1, tmpnonce, key);
+                if (CTRMODU)
+                {
+                    #region Counter (CTR) modu
+                    //4 byte int32 ye cevir ve ctrcounter ekle
+                    ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
+                    //degeri sonraki adım icin arttır
+                    ctrcounter++;
+                    //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
+                    Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
+                    //tmpsabit i sifrele
+                    byte[] tmpenc = Encrypt(i + 1, tmpnonce, key);
 
-                //çıkan şifreli sabiti plain text ile xor la
-                tmpcipher = Xor(tmpcipher, tmpenc);
-                #endregion
-
-                //normal ctr siz hali
-                //tmpcipher = Decrypt(i + 1, tmpcipher, key);
-
+                    //çıkan şifreli sabiti plain text ile xor la
+                    tmpcipher = Xor(tmpcipher, tmpenc);
+                    #endregion
+                }
+                else
+                {
+                    //normal ctr siz hali
+                    tmpcipher = Decrypt(i + 1, tmpcipher, key);
+                }
                 //blogu chiper text (plain) e yerlestir
                 Array.Copy(tmpcipher, 0, chiperText, i * WORDSIZE, WORDSIZE);
 
@@ -231,6 +241,16 @@ namespace Algorithms
 
                 for (int it = 0; it < t; it++)
                 {
+                    ulong tmp = (rotl(msgU[1], 1) & rotl(msgU[1], 8)) ^ msgU[0] ^ rotl(msgU[1], 2);
+                    msgU[0] = msgU[1];
+                    msgU[1] = tmp ^ keys[it];
+                    AddStep("Encryption Part (" + partno.ToString("D2") + ") Round : (" + it.ToString("D2") + ") " + print_chipers(ulongToByte(msgU), null), toBinaryString(ulongToByte(msgU)));
+                }
+
+
+                /*
+                for (int it = 0; it < t; it++)
+                {
                     ulong tmp = msgU[1];
 
                     msgU[1] = msgU[0] ^ (rotl(msgU[1], 1) & rotl(msgU[1], 8)) ^ rotl(msgU[1], 2) ^ keys[it];
@@ -238,6 +258,23 @@ namespace Algorithms
 
                     AddStep("Encryption Part (" + partno.ToString("D2") + ") Round : (" + it.ToString("D2") + ") " + print_chipers(ulongToByte(msgU), null), toBinaryString(ulongToByte(msgU)));
                 }
+                */
+
+                /*
+                int x = 1;
+                int y = 0;
+
+                for (int it = 0; it < t; it+=2)
+                {
+                    ulong tmp = msgU[1];
+
+                    msgU[y] = (msgU[y] ^ ((rotl(msgU[x], 1) & rotl(msgU[x], 8)) ^ rotl(msgU[x], 2))) ^ keys[it];
+                    msgU[x] = (msgU[x] ^ ((rotl(msgU[y], 1) & rotl(msgU[y], 8)) ^ rotl(msgU[y], 2))) ^ keys[it+1];
+                    
+
+                    AddStep("Encryption Part (" + partno.ToString("D2") + ") Round : (" + it.ToString("D2") + ") " + print_chipers(ulongToByte(msgU), null), toBinaryString(ulongToByte(msgU)));
+                }
+                */
 
                 encrypt[i] = msgU[0];
                 encrypt[i + 1] = msgU[1];
@@ -314,6 +351,14 @@ namespace Algorithms
         {
             return ((block << cant) + (block >> (64 - cant)));
         }
+
+        //Bit kaydırma döndürme
+        private ulong rotr(ulong block, int cant)
+        {
+            return ((block >> cant) + (block << (64 - cant)));
+        }
+
+
 
         //n Anahtarlarını al
         private ulong getNBits(ulong block)

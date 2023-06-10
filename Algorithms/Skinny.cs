@@ -13,6 +13,7 @@ namespace Algorithms
         private const int KEYSIZE = 128;
         private const int ROUND = 40;
         private const int WORDSIZE = 16;
+        private bool CTRMODU = false;
 
         // 8-bit Sbox
         private static readonly byte[] sbox_8 = {
@@ -70,6 +71,122 @@ namespace Algorithms
             0x26, 0x0C, 0x19, 0x32, 0x25, 0x0A, 0x15, 0x2A, 0x14, 0x28,
             0x10, 0x20
         };
+
+        public Skinny(InputDto input) : base(input)
+        {
+        }
+
+        protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
+        {
+
+            byte[] plainText = ByteValue;
+
+            string keyHexString = inputKey;
+            // Anahtar uzunluğu 16 byte (128 bit) 
+            if (keyHexString.Length != (KEYSIZE / 8) * 2) // Her bir byte 2 hexadecimal karakterle temsil edilir
+            {
+                throw new ArgumentException("Geçersiz anahtar uzunluğu. Anahtar 128 bit (16 byte) olmalıdır.");
+            }
+
+            byte[] key = Enumerable.Range(0, keyHexString.Length / 2)
+                          .Select(x => Convert.ToByte(keyHexString.Substring(x * 2, 2), 16))
+                          .ToArray();
+
+
+            byte[] chiperText = new byte[plainText.Length % WORDSIZE == 0 ? plainText.Length : plainText.Length + (WORDSIZE - (plainText.Length % WORDSIZE))];
+
+            plainText.CopyTo(chiperText, 0);
+
+            #region Counter (CTR) modu
+            //ctrsabit
+            byte[] nonce = GetByteArray(WORDSIZE);
+            uint ctrcounter = 0, ncounter;
+            //tmpsabit
+            byte[] tmpnonce = new byte[WORDSIZE];
+            //tmpsabit e ctrsabit kopyala
+            nonce.CopyTo(tmpnonce, 0);
+            #endregion
+
+            for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
+            {
+                byte[] tmpplain = new byte[WORDSIZE];
+                Array.Copy(chiperText, i * WORDSIZE, tmpplain, 0, WORDSIZE);
+
+                if (CTRMODU)
+                {
+                    #region Counter (CTR) modu
+                    //4 byte int32 ye cevir ve ctrcounter ekle
+                    ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
+                    //degeri sonraki adım icin arttır
+                    ctrcounter++;
+                    //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
+                    Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
+                    //tmpsabit i sifrele                
+                    byte[] tmpenc = Encrypt(i + 1, tmpnonce, key);
+                    //çıkan şifreli sabiti plain text ile xor la
+                    tmpplain = Xor(tmpplain, tmpenc);
+                    #endregion
+                }
+                else
+                {
+                    //normal ctr siz hali
+                    tmpplain = Encrypt(i + 1, tmpplain, key);
+                }
+                //blogu chiper text e yerlestir
+                Array.Copy(tmpplain, 0, chiperText, i * WORDSIZE, WORDSIZE);
+            }
+
+            byte[] encrytpText = new byte[chiperText.Length];
+
+            chiperText.CopyTo(encrytpText, 0);
+
+            #region Counter (CTR) modu
+            ctrcounter = 0;
+            Array.Copy(nonce, 0, tmpnonce, 0, WORDSIZE);
+            #endregion
+
+            for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
+            {
+                byte[] tmpcipher = new byte[WORDSIZE];
+                Array.Copy(chiperText, i * WORDSIZE, tmpcipher, 0, WORDSIZE);
+
+                if (CTRMODU)
+                {
+                    #region Counter (CTR) modu
+                    //4 byte int32 ye cevir ve ctrcounter ekle
+                    ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
+                    //degeri sonraki adım icin arttır
+                    ctrcounter++;
+                    //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
+                    Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
+                    //tmpsabit i sifrele                
+                    byte[] tmpenc = Encrypt(i + 1, tmpnonce, key);
+                    //çıkan şifreli sabiti plain text ile xor la
+                    tmpcipher = Xor(tmpcipher, tmpenc);
+                    #endregion
+                }
+                else
+                {
+                    //normal ctr siz hali
+                    tmpcipher = Decrypt(i + 1, tmpcipher, key);
+                }
+                //blogu chiper text (plain) e yerlestir
+                Array.Copy(tmpcipher, 0, chiperText, i * WORDSIZE, WORDSIZE);
+            }
+
+            clearlast0(ref chiperText);
+
+
+            AddStep("Düz metin      : " + toOut(plainText, outputTypes), toBinaryString(plainText));
+
+            AddStep("Anahtar        : " + BitConverter.ToString(key), toBinaryString(key));
+
+            AddStep("Şifreli metin  : " + BitConverter.ToString(encrytpText), toBinaryString(encrytpText));
+
+            AddStep("Çözülmüş metin : " + toOut(chiperText, outputTypes), toBinaryString(chiperText));
+
+
+        }
 
 
         private static string print_chipers(byte[,] state, byte[,] keyCells)
@@ -491,113 +608,6 @@ namespace Algorithms
         }
 
 
-        public Skinny(InputDto input) : base(input)
-        {
-        }
-
-        protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
-        {
-
-            byte[] plainText = ByteValue;
-
-            string keyHexString = inputKey;
-            // Anahtar uzunluğu 16 byte (128 bit) 
-            if (keyHexString.Length != (KEYSIZE / 8) * 2) // Her bir byte 2 hexadecimal karakterle temsil edilir
-            {
-                throw new ArgumentException("Geçersiz anahtar uzunluğu. Anahtar 128 bit (16 byte) olmalıdır.");
-            }
-
-            byte[] key = Enumerable.Range(0, keyHexString.Length / 2)
-                          .Select(x => Convert.ToByte(keyHexString.Substring(x * 2, 2), 16))
-                          .ToArray();
-
-
-            byte[] chiperText = new byte[plainText.Length % WORDSIZE == 0 ? plainText.Length : plainText.Length + (WORDSIZE - (plainText.Length % WORDSIZE))];
-
-            plainText.CopyTo(chiperText, 0);
-
-            #region Counter (CTR) modu
-            //ctrsabit
-            byte[] nonce = GetByteArray(WORDSIZE);
-            uint ctrcounter = 0, ncounter;
-            //tmpsabit
-            byte[] tmpnonce = new byte[WORDSIZE];
-            //tmpsabit e ctrsabit kopyala
-            nonce.CopyTo(tmpnonce, 0);
-            #endregion
-
-            for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
-            {
-                byte[] tmpplain = new byte[WORDSIZE];
-                Array.Copy(chiperText, i * WORDSIZE, tmpplain, 0, WORDSIZE);
-
-                #region Counter (CTR) modu
-                //4 byte int32 ye cevir ve ctrcounter ekle
-                ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
-                //degeri sonraki adım icin arttır
-                ctrcounter++;
-                //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
-                Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
-                //tmpsabit i sifrele                
-                byte[] tmpenc = Encrypt(i + 1, tmpnonce, key);
-                //çıkan şifreli sabiti plain text ile xor la
-                tmpplain = Xor(tmpplain, tmpenc);
-                #endregion
-
-                //normal ctr siz hali
-                //tmpplain=encrypt(i + 1, tmpplain, key);
-
-                //blogu chiper text e yerlestir
-                Array.Copy(tmpplain, 0, chiperText, i * WORDSIZE, WORDSIZE);
-            }
-
-            byte[] encrytpText = new byte[chiperText.Length];
-
-            chiperText.CopyTo(encrytpText, 0);
-
-            #region Counter (CTR) modu
-            ctrcounter = 0;
-            Array.Copy(nonce, 0, tmpnonce, 0, WORDSIZE);
-            #endregion
-
-            for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
-            {
-                byte[] tmpcipher = new byte[WORDSIZE];
-                Array.Copy(chiperText, i * WORDSIZE, tmpcipher, 0, WORDSIZE);
-
-                #region Counter (CTR) modu
-                //4 byte int32 ye cevir ve ctrcounter ekle
-                ncounter = BitConverter.ToUInt32(nonce, 0) + ctrcounter;
-                //degeri sonraki adım icin arttır
-                ctrcounter++;
-                //yeni int32 (4 byte degeri tmpsabit e btye olarak ata
-                Array.Copy(uinttoByte(ncounter), 0, tmpnonce, 0, 4);
-                //tmpsabit i sifrele                
-                byte[] tmpenc = Encrypt(i + 1, tmpnonce, key);
-                //çıkan şifreli sabiti plain text ile xor la
-                tmpcipher = Xor(tmpcipher, tmpenc);
-                #endregion
-
-                //normal ctr siz hali
-                //tmpcipher=Decrypt(i + 1, tmpcipher, key);
-
-                //blogu chiper text (plain) e yerlestir
-                Array.Copy(tmpcipher, 0, chiperText, i * WORDSIZE, WORDSIZE);
-            }
-
-            clearlast0(ref chiperText);
-
-
-            AddStep("Düz metin      : " + toOut(plainText, outputTypes), toBinaryString(plainText));
-
-            AddStep("Anahtar        : " + BitConverter.ToString(key), toBinaryString(key));
-
-            AddStep("Şifreli metin  : " + BitConverter.ToString(encrytpText), toBinaryString(encrytpText));
-
-            AddStep("Çözülmüş metin : " + toOut(chiperText, outputTypes), toBinaryString(chiperText));
-
-
-        }
 
 
 

@@ -18,14 +18,15 @@ namespace Algorithms
         private const int BYTEBIT = 8; // Bit cinsinden 1 bayt uzunluğu
         private const int NUM_ROUNDS = (3 * TEXT_KEY_LENGHT / 4) + 2 * ((TEXT_KEY_LENGHT / (2 * BYTEBIT)) + (BYTEBIT / 2)) + 1; // Tur sayısı
         private const int HALF_TK_LENGHT = TEXT_KEY_LENGHT / 2; // Blok bit sayısı
+        private bool CTRMODU = false;
 
         public Sea(InputDto input) : base(input)
         {
         }
-        
+
         protected override void Initial(string inputKey, DataTypes inputTypes, DataTypes outputTypes)
         {
-            bool CTRMODU = false;
+
             byte[] plainText = ByteValue;
 
             string keyHexString = inputKey;
@@ -44,21 +45,21 @@ namespace Algorithms
 
             plainText.CopyTo(chiperText, 0);
 
+            #region Counter (CTR) modu
+            //ctrsabit
+            byte[] nonce = GetByteArray(WORDSIZE);
+            uint ctrcounter = 0, ncounter;
+            //tmpsabit
+            byte[] tmpnonce = new byte[WORDSIZE];
+            //tmpsabit e ctrsabit kopyala
+            nonce.CopyTo(tmpnonce, 0);
+            #endregion
 
-                #region Counter (CTR) modu
-                //ctrsabit
-                byte[] nonce = GetByteArray(WORDSIZE);
-                uint ctrcounter = 0, ncounter;
-                //tmpsabit
-                byte[] tmpnonce = new byte[WORDSIZE];
-                //tmpsabit e ctrsabit kopyala
-                nonce.CopyTo(tmpnonce, 0);
-                #endregion
-            
             for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
             {
                 byte[] tmpplain = new byte[WORDSIZE];
                 Array.Copy(chiperText, i * WORDSIZE, tmpplain, 0, WORDSIZE);
+
                 if (CTRMODU)
                 {
                     #region Counter (CTR) modu
@@ -75,9 +76,11 @@ namespace Algorithms
                     tmpplain = Xor(tmpplain, tmpenc);
                     #endregion
                 }
-                //normal ctr siz hali
-                else 
+                else
+                {
+                    //normal ctr siz hali
                     tmpplain = Encrypt(i + 1, byteToUints(tmpplain, 0), byteToUints(key, 0));
+                }
 
                 //blogu chiper text e yerlestir
                 Array.Copy(tmpplain, 0, chiperText, i * WORDSIZE, WORDSIZE);
@@ -86,10 +89,12 @@ namespace Algorithms
             byte[] encrytpText = new byte[chiperText.Length];
 
             chiperText.CopyTo(encrytpText, 0);
+
             #region Counter (CTR) modu
             ctrcounter = 0;
             Array.Copy(nonce, 0, tmpnonce, 0, WORDSIZE);
             #endregion
+
             for (int i = 0; i < (chiperText.Length / WORDSIZE); i++)
             {
                 byte[] tmpchiper = new byte[WORDSIZE];
@@ -111,8 +116,10 @@ namespace Algorithms
                     #endregion
                 }
                 else
-                //normal ctr siz hali
-                tmpchiper = Decrypt(i + 1, byteToUints(tmpchiper, 0), byteToUints(key, 0));
+                {
+                    //normal ctr siz hali
+                    tmpchiper = Decrypt(i + 1, byteToUints(tmpchiper, 0), byteToUints(key, 0));
+                }
 
                 //blogu chiper text (plain) e yerlestir
                 Array.Copy(tmpchiper, 0, chiperText, i * WORDSIZE, WORDSIZE);
