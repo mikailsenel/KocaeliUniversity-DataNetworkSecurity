@@ -67,9 +67,18 @@ public class AlgorithmController : Controller
     {
         return Ok(new Speck(input).GetSteps());
     }
-    
+
+    [HttpGet("/Twine/ 128 bit (16) byte key girilmelidir.", Name = nameof(GetTwine))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
+    public async Task<IActionResult> GetTwine([FromQuery] InputDto input)
+    {
+        return Ok(new Twine(input).GetSteps());
+    }
+
+
+
     //// ----------------------------------------------------------------
-    
+
     [HttpGet("/sea/ 48 bit (6) byte key girilmelidir.", Name = nameof(GetSea))]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(StepDto[]))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BusinessProblemDetail))]
